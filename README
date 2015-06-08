@@ -1,0 +1,14 @@
+                         David's Version Control
+
+This project aims to be a Distributed Version Control System similar to GIT
+but with a SANE command line interface (CLI).
+
+Initial sub-commands:
+
+- init     - Initialize working copy.
+- checkout - Checkout branch / tag.
+- commit   - Commit changes from working copy.
+- fetch    - Fetch from server.
+- pull     - Pull from server.
+- push     - Push to server.
+- status   - Print status.
