@@ -18,18 +18,25 @@ int main( int argc_, char **argv_ )
 
   DVC dvc;
   std::string command = argv_[1];
+  std::string err;
 
   if ( command == "init" )
   {
-    dvc.Init( );
+    err = dvc.Init( );
   }
   else if ( command == "status" )
   {
-    dvc.Status( );
+    err = dvc.Status( );
   }
   else
   {
     std::cerr << "Command '" << command << "' not yet implemented." << std::endl;
+    return 1;
+  }
+
+  if ( !err.empty( ) )
+  {
+    std::cerr << err << std::endl;
     return 1;
   }
 

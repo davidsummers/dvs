@@ -1,6 +1,12 @@
+#ifndef _DVC_H_
+#define _DVC_H_
 //
 // DVC declaration
 //
+
+#include <string>
+
+#define DVC_DIR ".dvc"
 
 class DVC
 {
@@ -10,15 +16,19 @@ class DVC
     ~DVC( );
 
     // Sub-commands.
-    void Init( );
-    void Checkout( );
-    void Commit( );
-    void Fetch( );
-    void Pull( );
-    void Push( );
-    void Status( );
+    std::string Init( );
+    std::string Checkout( );
+    std::string Commit( );
+    std::string Fetch( );
+    std::string Pull( );
+    std::string Push( );
+    std::string Status( );
 
   protected:
 
   private:
+
+    std::string Validate( );
 };
+
+#endif // _DVC_H_
