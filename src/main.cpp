@@ -1,5 +1,5 @@
 //
-// DVC main program driver.
+// DVS main program driver.
 //
 
 #include <iostream>
@@ -45,7 +45,7 @@ int main( int argc_, char **argv_ )
 
 void usage( )
 {
-  std::cerr << "Usage: dvc sub-command" << std::endl;
+  std::cerr << "Usage: dvs sub-command" << std::endl;
   std::cerr << "  where sub-command is one of:" << std::endl;
   std::cerr << "    init"     << std::endl;
   std::cerr << "    checkout" << std::endl;

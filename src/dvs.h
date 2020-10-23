@@ -6,7 +6,7 @@
 
 #include <string>
 
-constexpr const char *DVC_DIR = ".dvc";
+constexpr const char *DVS_DIR = ".dvs";
 
 class DVC
 {
