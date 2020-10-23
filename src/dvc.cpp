@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -25,19 +26,22 @@ std::string DVC::Init( )
   }
 
   std::string validate_error;
-  validate_error = Validate( ):
+  validate_error = Validate( );
 
-  if ( !validate_error.empty( ) ))
+  if ( !validate_error.empty( ) )
   {
-    return "Can't validate " + DVC_DIR + "directory: " + validate_error;
+    std::stringstream ss;
+    ss << "Can't validate " << DVC_DIR << " directory: " + validate_error;
+    return ss.str( );
   }
 
   // Create directory and file structure.
-  std::string tmp;
-  tmp = DVC_DIR;
-  mkdir( tmp.c_str( ), 0777 );
-  tmp = DVC_DIR + "/objects";
-  mkdir( tmp.c_str( ), 0777 );
+  std::stringstream tmp;
+  tmp << DVC_DIR;
+  mkdir( tmp.str( ).c_str( ), 0777 );
+  tmp.clear( );
+  tmp << DVC_DIR << "/objects";
+  mkdir( tmp.str( ).c_str( ), 0777 );
 
   return ""; // No error.
 }
