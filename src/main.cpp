@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "dvc.h"
+#include "dvs.h"
 
 void usage( );
 

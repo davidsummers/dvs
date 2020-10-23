@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "dvc.h"
+#include "dvs.h"
 
 DVC::DVC( )
 {

@@ -1,11 +1,11 @@
 
 set( SOURCE_FILES
-     dvc.cpp
+     dvs.cpp
      main.cpp
    )
 
 set( HEADER_FILES
-     dvc.h
+     dvs.h
    )
 
 add_executable( dvs
