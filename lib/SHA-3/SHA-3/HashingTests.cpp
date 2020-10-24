@@ -1,7 +1,9 @@
 // Hashing Tests.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 // #define BOOST_TEST_MODULE MyTest
-#include <boost/test/unit_test.hpp> 
+#ifdef FIXME
+#include <boost/test/unit_test.hpp>
+#endif
 #include "stdafx.h"
 #include "Keccak.h" // project being tested
 #include "Hex.h"
@@ -11,7 +13,7 @@
 
 std::string hex_encode(std::string inpt, KeccakBase &k) {
 	uint8_t* byte_array = reinterpret_cast<uint8_t*>(&inpt[0]);
-	k.addData(byte_array, 0, inpt.length());
+	k.addData( byte_array, 0, static_cast< unsigned int >( inpt.length( ) ) );
 	std::vector<unsigned char> op = k.digest();
 	std::ostringstream b;
 	for (auto& oi : op)
@@ -21,6 +23,7 @@ std::string hex_encode(std::string inpt, KeccakBase &k) {
 	return b.str();
 }
 
+#ifdef FIXME
 BOOST_AUTO_TEST_CASE(my_boost_test)
 {
 	// test cases from https://emn178.github.io/online-tools/sha3_256.html
@@ -34,7 +37,7 @@ BOOST_AUTO_TEST_CASE(my_boost_test)
 	expected_value = "bde3f269175e1dcda13848278aa6046bd643cea85b84c8b8bb80952e70b6eae0";
 	BOOST_CHECK_EQUAL(hex_encode(raw_data, h), expected_value);
 }
-
+#endif
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu

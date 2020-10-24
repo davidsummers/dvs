@@ -30,9 +30,9 @@ int readFileIntoFunc(const char *fileName, F f)
 	ArrayWrapper<char> buf(bufferSize);
 	while (true)
 	{
-		unsigned int bytesRead = fread((void *)buf.data, 1, bufferSize, fHand);
+		size_t bytesRead = fread((void *)buf.data, 1, bufferSize, fHand);
 
-		f((uint8_t*)buf.data, bytesRead);
+		f((uint8_t*)buf.data, static_cast< unsigned int >( bytesRead ) );
 		if (bytesRead < bufferSize)
 		{
 			break;
@@ -294,6 +294,8 @@ int parseOutputOption(const char *param, const unsigned int pSize, options &opt)
 			return 0;
 		}
 	}
+
+  return 0;
 }
 
 int parseOption(const char *param, const unsigned int pSize, options &opt)
@@ -346,13 +348,13 @@ int parseOption(const char *param, const unsigned int pSize, options &opt)
 
 void parseParameter(const char *param, options &opt)
 {
-	unsigned int index = 0;
-	unsigned int paramSize = 0;
+	size_t index = 0;
+	size_t paramSize = 0;
 
 	paramSize = strlen(param);
 
 	// Eat leading whitespace
-	for(unsigned int i = index ; i != paramSize ; i++)
+	for( size_t i = index; i != paramSize; i++ )
 	{
 		const char posI = param[i];
 		if((posI != ' ') && (posI != '\t'))
@@ -370,7 +372,7 @@ void parseParameter(const char *param, options &opt)
 		}
 		else
 		{
-			parseOption(&param[index], paramSize-index, opt);	
+			parseOption( &param[ index ], static_cast< unsigned int >( paramSize - index ), opt );	
 		}
 	}
 }
@@ -394,9 +396,12 @@ void parseCommandLine(const int argc, char* argv[])
 	}
 }
 
+#ifdef NOTUSED
 int main(int argc, char* argv[])
 {
 	parseCommandLine(argc, argv);
 
 	return 0;
 }
+#endif
+
