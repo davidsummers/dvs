@@ -59,6 +59,8 @@ std::string DVC::Init( )
     return ss.str( );
   }
 
+  std::cout << "Initialized empty DVS repository in " << std::filesystem::absolute( rootPath ) << std::endl;
+
   return ""; // No error.
 }
 
