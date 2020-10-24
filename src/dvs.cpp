@@ -1,7 +1,7 @@
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #include "dvs.h"
 
@@ -19,10 +19,15 @@ std::string DVC::Init( )
 {
   std::cout << "Initializing..." << std::endl;
 
+  std::filesystem::path rootPath = DVS_DIR;
+
   // Create initial control directory structure
-  if ( access( DVS_DIR, R_OK | W_OK ) == 0 )
+  if ( std::filesystem::exists( rootPath ) &&
+       std::filesystem::is_directory( rootPath ) )
   {
-    return "Directory .dvc already exists.";
+    std::stringstream ss;
+    ss << "Directory " << DVS_DIR << " already exists.";
+    return ss.str( );
   }
 
   std::string validate_error;
@@ -35,13 +40,24 @@ std::string DVC::Init( )
     return ss.str( );
   }
 
-  // Create directory and file structure.
-  std::stringstream tmp;
-  tmp << DVS_DIR;
-  mkdir( tmp.str( ).c_str( ), 0777 );
-  tmp.clear( );
-  tmp << DVS_DIR << "/objects";
-  mkdir( tmp.str( ).c_str( ), 0777 );
+  // Create DVS directory.
+  if ( !std::filesystem::create_directory( rootPath ) )
+  {
+    std::stringstream ss;
+    ss << "Can't create directory '" << rootPath << "'";
+    return ss.str( );
+  }
+
+  // Create DVS/objects directory.
+  std::filesystem::path objectsDir = rootPath;
+  objectsDir /= "objects";
+
+  if ( !std::filesystem::create_directory( objectsDir ) )
+  {
+    std::stringstream ss;
+    ss << "Can't create directory '" << objectsDir << "'";
+    return ss.str( );
+  }
 
   return ""; // No error.
 }
