@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "docopt.h"
 #include "dvs.h"
 
 void usage( );

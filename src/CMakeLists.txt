@@ -12,3 +12,7 @@ add_executable( dvs
                 ${SOURCE_FILES}
                 ${HEADER_FILES}
               )
+
+target_include_directories( dvs PRIVATE
+                            ../lib/docopt
+                          )
