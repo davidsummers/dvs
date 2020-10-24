@@ -3,35 +3,56 @@
 //
 
 #include <iostream>
+#include <map>
 
 #include "docopt.h"
 #include "dvs.h"
 
-void usage( );
+const char USAGE [] =
+R"(DVS - David's Versioning System.
+
+    Usage:
+      dvs checkout
+      dvs commit
+      dvs fetch
+      dvs init
+      dvs pull
+      dvs push
+      dvs status
+      dvs (-h | --help)
+      dvs --version
+
+    Options:
+      -h --help              Show this help information.
+      --version              Show version.
+)";
+
 
 int main( int argc_, char **argv_ )
 {
-  if ( argc_ < 2 )
-  {
-    usage( );
-    return 1; // Error.
-  }
+  std::map< std::string, docopt::value > args =
+    docopt::docopt( USAGE,
+                    { argv_ + 1, argv_ + argc_ },
+                    true, // Show help if requested.
+                    "dvs Version 1.0" // Version string.
+                  );
 
   DVS dvs;
-  std::string command = argv_[1];
   std::string err;
 
-  if ( command == "init" )
+  if ( docopt::value initOption = args[ "init" ];
+       initOption && initOption.isBool( ) && initOption.asBool( ) )
   {
     err = dvs.Init( );
   }
-  else if ( command == "status" )
+  else if ( docopt::value statusOption = args[ "status" ];
+            statusOption && statusOption.isBool( ) && statusOption.asBool( ) )
   {
     err = dvs.Status( );
   }
   else
   {
-    std::cerr << "Command '" << command << "' not yet implemented." << std::endl;
+    std::cerr << "Command not yet implemented." << std::endl;
     return 1;
   }
 
@@ -42,17 +63,4 @@ int main( int argc_, char **argv_ )
   }
 
   return 0;
-}
-
-void usage( )
-{
-  std::cerr << "Usage: dvs sub-command" << std::endl;
-  std::cerr << "  where sub-command is one of:" << std::endl;
-  std::cerr << "    init"     << std::endl;
-  std::cerr << "    checkout" << std::endl;
-  std::cerr << "    commit"   << std::endl;
-  std::cerr << "    fetch"    << std::endl;
-  std::cerr << "    pull"     << std::endl;
-  std::cerr << "    push"     << std::endl;
-  std::cerr << "    status"   << std::endl;
 }
