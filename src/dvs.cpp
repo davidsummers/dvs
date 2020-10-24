@@ -5,17 +5,17 @@
 
 #include "dvs.h"
 
-DVC::DVC( )
+DVS::DVS( )
 {
 }
 
 
-DVC::~DVC( )
+DVS::~DVS( )
 {
 }
 
 
-std::string DVC::Init( )
+std::string DVS::Init( )
 {
   std::cout << "Initializing..." << std::endl;
 
@@ -65,14 +65,14 @@ std::string DVC::Init( )
 }
 
 
-std::string DVC::Status( )
+std::string DVS::Status( )
 {
   std::cout << "Status: " << std::endl;
   return ""; // No error.
 }
 
 
-std::string DVC::Validate( )
+std::string DVS::Validate( )
 {
   return ""; // No errors.
 }

@@ -16,17 +16,17 @@ int main( int argc_, char **argv_ )
     return 1; // Error.
   }
 
-  DVC dvc;
+  DVS dvs;
   std::string command = argv_[1];
   std::string err;
 
   if ( command == "init" )
   {
-    err = dvc.Init( );
+    err = dvs.Init( );
   }
   else if ( command == "status" )
   {
-    err = dvc.Status( );
+    err = dvs.Status( );
   }
   else
   {

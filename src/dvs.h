@@ -1,19 +1,19 @@
-#ifndef _DVC_H_
-#define _DVC_H_
+#pragma once
+
 //
-// DVC declaration
+// DVS declaration
 //
 
 #include <string>
 
 constexpr const char *DVS_DIR = ".dvs";
 
-class DVC
+class DVS
 {
   public:
 
-    DVC( );
-    ~DVC( );
+    DVS( );
+    ~DVS( );
 
     // Sub-commands.
     std::string Init( );
@@ -30,5 +30,3 @@ class DVC
 
     std::string Validate( );
 };
-
-#endif // _DVC_H_
