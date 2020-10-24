@@ -16,3 +16,7 @@ add_executable( dvs
 target_include_directories( dvs PRIVATE
                             ../lib/docopt
                           )
+
+target_link_libraries( dvs
+                       docopt_s
+                     )
