@@ -306,19 +306,19 @@ std::string DVS::Hash( std::istream &str_, const bool write_ )
 
   str_.clear( );
 
-	std::ostringstream hashSs;
+  std::ostringstream hashSs;
 
-	std::vector< unsigned char > op = hashObj.digest();
+  std::vector< unsigned char > op = hashObj.digest();
 
-	for ( auto &oi : op )
-	{
-		Hex( oi, [ &hashSs ] ( unsigned char a_ )
+  for ( auto &oi : op )
+  {
+    Hex( oi, [ &hashSs ] ( unsigned char a_ )
     {
       hashSs << a_;
     } );
-	}
+  }
 
-	std::cout << hashSs.str() << std::endl;
+  std::cout << hashSs.str() << std::endl;
 
   if ( write_ )
   {
