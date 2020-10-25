@@ -38,11 +38,15 @@ R"(DVS - David's Versioning System.
 
 DVS::DVS( )
 {
+  // Save current working directory.
+  m_OriginalDirectory = std::filesystem::current_path( );
 }
 
 
 DVS::~DVS( )
 {
+  // Restore current working directory.
+  std::filesystem::current_path( m_OriginalDirectory );
 }
 
 

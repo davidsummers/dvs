@@ -4,6 +4,7 @@
 // DVS declaration
 //
 
+#include <filesystem>
 #include <string>
 
 constexpr const char *DVS_DIR = ".dvs";
@@ -30,6 +31,16 @@ class DVS
   protected:
 
   private:
+
+    //
+    // Data
+    //
+
+    std::filesystem::path m_OriginalDirectory;
+
+    //
+    // Methods
+    //
 
     std::string Validate( );
 };
