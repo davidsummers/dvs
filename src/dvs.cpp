@@ -150,16 +150,6 @@ std::string DVS::Init( )
     return ss.str( );
   }
 
-  std::string validate_error;
-  validate_error = Validate( );
-
-  if ( !validate_error.empty( ) )
-  {
-    std::stringstream ss;
-    ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
-    return ss.str( );
-  }
-
   // Create DVS directory.
   if ( !std::filesystem::create_directory( rootPath ) )
   {
@@ -179,6 +169,16 @@ std::string DVS::Init( )
     return ss.str( );
   }
 
+  std::string validate_error;
+  validate_error = Validate( );
+
+  if ( !validate_error.empty( ) )
+  {
+    std::stringstream ss;
+    ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
+    return ss.str( );
+  }
+
   std::cout << "Initialized empty DVS repository in " << std::filesystem::absolute( rootPath ) << std::endl;
 
   return ""; // No error.
@@ -194,12 +194,29 @@ std::string DVS::Status( )
 
 std::string DVS::Validate( )
 {
+  if ( !std::filesystem::exists( DVS_DIR ) )
+  {
+    std::stringstream ss;
+    ss << "Directory " << DVS_DIR << " does not exist.";
+    return ss.str( );
+  }
+
   return ""; // No errors.
 }
 
 
 std::string DVS::Hash( std::istream &str_, const bool write_ )
 {
+  std::string validate_error;
+  validate_error = Validate( );
+
+  if ( !validate_error.empty( ) )
+  {
+    std::stringstream ss;
+    ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
+    return ss.str( );
+  }
+
   const int SHA_BUF_SIZE = 4096;
   Keccak hashObj( 256 );
   uint8_t buffer[ SHA_BUF_SIZE ];
