@@ -27,7 +27,7 @@ R"(DVS - David's Versioning System.
 
     Options:
       -h --help              Show this help information.
-      -i                     Take inpuf from stdin.
+      -i                     Take input from stdin.
       -w                     Write output to .dvs/object hash store.
       --version              Show version.
 )";
