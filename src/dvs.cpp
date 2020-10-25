@@ -207,10 +207,8 @@ std::string DVS::Validate( )
 
 std::string DVS::Hash( std::istream &str_, const bool write_ )
 {
-  std::string validate_error;
-  validate_error = Validate( );
-
-  if ( !validate_error.empty( ) )
+  if ( std::string validate_error = Validate( );
+       !validate_error.empty( ) )
   {
     std::stringstream ss;
     ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
