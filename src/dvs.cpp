@@ -202,7 +202,19 @@ std::string DVS::Status( )
 
 std::string DVS::Validate( )
 {
-  if ( !std::filesystem::exists( DVS_DIR ) )
+  std::filesystem::path currentPath = m_OriginalDirectory;
+
+  for ( ; !currentPath.empty( ); currentPath = RemoveLastPathElement( currentPath ) )
+  {
+    std::filesystem::path testPath = currentPath / DVS_DIR;
+    if ( std::filesystem::exists( testPath ) )
+    {
+      m_DvsDirectory = testPath;
+      break;
+    }
+  }
+
+  if ( currentPath.empty( ) )
   {
     std::stringstream ss;
     ss << "Directory " << DVS_DIR << " does not exist.";
@@ -293,4 +305,33 @@ std::string DVS::Hash( std::istream &str_, const bool write_ )
   }
 
   return "";
+}
+
+
+std::filesystem::path DVS::RemoveLastPathElement( const std::filesystem::path &path_ )
+{
+  int num = NumPathElements( path_ );
+  std::filesystem::path newPath;
+  std::filesystem::path::iterator itr = path_.begin( );
+
+  for ( int i = 0; i < num - 1; ++i, ++itr )
+  {
+      newPath /= *itr;
+  }
+
+  return newPath;
+}
+
+
+int DVS::NumPathElements( const std::filesystem::path &path_ )
+{
+    int num = 0;
+    for ( std::filesystem::path::iterator itr = path_.begin( );
+          itr != path_.end( );
+          ++itr )
+    {
+      num++;
+    }
+
+  return num;
 }

@@ -43,6 +43,11 @@ class DVS
     //
 
     std::filesystem::path m_OriginalDirectory;
+    std::filesystem::path m_DvsDirectory;
+
+    // Helpers
+    std::filesystem::path RemoveLastPathElement( const std::filesystem::path & );
+    int NumPathElements( const std::filesystem::path & );
 
     //
     // Methods
