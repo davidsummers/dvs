@@ -108,7 +108,7 @@ std::string DVS::Hash( std::istream &str_, const bool write_ )
       b << a_;
     } );
 	}
-	std::cout << b.str();
+	std::cout << b.str() << std::endl;
 
   return "";
 }
