@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <sys/stat.h>
@@ -98,17 +99,59 @@ std::string DVS::Hash( std::istream &str_, const bool write_ )
     }
   } while ( str_.good( ) );
 
-	std::ostringstream b;
-	std::vector<unsigned char> op = hashObj.digest();
+  str_.clear( );
 
-	for ( auto& oi : op )
+	std::ostringstream hashSs;
+
+	std::vector< unsigned char > op = hashObj.digest();
+
+	for ( auto &oi : op )
 	{
-		Hex( oi, [ &b ] ( unsigned char a_ )
+		Hex( oi, [ &hashSs ] ( unsigned char a_ )
     {
-      b << a_;
+      hashSs << a_;
     } );
 	}
-	std::cout << b.str() << std::endl;
+
+	std::cout << hashSs.str() << std::endl;
+
+  if ( write_ )
+  {
+    str_.seekg( std::ios_base::beg );
+
+    std::filesystem::path objectPath = DVS_DIR;
+    objectPath /= "objects";
+    objectPath /= hashSs.str( ).substr( 0, 2 );
+    std::string shardedHash = hashSs.str( ).substr( 2 );
+
+    std::filesystem::create_directories( objectPath );
+
+    objectPath /= shardedHash;
+
+    if ( std::filesystem::exists( objectPath ) )
+    {
+      std::stringstream ss;
+      ss << "Error: File '" << objectPath << "' already exists.";
+      return ss.str( );
+    }
+
+    std::ofstream outputFile( objectPath,  std::ios_base::binary );
+
+    while ( outputFile.good( ) )
+    {
+      memset( &buffer[ 0 ], 0, sizeof( buffer ) );
+      str_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
+      if ( std::streamsize bytesRead = str_.gcount( );
+           bytesRead > 0 )
+      {
+        outputFile.write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
+      }
+      else
+      {
+        break;
+      }
+    }
+  }
 
   return "";
 }
