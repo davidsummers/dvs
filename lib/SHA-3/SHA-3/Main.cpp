@@ -1,5 +1,4 @@
-#pragma once
-#include "commandParser.h"
+#include "CommandParser.h"
 
 int main(int argc, char* argv[])
 {
