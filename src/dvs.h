@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <string>
 
+#include "docopt.h"
+
 constexpr const char *DVS_DIR = ".dvs";
 
 class DVS
@@ -18,15 +20,19 @@ class DVS
 
     int ParseCommands( int argc, char **argv );
 
+    std::string ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
+
     // Sub-commands.
     std::string Init( );
     std::string Checkout( );
     std::string Commit( );
     std::string Fetch( );
-    std::string Hash( std::istream &, bool write );
     std::string Pull( );
     std::string Push( );
     std::string Status( );
+
+    // Internal commands
+    std::string Hash( std::istream &, bool write );
 
   protected:
 

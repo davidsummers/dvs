@@ -20,11 +20,11 @@ R"(DVS - David's Versioning System.
       dvs checkout
       dvs commit
       dvs fetch
-      dvs hash [ -i ] [ -w ] [ <file> ]
       dvs init
       dvs pull
       dvs push
       dvs status
+      dvs internal hash [ -i ] [ -w ] [ <file> ]
       dvs (-h | --help)
       dvs --version
 
@@ -71,12 +71,37 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   {
     err = Status( );
   }
-  if ( docopt::value hashOption = args[ "hash" ];
+  else if ( docopt::value internalOption = args[ "internal" ];
+       internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
+  {
+    err = ParseInternalCommands( args );
+  }
+  else
+  {
+    std::cerr << "Command not yet implemented." << std::endl;
+    return 1;
+  }
+
+  if ( !err.empty( ) )
+  {
+    std::cerr << err << std::endl;
+    return 1;
+  }
+
+  return 0;
+}
+
+
+std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &args_ )
+{
+  std::string err;
+
+  if ( docopt::value hashOption = args_[ "hash" ];
        hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
   {
-    docopt::value stdinOption = args[ "-i" ];
+    docopt::value stdinOption = args_[ "-i" ];
     bool stdInput = stdinOption && stdinOption.isBool( ) && stdinOption.asBool( );
-    docopt::value writeOption = args[ "-w" ];
+    docopt::value writeOption = args_[ "-w" ];
     bool write = writeOption && writeOption.isBool( ) && writeOption.asBool( );
     if ( stdInput )
     {
@@ -84,7 +109,7 @@ int DVS::ParseCommands( int argc_, char **argv_ )
     }
     else
     {
-      if ( docopt::value fileOption = args[ "<file>" ];
+      if ( docopt::value fileOption = args_[ "<file>" ];
            fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
       {
         std::ifstream inputFile( fileOption.asString( ), std::ios_base::binary );
@@ -105,19 +130,8 @@ int DVS::ParseCommands( int argc_, char **argv_ )
       }
     }
   }
-  else
-  {
-    std::cerr << "Command not yet implemented." << std::endl;
-    return 1;
-  }
 
-  if ( !err.empty( ) )
-  {
-    std::cerr << err << std::endl;
-    return 1;
-  }
-
-  return 0;
+  return err;
 }
 
 
