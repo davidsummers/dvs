@@ -20,6 +20,7 @@ class DVS
     std::string Checkout( );
     std::string Commit( );
     std::string Fetch( );
+    std::string Hash( std::istream &, bool write );
     std::string Pull( );
     std::string Push( );
     std::string Status( );

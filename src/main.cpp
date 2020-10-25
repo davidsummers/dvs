@@ -2,8 +2,10 @@
 // DVS main program driver.
 //
 
+#include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 
 #include "docopt.h"
 #include "dvs.h"
@@ -15,6 +17,7 @@ R"(DVS - David's Versioning System.
       dvs checkout
       dvs commit
       dvs fetch
+      dvs hash [ -i ] [ -w ] [ <file> ]
       dvs init
       dvs pull
       dvs push
@@ -24,6 +27,8 @@ R"(DVS - David's Versioning System.
 
     Options:
       -h --help              Show this help information.
+      -i                     Take inpuf from stdin.
+      -w                     Write output to .dvs/object hash store.
       --version              Show version.
 )";
 
@@ -49,6 +54,40 @@ int main( int argc_, char **argv_ )
             statusOption && statusOption.isBool( ) && statusOption.asBool( ) )
   {
     err = dvs.Status( );
+  }
+  if ( docopt::value hashOption = args[ "hash" ];
+       hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
+  {
+    docopt::value stdinOption = args[ "-i" ];
+    bool stdInput = stdinOption && stdinOption.isBool( ) && stdinOption.asBool( );
+    docopt::value writeOption = args[ "-w" ];
+    bool write = writeOption && writeOption.isBool( ) && writeOption.asBool( );
+    if ( stdInput )
+    {
+      err = dvs.Hash( std::cin, write );
+    }
+    else
+    {
+      if ( docopt::value fileOption = args[ "<file>" ];
+           fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
+      {
+        std::ifstream inputFile( fileOption.asString( ), std::ios_base::binary );
+        if ( inputFile.is_open( ) )
+        {
+          err = dvs.Hash( inputFile, write );
+        }
+        else
+        {
+          std::stringstream ss;
+          ss << "Couldn't open input file '" << fileOption.asString( ) << "'";
+          err = ss.str( );
+        }
+      }
+      else
+      {
+        err = "Missing file name.";
+      }
+    }
   }
   else
   {

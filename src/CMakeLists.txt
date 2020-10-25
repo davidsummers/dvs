@@ -15,8 +15,10 @@ add_executable( dvs
 
 target_include_directories( dvs PRIVATE
                             ../lib/docopt
+                            ../lib/SHA-3/SHA-3
                           )
 
 target_link_libraries( dvs
                        docopt_s
+                       sha3lib
                      )

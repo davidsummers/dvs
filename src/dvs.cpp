@@ -3,7 +3,10 @@
 #include <sstream>
 #include <sys/stat.h>
 
+#include "CommandParser.h"
 #include "dvs.h"
+#include "Hex.h"
+#include "Keccak.h"
 
 DVS::DVS( )
 {
@@ -75,4 +78,37 @@ std::string DVS::Status( )
 std::string DVS::Validate( )
 {
   return ""; // No errors.
+}
+
+
+std::string DVS::Hash( std::istream &str_, const bool write_ )
+{
+  const int SHA_BUF_SIZE = 4096;
+  Keccak hashObj( 256 );
+  uint8_t buffer[ SHA_BUF_SIZE ];
+
+  do
+  {
+    memset( &buffer[ 0 ], 0, sizeof( buffer ) );
+    str_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
+    if ( std::streamsize bytesRead = str_.gcount( );
+         bytesRead > 0 )
+    {
+      hashObj.addData( &buffer[ 0 ], 0, static_cast< unsigned int>( bytesRead ) );
+    }
+  } while ( str_.good( ) );
+
+	std::ostringstream b;
+	std::vector<unsigned char> op = hashObj.digest();
+
+	for ( auto& oi : op )
+	{
+		Hex( oi, [ &b ] ( unsigned char a_ )
+    {
+      b << a_;
+    } );
+	}
+	std::cout << b.str();
+
+  return "";
 }
