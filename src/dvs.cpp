@@ -187,6 +187,14 @@ std::string DVS::Init( )
 
 std::string DVS::Status( )
 {
+  if ( std::string validate_error = Validate( );
+       !validate_error.empty( ) )
+  {
+    std::stringstream ss;
+    ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
+    return ss.str( );
+  }
+
   std::cout << "Status: " << std::endl;
   return ""; // No error.
 }
