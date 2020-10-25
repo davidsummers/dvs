@@ -324,7 +324,7 @@ std::string DVS::Hash( std::istream &str_, const bool write_ )
   {
     str_.seekg( std::ios_base::beg );
 
-    std::filesystem::path objectPath = DVS_DIR;
+    std::filesystem::path objectPath = m_DvsDirectory;
     objectPath /= "objects";
     objectPath /= hashSs.str( ).substr( 0, 2 );
     std::string shardedHash = hashSs.str( ).substr( 2 );
