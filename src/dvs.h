@@ -15,6 +15,8 @@ class DVS
     DVS( );
     ~DVS( );
 
+    int ParseCommands( int argc, char **argv );
+
     // Sub-commands.
     std::string Init( );
     std::string Checkout( );
