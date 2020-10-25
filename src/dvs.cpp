@@ -24,6 +24,7 @@ R"(DVS - David's Versioning System.
       dvs pull
       dvs push
       dvs status
+      dvs internal cat <hash>
       dvs internal hash [ -i ] [ -w ] [ <file> ]
       dvs (-h | --help)
       dvs --version
@@ -96,7 +97,22 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
 {
   std::string err;
 
-  if ( docopt::value hashOption = args_[ "hash" ];
+  if ( docopt::value catOption = args_[ "cat" ];
+       catOption && catOption.isBool( ) && catOption.asBool( ) )
+  {
+      if ( docopt::value hashOption = args_[ "<hash>" ];
+           hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
+      {
+          err = Cat( hashOption.asString( ) );
+      }
+      else
+      {
+          std::stringstream ss;
+          ss << "Missing hash identifier.";
+          return ss.str( );
+      }
+  }
+  else if ( docopt::value hashOption = args_[ "hash" ];
        hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
   {
     docopt::value stdinOption = args_[ "-i" ];
@@ -169,14 +185,11 @@ std::string DVS::Init( )
     return ss.str( );
   }
 
-  std::string validate_error;
-  validate_error = Validate( );
 
-  if ( !validate_error.empty( ) )
+  if ( std::string validate_error = Validate( );
+       !validate_error.empty( ) )
   {
-    std::stringstream ss;
-    ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
-    return ss.str( );
+    return validate_error;
   }
 
   std::cout << "Initialized empty DVS repository in " << std::filesystem::absolute( rootPath ) << std::endl;
@@ -197,6 +210,49 @@ std::string DVS::Status( )
 
   std::cout << "Status: " << std::endl;
   return ""; // No error.
+}
+
+
+std::string DVS::Cat( const std::string &hash_id_ )
+{
+  if ( std::string validateError = Validate( );
+       !validateError.empty( ) )
+  {
+    return validateError;
+  }
+
+  std::filesystem::path hashPath = m_DvsDirectory / "objects" / hash_id_.substr( 0, 2 ) / hash_id_.substr( 2 );
+
+  if ( !std::filesystem::exists( hashPath ) )
+  {
+    std::stringstream ss;
+    ss << "Hash " << hash_id_ << " does not exist.";
+    return ss.str( );
+  }
+
+  std::ifstream inputFile( hashPath, std::ios_base::binary );
+
+  if ( !inputFile.is_open( ) )
+  {
+    std::stringstream ss;
+    ss << "Can't open file " << hashPath << ".";
+    return ss.str( );
+  }
+
+  uint8_t buffer[ 4096 ];
+
+  do
+  {
+    memset( &buffer[ 0 ], 0, sizeof( buffer ) );
+    inputFile.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
+    if ( std::streamsize bytesRead = inputFile.gcount( );
+         bytesRead > 0 )
+    {
+      std::cout.write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
+    }
+  } while ( inputFile.good( ) );
+
+  return "";
 }
 
 
@@ -230,9 +286,7 @@ std::string DVS::Hash( std::istream &str_, const bool write_ )
   if ( std::string validate_error = Validate( );
        !validate_error.empty( ) )
   {
-    std::stringstream ss;
-    ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
-    return ss.str( );
+    return validate_error;
   }
 
   const int SHA_BUF_SIZE = 4096;

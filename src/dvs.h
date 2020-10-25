@@ -32,6 +32,7 @@ class DVS
     std::string Status( );
 
     // Internal commands
+    std::string Cat( const std::string &hashId );
     std::string Hash( std::istream &, bool write );
 
   protected:
