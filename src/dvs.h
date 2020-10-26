@@ -30,9 +30,6 @@ class DVS
     std::string Push( );
     std::string Status( );
 
-    // Internal commands
-    std::string Cat( const std::string &hashId );
-
     // Helpers
     std::string Validate( );
 

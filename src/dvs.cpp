@@ -9,9 +9,11 @@
 
 #include "dvs.h"
 
+#include "command_cat.h"
 #include "command_hash.h"
 #include "command_init.h"
 #include "CommandParser.h"
+
 
 const char USAGE [] =
 R"(DVS - David's Versioning System.
@@ -104,7 +106,8 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
       if ( docopt::value hashOption = args_[ "<hash>" ];
            hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
       {
-          err = Cat( hashOption.asString( ) );
+          CatCommand catCommand;
+          err = catCommand( *this, hashOption.asString( ) );
       }
       else
       {
@@ -165,49 +168,6 @@ std::string DVS::Status( )
 
   std::cout << "Status: " << std::endl;
   return ""; // No error.
-}
-
-
-std::string DVS::Cat( const std::string &hash_id_ )
-{
-  if ( std::string validateError = Validate( );
-       !validateError.empty( ) )
-  {
-    return validateError;
-  }
-
-  std::filesystem::path hashPath = m_DvsDirectory / "objects" / hash_id_.substr( 0, 2 ) / hash_id_.substr( 2 );
-
-  if ( !std::filesystem::exists( hashPath ) )
-  {
-    std::stringstream ss;
-    ss << "Hash " << hash_id_ << " does not exist.";
-    return ss.str( );
-  }
-
-  std::ifstream inputFile( hashPath, std::ios_base::binary );
-
-  if ( !inputFile.is_open( ) )
-  {
-    std::stringstream ss;
-    ss << "Can't open file " << hashPath << ".";
-    return ss.str( );
-  }
-
-  uint8_t buffer[ 4096 ];
-
-  do
-  {
-    memset( &buffer[ 0 ], 0, sizeof( buffer ) );
-    inputFile.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-    if ( std::streamsize bytesRead = inputFile.gcount( );
-         bytesRead > 0 )
-    {
-      std::cout.write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
-    }
-  } while ( inputFile.good( ) );
-
-  return "";
 }
 
 
