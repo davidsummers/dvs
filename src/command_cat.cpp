@@ -6,7 +6,7 @@
 #include "dvs.h"
 
 
-std::string CatCommand::operator ( ) ( DVS &dvs_, const std::string &hash_id_ )
+std::string CatCommand::operator ( ) ( DVS &dvs_, const PrintType printType_, const std::string &hash_id_ )
 {
   if ( std::string validateError = dvs_.Validate( );
        !validateError.empty( ) )
@@ -32,6 +32,23 @@ std::string CatCommand::operator ( ) ( DVS &dvs_, const std::string &hash_id_ )
     return ss.str( );
   }
 
+  std::string header;
+
+  // Read header.
+  std::getline( inputFile, header, '\0' );
+
+  if ( printType_ == PrintType::type )
+  {
+    std::string::size_type pos = header.find( ' ' );
+    if ( pos != std::string::npos )
+    {
+      header = header.substr( 0, pos );
+    }
+
+    std::cout << header << std::endl;
+    return "";
+  }
+  
   uint8_t buffer[ 4096 ];
 
   do

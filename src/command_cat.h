@@ -8,7 +8,13 @@ class CatCommand
 {
   public:
 
-    std::string operator ( ) ( DVS &, const std::string &hashId );
+    enum class PrintType
+    {
+      hash,
+      type,
+    };
+
+    std::string operator ( ) ( DVS &, const PrintType, const std::string &hashId );
 
   protected:
 

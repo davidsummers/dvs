@@ -27,7 +27,7 @@ R"(DVS - David's Versioning System.
       dvs pull
       dvs push
       dvs status
-      dvs internal cat <hash>
+      dvs internal cat [ -t ] <hash>
       dvs internal hash [ -i ] [ -w ] [ <file> ]
       dvs (-h | --help)
       dvs --version
@@ -35,6 +35,7 @@ R"(DVS - David's Versioning System.
     Options:
       -h --help              Show this help information.
       -i                     Take input from stdin.
+      -t                     Type of hash content (blob, commit, tag, tree).
       -w                     Write output to .dvs/object hash store.
       --version              Show version.
 )";
@@ -105,11 +106,19 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
   if ( docopt::value catOption = args_[ "cat" ];
        catOption && catOption.isBool( ) && catOption.asBool( ) )
   {
+      CatCommand::PrintType printType = CatCommand::PrintType::hash;
+
+      if ( docopt::value typeOption = args_[ "-t" ];
+           typeOption && typeOption.isBool( ) && typeOption.asBool( ) )
+      {
+        printType = CatCommand::PrintType::type; 
+      }
+
       if ( docopt::value hashOption = args_[ "<hash>" ];
            hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
       {
           CatCommand catCommand;
-          err = catCommand( *this, hashOption.asString( ) );
+          err = catCommand( *this, printType, hashOption.asString( ) );
       }
       else
       {
