@@ -3,6 +3,7 @@ set( SOURCE_FILES
      command_cat.cpp
      command_hash.cpp
      command_init.cpp
+     command_status.cpp
      dvs.cpp
      main.cpp
    )
@@ -11,6 +12,7 @@ set( HEADER_FILES
      command_cat.h
      command_hash.h
      command_init.h
+     command_status.h
      dvs.h
    )
 

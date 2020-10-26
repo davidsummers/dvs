@@ -12,6 +12,7 @@
 #include "command_cat.h"
 #include "command_hash.h"
 #include "command_init.h"
+#include "command_status.h"
 #include "CommandParser.h"
 
 
@@ -73,7 +74,8 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   else if ( docopt::value statusOption = args[ "status" ];
             statusOption && statusOption.isBool( ) && statusOption.asBool( ) )
   {
-    err = Status( );
+    StatusCommand statusCommand;
+    err = statusCommand( *this );
   }
   else if ( docopt::value internalOption = args[ "internal" ];
        internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
@@ -153,21 +155,6 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
   }
 
   return err;
-}
-
-
-std::string DVS::Status( )
-{
-  if ( std::string validate_error = Validate( );
-       !validate_error.empty( ) )
-  {
-    std::stringstream ss;
-    ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
-    return ss.str( );
-  }
-
-  std::cout << "Status: " << std::endl;
-  return ""; // No error.
 }
 
 

@@ -22,14 +22,6 @@ class DVS
 
     std::string ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
 
-    // Sub-commands.
-    std::string Checkout( );
-    std::string Commit( );
-    std::string Fetch( );
-    std::string Pull( );
-    std::string Push( );
-    std::string Status( );
-
     // Helpers
     std::string Validate( );
 
