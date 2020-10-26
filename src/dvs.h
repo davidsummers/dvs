@@ -32,10 +32,11 @@ class DVS
 
     // Internal commands
     std::string Cat( const std::string &hashId );
-    std::string Hash( std::istream &, bool write );
 
     // Helpers
     std::string Validate( );
+
+    std::filesystem::path GetDvsDirectory( );
 
   protected:
 

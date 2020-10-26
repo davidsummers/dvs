@@ -9,10 +9,9 @@
 
 #include "dvs.h"
 
+#include "command_hash.h"
 #include "command_init.h"
 #include "CommandParser.h"
-#include "Hex.h"
-#include "Keccak.h"
 
 const char USAGE [] =
 R"(DVS - David's Versioning System.
@@ -117,13 +116,14 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
   else if ( docopt::value hashOption = args_[ "hash" ];
        hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
   {
+    HashCommand hashCommand;
     docopt::value stdinOption = args_[ "-i" ];
     bool stdInput = stdinOption && stdinOption.isBool( ) && stdinOption.asBool( );
     docopt::value writeOption = args_[ "-w" ];
     bool write = writeOption && writeOption.isBool( ) && writeOption.asBool( );
     if ( stdInput )
     {
-      err = Hash( std::cin, write );
+      err = hashCommand( *this, std::cin, write );
     }
     else
     {
@@ -133,7 +133,7 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
         std::ifstream inputFile( fileOption.asString( ), std::ios_base::binary );
         if ( inputFile.is_open( ) )
         {
-          err = Hash( inputFile, write );
+          err = hashCommand( *this, inputFile, write );
         }
         else
         {
@@ -236,87 +236,6 @@ std::string DVS::Validate( )
 }
 
 
-std::string DVS::Hash( std::istream &str_, const bool write_ )
-{
-  if ( std::string validate_error = Validate( );
-       !validate_error.empty( ) )
-  {
-    return validate_error;
-  }
-
-  const int SHA_BUF_SIZE = 4096;
-  Keccak hashObj( 256 );
-  uint8_t buffer[ SHA_BUF_SIZE ];
-
-  do
-  {
-    memset( &buffer[ 0 ], 0, sizeof( buffer ) );
-    str_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-    if ( std::streamsize bytesRead = str_.gcount( );
-         bytesRead > 0 )
-    {
-      hashObj.addData( &buffer[ 0 ], 0, static_cast< unsigned int>( bytesRead ) );
-    }
-  } while ( str_.good( ) );
-
-  str_.clear( );
-
-  std::ostringstream hashSs;
-
-  std::vector< unsigned char > op = hashObj.digest();
-
-  for ( auto &oi : op )
-  {
-    Hex( oi, [ &hashSs ] ( unsigned char a_ )
-    {
-      hashSs << a_;
-    } );
-  }
-
-  std::cout << hashSs.str() << std::endl;
-
-  if ( write_ )
-  {
-    str_.seekg( std::ios_base::beg );
-
-    std::filesystem::path objectPath = m_DvsDirectory;
-    objectPath /= "objects";
-    objectPath /= hashSs.str( ).substr( 0, 2 );
-    std::string shardedHash = hashSs.str( ).substr( 2 );
-
-    std::filesystem::create_directories( objectPath );
-
-    objectPath /= shardedHash;
-
-    if ( std::filesystem::exists( objectPath ) )
-    {
-      std::stringstream ss;
-      ss << "Error: File '" << objectPath << "' already exists.";
-      return ss.str( );
-    }
-
-    std::ofstream outputFile( objectPath,  std::ios_base::binary );
-
-    while ( outputFile.good( ) )
-    {
-      memset( &buffer[ 0 ], 0, sizeof( buffer ) );
-      str_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-      if ( std::streamsize bytesRead = str_.gcount( );
-           bytesRead > 0 )
-      {
-        outputFile.write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
-      }
-      else
-      {
-        break;
-      }
-    }
-  }
-
-  return "";
-}
-
-
 std::filesystem::path DVS::RemoveLastPathElement( const std::filesystem::path &path_ )
 {
   int num = NumPathElements( path_ );
@@ -343,4 +262,10 @@ int DVS::NumPathElements( const std::filesystem::path &path_ )
     }
 
   return num;
+}
+
+
+std::filesystem::path DVS::GetDvsDirectory( )
+{
+  return m_DvsDirectory;
 }

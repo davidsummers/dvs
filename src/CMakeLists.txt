@@ -1,11 +1,13 @@
 
 set( SOURCE_FILES
+     command_hash.cpp
      command_init.cpp
      dvs.cpp
      main.cpp
    )
 
 set( HEADER_FILES
+     command_hash.h
      command_init.h
      dvs.h
    )
