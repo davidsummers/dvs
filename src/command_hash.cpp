@@ -6,7 +6,7 @@
 #include "Keccak.h"
 
 
-std::string HashCommand::operator ( ) ( DVS &dvs_, std::istream &str_, const bool write_ )
+std::string HashCommand::operator ( ) ( DVS &dvs_, const HashType hashType_, const std::string &filename_, std::istream &str_, const bool write_ )
 {
   if ( std::string validate_error = dvs_.Validate( );
        !validate_error.empty( ) )
@@ -16,8 +16,36 @@ std::string HashCommand::operator ( ) ( DVS &dvs_, std::istream &str_, const boo
 
   const int SHA_BUF_SIZE = 4096;
   Keccak hashObj( 256 );
-  uint8_t buffer[ SHA_BUF_SIZE ];
+  std::vector< uint8_t > buffer( SHA_BUF_SIZE );
+  
+  // Add header (hash type) to buffer.
+  std::stringstream headerSs;
 
+  switch ( hashType_ )
+  {
+    case HashType::blob:
+      headerSs << "blob " << std::filesystem::file_size( filename_ ) << '\0';
+      break;
+
+    case HashType::commit:
+      headerSs << "commit\0";
+      break;
+
+    case HashType::tag:
+      headerSs << "tag\0";
+      break;
+
+    case HashType::tree:
+      headerSs << "tree\0";
+      break;
+  }
+
+  std::string header = headerSs.str( );
+  size_t headerSize = header.size( );
+
+  hashObj.addData( reinterpret_cast< uint8_t * >( &header[ 0 ] ), 0, static_cast< unsigned int >( headerSize ) );
+
+  // Read input into buffer and write buffer to hash function.
   do
   {
     memset( &buffer[ 0 ], 0, sizeof( buffer ) );
@@ -66,6 +94,8 @@ std::string HashCommand::operator ( ) ( DVS &dvs_, std::istream &str_, const boo
     }
 
     std::ofstream outputFile( objectPath,  std::ios_base::binary );
+
+    outputFile.write( &header[ 0 ], headerSize );
 
     while ( outputFile.good( ) )
     {

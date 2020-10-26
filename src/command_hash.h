@@ -9,7 +9,15 @@ class HashCommand
 {
   public:
 
-    std::string operator ( ) ( DVS &, std::istream &, bool write );
+    enum class HashType
+    {
+      blob,
+      commit,
+      tree,
+      tag,
+    };
+
+    std::string operator ( ) ( DVS &, const HashType, const std::string &filename, std::istream &, bool write );
 
   protected:
 

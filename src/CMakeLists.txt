@@ -21,6 +21,10 @@ add_executable( dvs
                 ${HEADER_FILES}
               )
 
+target_compile_definitions( dvs PRIVATE
+                           _CRT_SECURE_NO_WARNINGS
+                         )
+
 target_include_directories( dvs PRIVATE
                             ../lib/docopt
                             ../lib/SHA-3/SHA-3

@@ -128,7 +128,7 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
     bool write = writeOption && writeOption.isBool( ) && writeOption.asBool( );
     if ( stdInput )
     {
-      err = hashCommand( *this, std::cin, write );
+      err = hashCommand( *this, HashCommand::HashType::blob, "", std::cin, write );
     }
     else
     {
@@ -138,7 +138,7 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
         std::ifstream inputFile( fileOption.asString( ), std::ios_base::binary );
         if ( inputFile.is_open( ) )
         {
-          err = hashCommand( *this, inputFile, write );
+          err = hashCommand( *this, HashCommand::HashType::blob, fileOption.asString( ), inputFile, write );
         }
         else
         {
