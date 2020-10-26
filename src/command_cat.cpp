@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string.h>
 
 #include "command_cat.h"
 #include "dvs.h"
