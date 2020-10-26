@@ -58,8 +58,8 @@ std::string HashCommand::operator ( ) ( DVS &dvs_ )
 
     // Set up output to temporary output file so we can get the file length.
     std::filesystem::path tempPath = std::filesystem::temp_directory_path( );
-    tempPath /= tmpnam( nullptr );
-
+    std::string t = "XXXXXX";
+    tempPath /= mktemp( &t[ 0 ] );
     std::ofstream outputFile( tempPath,  std::ios_base::binary );
 
     char buffer[ 4096 ];
@@ -117,6 +117,9 @@ std::string HashCommand::operator ( ) ( DVS &dvs_ )
       case HashType::commit:
         headerSs << "commit\0";
         break;
+
+      case HashType::none:
+        return "HashType: none"; // Illegal - return errror.
 
       case HashType::tag:
         headerSs << "tag\0";

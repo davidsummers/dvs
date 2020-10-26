@@ -20,7 +20,7 @@ class HashCommand
       tag,
     };
 
-    std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > & );
+    std::string ParseArgs( std::map< std::string, docopt::value > & );
 
     std::string operator ( ) ( DVS & );
 
