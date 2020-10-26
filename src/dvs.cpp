@@ -9,6 +9,7 @@
 
 #include "dvs.h"
 
+#include "command_init.h"
 #include "CommandParser.h"
 #include "Hex.h"
 #include "Keccak.h"
@@ -65,7 +66,8 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   if ( docopt::value initOption = args[ "init" ];
        initOption && initOption.isBool( ) && initOption.asBool( ) )
   {
-    err = Init( );
+    InitCommand initCommand;
+    err = initCommand( *this );
   }
   else if ( docopt::value statusOption = args[ "status" ];
             statusOption && statusOption.isBool( ) && statusOption.asBool( ) )
@@ -148,53 +150,6 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
   }
 
   return err;
-}
-
-
-std::string DVS::Init( )
-{
-  std::cout << "Initializing..." << std::endl;
-
-  std::filesystem::path rootPath = DVS_DIR;
-
-  // Create initial control directory structure
-  if ( std::filesystem::exists( rootPath ) &&
-       std::filesystem::is_directory( rootPath ) )
-  {
-    std::stringstream ss;
-    ss << "Directory " << DVS_DIR << " already exists.";
-    return ss.str( );
-  }
-
-  // Create DVS directory.
-  if ( !std::filesystem::create_directory( rootPath ) )
-  {
-    std::stringstream ss;
-    ss << "Can't create directory '" << rootPath << "'";
-    return ss.str( );
-  }
-
-  // Create DVS/objects directory.
-  std::filesystem::path objectsDir = rootPath;
-  objectsDir /= "objects";
-
-  if ( !std::filesystem::create_directory( objectsDir ) )
-  {
-    std::stringstream ss;
-    ss << "Can't create directory '" << objectsDir << "'";
-    return ss.str( );
-  }
-
-
-  if ( std::string validate_error = Validate( );
-       !validate_error.empty( ) )
-  {
-    return validate_error;
-  }
-
-  std::cout << "Initialized empty DVS repository in " << std::filesystem::absolute( rootPath ) << std::endl;
-
-  return ""; // No error.
 }
 
 

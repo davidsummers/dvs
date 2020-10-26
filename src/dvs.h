@@ -23,7 +23,6 @@ class DVS
     std::string ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
 
     // Sub-commands.
-    std::string Init( );
     std::string Checkout( );
     std::string Commit( );
     std::string Fetch( );
@@ -34,6 +33,9 @@ class DVS
     // Internal commands
     std::string Cat( const std::string &hashId );
     std::string Hash( std::istream &, bool write );
+
+    // Helpers
+    std::string Validate( );
 
   protected:
 
@@ -53,6 +55,4 @@ class DVS
     //
     // Methods
     //
-
-    std::string Validate( );
 };
