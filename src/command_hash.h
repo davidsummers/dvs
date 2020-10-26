@@ -1,7 +1,9 @@
 #pragma once
 
-#include <istream>
 #include <string>
+
+#include "docopt.h"
+
 
 class DVS;
 
@@ -11,13 +13,16 @@ class HashCommand
 
     enum class HashType
     {
+      none,
       blob,
       commit,
       tree,
       tag,
     };
 
-    std::string operator ( ) ( DVS &, const HashType, const std::string &filename, std::istream &, bool write );
+    std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > & );
+
+    std::string operator ( ) ( DVS & );
 
   protected:
 
@@ -26,6 +31,11 @@ class HashCommand
     //
     // Data
     //
+
+    HashType    m_HashType  = HashType::blob;
+    bool        m_StdInput  = false;
+    bool        m_WriteFile = false;
+    std::string m_Filename;
 
     //
     // Methods

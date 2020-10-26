@@ -1,3 +1,4 @@
+#include <iostream>
 #include <fstream>
 
 #include "command_hash.h"
@@ -6,12 +7,65 @@
 #include "Keccak.h"
 
 
-std::string HashCommand::operator ( ) ( DVS &dvs_, const HashType hashType_, const std::string &filename_, std::istream &str_, const bool write_ )
+std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+{
+    std::string err;
+
+    if ( docopt::value stdinOption = args_[ "-i" ];
+         stdinOption && stdinOption.isBool( ) && stdinOption.asBool( ) )
+    {
+      m_StdInput = true;
+    }
+
+    if ( docopt::value writeOption = args_[ "-w" ];
+         writeOption && writeOption.isBool( ) && writeOption.asBool( ) )
+    {
+      m_WriteFile = true;
+    }
+
+    if ( !m_StdInput )
+    {
+      if ( docopt::value fileOption = args_[ "<file>" ];
+           fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
+      {
+        m_Filename = fileOption.asString( );
+      }
+      else
+      {
+        err = "Missing file name.";
+      }
+    }
+
+  return err;
+}
+
+
+std::string HashCommand::operator ( ) ( DVS &dvs_ )
 {
   if ( std::string validate_error = dvs_.Validate( );
        !validate_error.empty( ) )
   {
     return validate_error;
+  }
+
+  std::string err;
+
+  std::istream *inputStream = &std::cin;
+
+  std::ifstream inputFileStream;
+
+  if ( !m_StdInput )
+  {
+    inputFileStream.open( m_Filename, std::ios_base::binary );
+
+    if ( !inputFileStream.is_open( ) )
+    {
+      std::stringstream ss;
+      ss << "Couldn't open input file '" << m_Filename << "'";
+      err = ss.str( );
+    }
+
+    inputStream = &inputFileStream;
   }
 
   const int SHA_BUF_SIZE = 4096;
@@ -21,10 +75,10 @@ std::string HashCommand::operator ( ) ( DVS &dvs_, const HashType hashType_, con
   // Add header (hash type) to buffer.
   std::stringstream headerSs;
 
-  switch ( hashType_ )
+  switch ( m_HashType )
   {
     case HashType::blob:
-      headerSs << "blob " << std::filesystem::file_size( filename_ ) << '\0';
+      headerSs << "blob " << std::filesystem::file_size( m_Filename ) << '\0';
       break;
 
     case HashType::commit:
@@ -49,15 +103,15 @@ std::string HashCommand::operator ( ) ( DVS &dvs_, const HashType hashType_, con
   do
   {
     memset( &buffer[ 0 ], 0, sizeof( buffer ) );
-    str_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-    if ( std::streamsize bytesRead = str_.gcount( );
+    inputStream->read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
+    if ( std::streamsize bytesRead = inputStream->gcount( );
          bytesRead > 0 )
     {
       hashObj.addData( &buffer[ 0 ], 0, static_cast< unsigned int>( bytesRead ) );
     }
-  } while ( str_.good( ) );
+  } while ( inputStream->good( ) );
 
-  str_.clear( );
+  inputStream->clear( );
 
   std::ostringstream hashSs;
 
@@ -73,9 +127,9 @@ std::string HashCommand::operator ( ) ( DVS &dvs_, const HashType hashType_, con
 
   std::cout << hashSs.str() << std::endl;
 
-  if ( write_ )
+  if ( m_WriteFile )
   {
-    str_.seekg( std::ios_base::beg );
+    inputStream->seekg( std::ios_base::beg );
 
     std::filesystem::path objectPath = dvs_.GetDvsDirectory( );
     objectPath /= "objects";
@@ -100,8 +154,8 @@ std::string HashCommand::operator ( ) ( DVS &dvs_, const HashType hashType_, con
     while ( outputFile.good( ) )
     {
       memset( &buffer[ 0 ], 0, sizeof( buffer ) );
-      str_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-      if ( std::streamsize bytesRead = str_.gcount( );
+      inputStream->read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
+      if ( std::streamsize bytesRead = inputStream->gcount( );
            bytesRead > 0 )
       {
         outputFile.write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );

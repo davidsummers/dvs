@@ -116,42 +116,20 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
       }
 
       err = catCommand( *this );
-      return err;
   }
   else if ( docopt::value hashOption = args_[ "hash" ];
-       hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
+            hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
   {
     HashCommand hashCommand;
-    docopt::value stdinOption = args_[ "-i" ];
-    bool stdInput = stdinOption && stdinOption.isBool( ) && stdinOption.asBool( );
-    docopt::value writeOption = args_[ "-w" ];
-    bool write = writeOption && writeOption.isBool( ) && writeOption.asBool( );
-    if ( stdInput )
+
+    err = hashCommand.ParseArgs( args_ );
+
+    if ( !err.empty( ) )
     {
-      err = hashCommand( *this, HashCommand::HashType::blob, "", std::cin, write );
+      return err;
     }
-    else
-    {
-      if ( docopt::value fileOption = args_[ "<file>" ];
-           fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
-      {
-        std::ifstream inputFile( fileOption.asString( ), std::ios_base::binary );
-        if ( inputFile.is_open( ) )
-        {
-          err = hashCommand( *this, HashCommand::HashType::blob, fileOption.asString( ), inputFile, write );
-        }
-        else
-        {
-          std::stringstream ss;
-          ss << "Couldn't open input file '" << fileOption.asString( ) << "'";
-          err = ss.str( );
-        }
-      }
-      else
-      {
-        err = "Missing file name.";
-      }
-    }
+
+    err = hashCommand( *this );
   }
 
   return err;
