@@ -1,5 +1,9 @@
 #include <iostream>
 #include <fstream>
+#ifdef WIN32
+#include <io.h>
+#define mktemp _mktemp
+#endif
 
 #include "command_hash.h"
 #include "dvs.h"
