@@ -106,26 +106,17 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
   if ( docopt::value catOption = args_[ "cat" ];
        catOption && catOption.isBool( ) && catOption.asBool( ) )
   {
-      CatCommand::PrintType printType = CatCommand::PrintType::hash;
+      CatCommand catCommand;
 
-      if ( docopt::value typeOption = args_[ "-t" ];
-           typeOption && typeOption.isBool( ) && typeOption.asBool( ) )
+      err = catCommand.ParseArgs( args_ );
+
+      if ( !err.empty( ) )
       {
-        printType = CatCommand::PrintType::type; 
+        return err;
       }
 
-      if ( docopt::value hashOption = args_[ "<hash>" ];
-           hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
-      {
-          CatCommand catCommand;
-          err = catCommand( *this, printType, hashOption.asString( ) );
-      }
-      else
-      {
-          std::stringstream ss;
-          ss << "Missing hash identifier.";
-          return ss.str( );
-      }
+      err = catCommand( *this );
+      return err;
   }
   else if ( docopt::value hashOption = args_[ "hash" ];
        hashOption && hashOption.isBool( ) && hashOption.asBool( ) )

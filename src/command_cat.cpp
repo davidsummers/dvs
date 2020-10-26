@@ -7,7 +7,33 @@
 #include "dvs.h"
 
 
-std::string CatCommand::operator ( ) ( DVS &dvs_, const PrintType printType_, const std::string &hash_id_ )
+std::string CatCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+{
+  std::string err;
+
+  if ( docopt::value typeOption = args_[ "-t" ];
+        typeOption && typeOption.isBool( ) && typeOption.asBool( ) )
+  {
+    m_PrintType = CatCommand::PrintType::type; 
+  }
+
+  if ( docopt::value hashOption = args_[ "<hash>" ];
+        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
+  {
+      m_HashId = hashOption.asString( );
+  }
+  else
+  {
+      std::stringstream ss;
+      ss << "Missing hash identifier.";
+      err = ss.str( );
+  }
+
+  return err;
+}
+
+
+std::string CatCommand::operator ( ) ( DVS &dvs_ )
 {
   if ( std::string validateError = dvs_.Validate( );
        !validateError.empty( ) )
@@ -15,12 +41,12 @@ std::string CatCommand::operator ( ) ( DVS &dvs_, const PrintType printType_, co
     return validateError;
   }
 
-  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / hash_id_.substr( 0, 2 ) / hash_id_.substr( 2 );
+  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / m_HashId.substr( 0, 2 ) / m_HashId.substr( 2 );
 
   if ( !std::filesystem::exists( hashPath ) )
   {
     std::stringstream ss;
-    ss << "Hash " << hash_id_ << " does not exist.";
+    ss << "Hash " << m_HashId << " does not exist.";
     return ss.str( );
   }
 
@@ -38,7 +64,7 @@ std::string CatCommand::operator ( ) ( DVS &dvs_, const PrintType printType_, co
   // Read header.
   std::getline( inputFile, header, '\0' );
 
-  if ( printType_ == PrintType::type )
+  if ( m_PrintType == PrintType::type )
   {
     std::string::size_type pos = header.find( ' ' );
     if ( pos != std::string::npos )
