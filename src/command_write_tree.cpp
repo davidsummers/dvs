@@ -14,14 +14,27 @@ std::string WriteTreeCommand::operator ( ) ( DVS &dvs_ )
     return validateError;
   }
 
-  std::string err = WriteTree( dvs_ );
+  WriteTreeResult result = WriteTree( dvs_ );
 
-  return err;
+  std::cout << "Top Level Directory: " << result.oid << std::endl;
+
+  return result.err;
 }
 
 
-std::string WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
+WriteTreeCommand::WriteTreeResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 {
+  using DirEntry = struct
+  {
+    std::string           oid;
+    HashCommand::HashType type;
+    std::string           filename;
+  };
+
+  using DirList = std::map< std::string, DirEntry >;
+
+  DirList dirList;
+
   for ( auto const &entry : std::filesystem::directory_iterator( dir_ ) )
   {
     if ( IsIgnored( entry.path( ) ) )
@@ -33,34 +46,58 @@ std::string WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
     {
       HashCommand hashCommand;
 
-      auto [ err, hash ] = hashCommand.Hash( dvs_, entry.path( ).string( ) );
+      auto [ err, hash ] = hashCommand.Hash( dvs_, entry.path( ).string( ), HashCommand::HashType::blob  );
 
       if ( !err.empty( ) )
       {
-        return err;
+        return { err, "" };
       }
 
-      std::cout << hash << " " << entry.path( ) << std::endl;
+      DirEntry dirEntry;
+      dirEntry.filename = entry.path( ).filename( ).string( );
+      dirEntry.type = HashCommand::HashType::blob;
+      dirEntry.oid = hash;
+      dirList[ dirEntry.filename ] = dirEntry;
     }
     else if ( entry.is_directory( ) )
     {
-      if ( std::string err = WriteTree( dvs_, entry.path( ).string( ) );
-           !err.empty( ) )
+      WriteTreeResult result = WriteTree( dvs_, entry.path( ).string( ) );
+      if ( !result.err.empty( ) )
       {
-        return err;
+        return { result.err, "" };
       }
 
-      // TODO: Do something with the directory entry.
+      DirEntry dirEntry;
+      dirEntry.filename = entry.path( ).filename( ).string( );
+      dirEntry.type = HashCommand::HashType::tree;
+      dirEntry.oid = result.oid;
+      dirList[ dirEntry.filename ] = dirEntry;
     }
     else
     {
       std::stringstream ss;
       ss << "Unknown file type for " << entry.path( ) << ".";
-      return ss.str( );
+      return { ss.str( ), "" };
     }
   }
 
-  return "";
+  HashCommand hashCommand;
+
+  std::stringstream ss;
+
+  for ( auto &entry : dirList )
+  {
+    ss << hashCommand.LookupType( entry.second.type ) << " " << entry.second.oid << " " << entry.second.filename << std::endl;
+  }
+
+  std::cout << "tree" << std::endl;
+  std::cout << ss.str( ) << std::endl;
+
+  auto [ hashErr, oid ] = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), HashCommand::HashType::tree );
+
+  // std::cout << "Directory End: " << oid << std::endl;
+  
+  return { hashErr, oid };
 }
 
 
