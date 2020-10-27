@@ -11,6 +11,17 @@
 #include "Keccak.h"
 
 
+using HashMapLookup = std::map< HashCommand::HashType, std::string >;
+
+HashMapLookup s_HashMapLookup =
+{
+  { HashCommand::HashType::none, "none" },
+  { HashCommand::HashType::blob, "blob" },
+  { HashCommand::HashType::tag,  "tag"  },
+  { HashCommand::HashType::tree, "tree" },
+};
+
+
 std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
     std::string err;
@@ -44,29 +55,30 @@ std::string HashCommand::operator ( ) ( DVS &dvs_ )
   return err;
 }
 
+
 HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const HashType hashType_ )
 {
-  std::string err;
+  std::ifstream inputFileStream( filename_, std::ios_base::binary );
 
-  std::ostringstream hashSs;
-
-  std::istream *inputStream = nullptr;
-
-  std::ifstream inputFileStream;
-
+  if ( !inputFileStream.is_open( ) )
   {
-    inputFileStream.open( filename_, std::ios_base::binary );
-
-    if ( !inputFileStream.is_open( ) )
-    {
-      std::stringstream ss;
-      ss << "Couldn't open input file '" << filename_ << "'";
-      err = ss.str( );
-      return { err, "" };
-    }
-
-    inputStream = &inputFileStream;
+    std::stringstream ss;
+    ss << "Couldn't open input file '" << filename_ << "'";
+    std::string err = ss.str( );
+    return { err, "" };
   }
+
+  size_t size = std::filesystem::file_size( filename_ );
+
+  auto [ err, oid ] = Hash( dvs_, inputFileStream, size, hashType_ );
+
+  return { err, oid };
+}
+
+
+HashCommand::HashResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_, HashType hashType_ )
+{
+  std::ostringstream hashSs;
 
   const int SHA_BUF_SIZE = 4096;
   Keccak hashObj( 256 );
@@ -78,7 +90,7 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filenam
   switch ( hashType_ )
   {
     case HashType::blob:
-      headerSs << "blob " << std::filesystem::file_size( filename_ ) << '\0';
+      headerSs << "blob " << size_ << '\0';
       break;
 
     case HashType::commit:
@@ -106,15 +118,15 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filenam
   do
   {
     memset( &buffer[ 0 ], 0, sizeof( buffer ) );
-    inputStream->read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-    if ( std::streamsize bytesRead = inputStream->gcount( );
+    inputStream_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
+    if ( std::streamsize bytesRead = inputStream_.gcount( );
           bytesRead > 0 )
     {
       hashObj.addData( &buffer[ 0 ], 0, static_cast< unsigned int>( bytesRead ) );
     }
-  } while ( inputStream->good( ) );
+  } while ( inputStream_.good( ) );
 
-  inputStream->clear( );
+  inputStream_.clear( );
 
   std::vector< unsigned char > op = hashObj.digest();
 
@@ -127,7 +139,7 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filenam
   }
 
   {
-    inputStream->seekg( std::ios_base::beg );
+    inputStream_.seekg( std::ios_base::beg );
 
     std::filesystem::path objectPath = dvs_.GetDvsDirectory( );
     objectPath /= "objects";
@@ -152,8 +164,8 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filenam
     while ( outputFile.good( ) )
     {
       memset( &buffer[ 0 ], 0, sizeof( buffer ) );
-      inputStream->read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-      if ( std::streamsize bytesRead = inputStream->gcount( );
+      inputStream_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
+      if ( std::streamsize bytesRead = inputStream_.gcount( );
             bytesRead > 0 )
       {
         outputFile.write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
@@ -166,4 +178,10 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filenam
   }
 
   return { "", hashSs.str( ) };
+}
+
+
+std::string HashCommand::LookupType( const HashType hashType_ )
+{
+  return s_HashMapLookup[ hashType_ ];
 }
