@@ -29,7 +29,7 @@ R"(DVS - David's Versioning System.
       dvs push
       dvs status
       dvs internal cat [ -t ] <hash>
-      dvs internal hash [ -i ] [ -w ] [ <file> ]
+      dvs internal hash <file>
       dvs internal write-tree
       dvs (-h | --help)
       dvs --version

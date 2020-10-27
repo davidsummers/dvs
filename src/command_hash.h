@@ -20,9 +20,17 @@ class HashCommand
       tag,
     };
 
+    using HashResult = struct
+    {
+      std::string err;
+      std::string oid;
+    };
+
     std::string ParseArgs( std::map< std::string, docopt::value > & );
 
     std::string operator ( ) ( DVS & );
+
+    HashResult Hash( DVS &, const std::string &, const HashType type = HashType::blob );
 
   protected:
 
@@ -32,9 +40,6 @@ class HashCommand
     // Data
     //
 
-    HashType    m_HashType  = HashType::blob;
-    bool        m_StdInput  = false;
-    bool        m_WriteFile = false;
     std::string m_Filename;
 
     //
