@@ -16,6 +16,6 @@ class WriteTreeCommand
 
   private:
 
-    std::string WriteTree( const std::string &dir = "." );
+    std::string WriteTree( DVS &, const std::string &dir = "." );
     bool IsIgnored( const std::filesystem::path & );
 };

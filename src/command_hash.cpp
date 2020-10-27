@@ -55,12 +55,12 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filenam
   std::ifstream inputFileStream;
 
   {
-    inputFileStream.open( m_Filename, std::ios_base::binary );
+    inputFileStream.open( filename_, std::ios_base::binary );
 
     if ( !inputFileStream.is_open( ) )
     {
       std::stringstream ss;
-      ss << "Couldn't open input file '" << m_Filename << "'";
+      ss << "Couldn't open input file '" << filename_ << "'";
       err = ss.str( );
       return { err, "" };
     }
@@ -78,7 +78,7 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filenam
   switch ( hashType_ )
   {
     case HashType::blob:
-      headerSs << "blob " << std::filesystem::file_size( m_Filename ) << '\0';
+      headerSs << "blob " << std::filesystem::file_size( filename_ ) << '\0';
       break;
 
     case HashType::commit:
