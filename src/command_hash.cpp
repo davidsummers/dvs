@@ -94,18 +94,18 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_
       break;
 
     case HashType::commit:
-      headerSs << "commit\0";
+      headerSs << "commit" << '\0';
       break;
 
     case HashType::none:
       return { "HashType: none", "" }; // Illegal - return errror.
 
     case HashType::tag:
-      headerSs << "tag\0";
+      headerSs << "tag" << '\0';
       break;
 
     case HashType::tree:
-      headerSs << "tree\0";
+      headerSs << "tree" << '\0';
       break;
   }
 
