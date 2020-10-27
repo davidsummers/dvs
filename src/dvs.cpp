@@ -13,6 +13,7 @@
 #include "command_hash.h"
 #include "command_init.h"
 #include "command_status.h"
+#include "command_write_tree.h"
 #include "CommandParser.h"
 
 
@@ -29,6 +30,7 @@ R"(DVS - David's Versioning System.
       dvs status
       dvs internal cat [ -t ] <hash>
       dvs internal hash [ -i ] [ -w ] [ <file> ]
+      dvs internal write-tree
       dvs (-h | --help)
       dvs --version
 
@@ -131,6 +133,12 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
 
     err = hashCommand( *this );
   }
+  else if ( docopt::value writeTreeOption = args_[ "write-tree" ];
+            writeTreeOption && writeTreeOption.isBool( ) && writeTreeOption.asBool( ) )
+ {
+   WriteTreeCommand writeTreeCommand;
+   err = writeTreeCommand( *this );
+ }
 
   return err;
 }

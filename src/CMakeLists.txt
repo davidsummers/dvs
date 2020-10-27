@@ -4,6 +4,7 @@ set( SOURCE_FILES
      command_hash.cpp
      command_init.cpp
      command_status.cpp
+     command_write_tree.cpp
      dvs.cpp
      main.cpp
    )
@@ -13,6 +14,7 @@ set( HEADER_FILES
      command_hash.h
      command_init.h
      command_status.h
+     command_write_tree.h
      dvs.h
    )
 
