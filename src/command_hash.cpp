@@ -153,8 +153,9 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_
     if ( std::filesystem::exists( objectPath ) )
     {
       std::stringstream ss;
-      ss << "Error: File '" << objectPath << "' already exists.";
-      return { ss.str( ), "" };
+      ss << "Warning: File '" << objectPath << "' already exists.";
+      std::cerr << ss.str( ) << std::endl;
+      return { "", hashSs.str( ) };
     }
 
     std::ofstream outputFile( objectPath,  std::ios_base::binary );
