@@ -31,7 +31,7 @@ R"(DVS - David's Versioning System.
       dvs status
       dvs internal cat [ -t ] <hash>
       dvs internal hash <file>
-      dvs internal read-tree
+      dvs internal read-tree <hash>
       dvs internal write-tree
       dvs (-h | --help)
       dvs --version
@@ -125,6 +125,13 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
             readTreeOption && readTreeOption.isBool( ) && readTreeOption.asBool( ) )
   {
     ReadTreeCommand readTreeCommand;
+
+    err = readTreeCommand.ParseArgs( args_ );
+
+    if ( !err.empty( ) )
+    {
+      return err;
+    }
 
     err = readTreeCommand( *this );
   }

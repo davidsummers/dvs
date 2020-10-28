@@ -16,11 +16,15 @@ class ReadTreeCommand
       std::string oid;
     };
 
+    std::string ParseArgs( std::map< std::string, docopt::value > & );
+
     std::string operator ( ) ( DVS & );
+
+    ReadTreeResult ReadTree( DVS &, const std::string &hashId );
 
   protected:
 
   private:
 
-//    WriteTreeResult WriteTree( DVS &, const std::string &dir = "." );
+    std::string m_HashId;
 };
