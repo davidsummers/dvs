@@ -12,6 +12,7 @@
 #include "command_cat.h"
 #include "command_hash.h"
 #include "command_init.h"
+#include "command_read_tree.h"
 #include "command_status.h"
 #include "command_write_tree.h"
 #include "CommandParser.h"
@@ -30,6 +31,7 @@ R"(DVS - David's Versioning System.
       dvs status
       dvs internal cat [ -t ] <hash>
       dvs internal hash <file>
+      dvs internal read-tree
       dvs internal write-tree
       dvs (-h | --help)
       dvs --version
@@ -118,6 +120,13 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
       }
 
       err = catCommand( *this );
+  }
+  else if ( docopt::value readTreeOption = args_[ "read-tree" ];
+            readTreeOption && readTreeOption.isBool( ) && readTreeOption.asBool( ) )
+  {
+    ReadTreeCommand readTreeCommand;
+
+    err = readTreeCommand( *this );
   }
   else if ( docopt::value hashOption = args_[ "hash" ];
             hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
