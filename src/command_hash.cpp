@@ -24,17 +24,17 @@ HashMapLookup s_HashMapLookup =
 
 std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-    std::string err;
+  std::string err;
 
-    if ( docopt::value fileOption = args_[ "<file>" ];
-          fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
-    {
-      m_Filename = fileOption.asString( );
-    }
-    else
-    {
-      err = "Missing file name.";
-    }
+  if ( docopt::value fileOption = args_[ "<file>" ];
+        fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
+  {
+    m_Filename = fileOption.asString( );
+  }
+  else
+  {
+    err = "Missing file name.";
+  }
 
   return err;
 }
