@@ -5,32 +5,60 @@
 #include "command_init.h"
 #include "dvs.h"
 
+std::string InitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+{
+  std::string err;
+
+  if ( docopt::value dirOption = args_[ "<directory>" ];
+       dirOption && dirOption.isString( ) && !dirOption.asString( ).empty( ) )
+  {
+    m_Directory = dirOption.asString( );
+  }
+
+  return err;
+}
+
 
 std::string InitCommand::operator ( ) ( DVS &dvs_ )
 {
-  std::cout << "Initializing..." << std::endl;
+  std::string err = InitDvs( dvs_, m_Directory );
 
-  std::filesystem::path rootPath = DVS_DIR;
+  return err;
+}
 
+
+std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_ )
+{
+  std::string rootPath = rootPath_;
+
+  if ( rootPath.empty( ) )
+  {
+    rootPath = ".";
+  }
+ 
   // Create initial control directory structure
-  if ( std::filesystem::exists( rootPath ) &&
+  if ( rootPath != "." &&
+       std::filesystem::exists( rootPath ) &&
        std::filesystem::is_directory( rootPath ) )
   {
     std::stringstream ss;
-    ss << "Directory " << DVS_DIR << " already exists.";
+    ss << "Directory '" << rootPath << "' already exists.";
     return ss.str( );
   }
 
+  std::filesystem::path dvsDir = rootPath;
+  dvsDir /= DVS_DIR;
+
   // Create DVS directory.
-  if ( !std::filesystem::create_directory( rootPath ) )
+  if ( !std::filesystem::create_directories( dvsDir ) )
   {
     std::stringstream ss;
-    ss << "Can't create directory '" << rootPath << "'";
+    ss << "Can't create directory '" << dvsDir << "'";
     return ss.str( );
   }
 
   // Create DVS/objects directory.
-  std::filesystem::path objectsDir = rootPath;
+  std::filesystem::path objectsDir = dvsDir;
   objectsDir /= "objects";
 
   if ( !std::filesystem::create_directory( objectsDir ) )
@@ -41,13 +69,15 @@ std::string InitCommand::operator ( ) ( DVS &dvs_ )
   }
 
 
-  if ( std::string validate_error = dvs_.Validate( );
+  if ( std::string validate_error = dvs_.Validate( dvsDir.string( ) );
        !validate_error.empty( ) )
   {
     return validate_error;
   }
 
-  std::cout << "Initialized empty DVS repository in " << std::filesystem::absolute( rootPath ) << std::endl;
+  std::cout << "Initialized empty DVS repository in " <<
+    ( rootPath == "." ? "current directory" : std::filesystem::absolute( rootPath ) ) <<
+    std::endl;
 
   return ""; // No error.
 }

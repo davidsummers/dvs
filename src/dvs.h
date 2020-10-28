@@ -23,7 +23,7 @@ class DVS
     std::string ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
 
     // Helpers
-    std::string Validate( );
+    std::string Validate( const std::string &dir = "" );
 
     std::filesystem::path GetDvsDirectory( );
 

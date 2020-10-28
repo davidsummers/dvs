@@ -25,7 +25,7 @@ R"(DVS - David's Versioning System.
       dvs checkout
       dvs commit
       dvs fetch
-      dvs init
+      dvs init [<directory>]
       dvs pull
       dvs push
       dvs status
@@ -74,12 +74,21 @@ int DVS::ParseCommands( int argc_, char **argv_ )
        initOption && initOption.isBool( ) && initOption.asBool( ) )
   {
     InitCommand initCommand;
+
+    err = initCommand.ParseArgs( args );
+
+    if ( !err.empty( ) )
+    {
+      return 1;
+    }
+
     err = initCommand( *this );
   }
   else if ( docopt::value statusOption = args[ "status" ];
             statusOption && statusOption.isBool( ) && statusOption.asBool( ) )
   {
     StatusCommand statusCommand;
+
     err = statusCommand( *this );
   }
   else if ( docopt::value internalOption = args[ "internal" ];
@@ -160,9 +169,14 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
 }
 
 
-std::string DVS::Validate( )
+std::string DVS::Validate( const std::string &dir_ )
 {
   std::filesystem::path currentPath = m_OriginalDirectory;
+
+  if ( !dir_.empty( ) )
+  {
+    currentPath = dir_;
+  }
 
   for ( ; !currentPath.empty( ); currentPath = RemoveLastPathElement( currentPath ) )
   {
