@@ -41,12 +41,20 @@ std::string CatCommand::operator ( ) ( DVS &dvs_ )
     return validateError;
   }
 
-  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / m_HashId.substr( 0, 2 ) / m_HashId.substr( 2 );
+  std::string err = GetHash( dvs_, m_HashId );
+
+  return err;
+}
+
+
+std::string CatCommand::GetHash( DVS &dvs_, const std::string &hashId_ )
+{
+  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / hashId_.substr( 0, 2 ) / hashId_.substr( 2 );
 
   if ( !std::filesystem::exists( hashPath ) )
   {
     std::stringstream ss;
-    ss << "Hash " << m_HashId << " does not exist.";
+    ss << "Hash " << hashId_ << " does not exist.";
     return ss.str( );
   }
 

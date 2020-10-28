@@ -13,7 +13,7 @@ class CatCommand
 
     enum class PrintType
     {
-      hash,
+      contents,
       type,
     };
 
@@ -21,10 +21,12 @@ class CatCommand
 
     std::string operator ( ) ( DVS & );
 
+    std::string GetHash( DVS &, const std::string &hashID );
+
   protected:
 
   private:
 
-    PrintType   m_PrintType = PrintType::hash;
+    PrintType   m_PrintType = PrintType::contents;
     std::string m_HashId;
 };
