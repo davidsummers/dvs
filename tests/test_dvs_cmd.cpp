@@ -20,12 +20,16 @@
 #include <unistd.h>
 #endif
 
+#include "dvs.h"
 #include "dvs_test.h"
 
 // The tests.
 
+// Tests the 'dvs init' command.
 static dvs_error_t test_dvs_init( )
 {
+  DVS dvs;
+
   return DVS_NO_ERROR;
 }
 

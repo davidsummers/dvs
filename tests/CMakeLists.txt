@@ -18,3 +18,6 @@ add_executable( test_dvs_command
                 ${DVS_TEST_HEADER_FILES}
               )
 
+target_include_directories( test_dvs_command PRIVATE
+                            ../src
+                          )
