@@ -56,7 +56,7 @@ std::string HashCommand::operator ( ) ( DVS &dvs_ )
 }
 
 
-HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const HashType hashType_ )
+OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const HashType hashType_ )
 {
   std::ifstream inputFileStream( filename_, std::ios_base::binary );
 
@@ -76,7 +76,7 @@ HashCommand::HashResult HashCommand::Hash( DVS &dvs_, const std::string &filenam
 }
 
 
-HashCommand::HashResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_, HashType hashType_ )
+OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_, HashType hashType_ )
 {
   std::ostringstream hashSs;
 

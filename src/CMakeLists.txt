@@ -17,6 +17,7 @@ set( HEADER_FILES
      command_read_tree.h
      command_status.h
      command_write_tree.h
+     common.h
      dvs.h
    )
 

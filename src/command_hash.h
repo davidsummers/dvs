@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "common.h"
 #include "docopt.h"
 
 
@@ -20,19 +21,13 @@ class HashCommand
       tag,
     };
 
-    using HashResult = struct
-    {
-      std::string err;
-      std::string oid;
-    };
-
     std::string ParseArgs( std::map< std::string, docopt::value > & );
 
     std::string operator ( ) ( DVS & );
 
-    HashResult Hash( DVS &, const std::string &filename, const HashType type = HashType::blob );
+    OidResult Hash( DVS &, const std::string &filename, const HashType type = HashType::blob );
 
-    HashResult Hash( DVS &, std::istream &, size_t size, const HashType type = HashType::blob );
+    OidResult Hash( DVS &, std::istream &, size_t size, const HashType type = HashType::blob );
 
     std::string LookupType( const HashType );
 

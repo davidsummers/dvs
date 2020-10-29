@@ -14,7 +14,7 @@ std::string WriteTreeCommand::operator ( ) ( DVS &dvs_ )
     return validateError;
   }
 
-  WriteTreeResult result = WriteTree( dvs_ );
+  OidResult result = WriteTree( dvs_ );
 
   std::cout << "Top Level Directory: " << result.oid << std::endl;
 
@@ -22,7 +22,7 @@ std::string WriteTreeCommand::operator ( ) ( DVS &dvs_ )
 }
 
 
-WriteTreeCommand::WriteTreeResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
+OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 {
   using DirEntry = struct
   {
@@ -61,7 +61,7 @@ WriteTreeCommand::WriteTreeResult WriteTreeCommand::WriteTree( DVS &dvs_, const 
     }
     else if ( entry.is_directory( ) )
     {
-      WriteTreeResult result = WriteTree( dvs_, entry.path( ).string( ) );
+      OidResult result = WriteTree( dvs_, entry.path( ).string( ) );
       if ( !result.err.empty( ) )
       {
         return { result.err, "" };
