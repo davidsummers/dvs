@@ -29,6 +29,7 @@
 // Tests the 'dvs init' command.
 static dvs_error_t test_dvs_init( )
 {
+  std::filesystem::remove_all( "test" );
   {
     DVS dvs;
 
