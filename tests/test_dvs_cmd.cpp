@@ -23,6 +23,7 @@
 
 #include "dvs.h"
 #include "dvs_test.h"
+#include "command_cat.h"
 #include "command_init.h"
 #include "command_hash.h"
 
@@ -74,23 +75,23 @@ static dvs_error_t test_dvs_internal_hash( )
 
     std::filesystem::current_path( TEST_DIR );
 
-    const char *README = "README.txt";
-
+    const char *EXPECTED_FILE_NAME = "README.txt";
+    const char *EXPECTED_TEXT = "This is a test file.\n";
     {
-      std::ofstream readmeFile( README );
-      readmeFile << "This is a " << README << " file." << std::endl;
+      std::ofstream readmeFile( EXPECTED_FILE_NAME );
+      readmeFile << EXPECTED_TEXT;
     }
 
     HashCommand hashCommand;
 
-    OidResult result = hashCommand.Hash( dvs, README );
+    OidResult result = hashCommand.Hash( dvs, EXPECTED_FILE_NAME );
     
     if ( !result.err.empty( ) )
     {
       DVS_ERROR( result.err.c_str( ) );
     }
 
-    const char *EXPECTED_OID = "996d18c4220e5b4386e1ddeba480b2fc6e54e4d986ecf3634b834122c7fafdff";
+    const char *EXPECTED_OID = "4489764f4231744fc5d7310cb208657282cfe45d943a65ac69b4d6404763193c";
     if ( result.oid != EXPECTED_OID )
     {
       std::stringstream ss;
@@ -103,6 +104,91 @@ static dvs_error_t test_dvs_internal_hash( )
 }
 
 
+// Tests the 'dvs internal cat <hash>' command.
+static dvs_error_t test_dvs_internal_cat( )
+{
+  std::filesystem::remove_all( TEST_DIR );
+  {
+    DVS dvs;
+
+    InitCommand initCommand;
+
+    std::string err = initCommand.InitDvs( dvs, TEST_DIR );
+
+    if ( !err.empty( ) )
+    {
+      std::stringstream ss;
+      ss << "Error creating dvs '" << TEST_DIR << "' directory: " << err << std::endl; 
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
+    std::filesystem::current_path( TEST_DIR );
+
+    const char *EXPECTED_FILE_NAME = "README.txt";
+    const char *EXPECTED_TEXT = "This is a test file.\r\n";
+    {
+      std::ofstream readmeFile( EXPECTED_FILE_NAME, std::ios_base::binary );
+      readmeFile << EXPECTED_TEXT;
+    }
+
+    HashCommand hashCommand;
+
+    OidResult result = hashCommand.Hash( dvs, EXPECTED_FILE_NAME );
+    
+    if ( !result.err.empty( ) )
+    {
+      DVS_ERROR( result.err.c_str( ) );
+    }
+
+    const char *EXPECTED_OID = "4489764f4231744fc5d7310cb208657282cfe45d943a65ac69b4d6404763193c";
+    if ( result.oid != EXPECTED_OID )
+    {
+      std::stringstream ss;
+      ss << "Expected: " << EXPECTED_OID << ", but got " << result.oid << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
+    CatCommand catCommand;
+
+    std::stringstream outputStream;
+
+    CatCommand::CatResult catResult = catCommand.GetHash( dvs, EXPECTED_OID, &outputStream );
+ 
+    const std::string expectedType = "blob";
+    const size_t expectedSize = 22;
+
+    if ( catResult.type != expectedType )
+    {
+      std::stringstream ss;
+      ss << "Expected type '" << expectedType << "' but got '" << catResult.type << "'." << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
+    if ( catResult.size != expectedSize )
+    {
+      std::stringstream ss;
+      ss << "Expected size " << expectedSize << " but got " << catResult.size << "." << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
+    if ( expectedSize != outputStream.str( ).size( ) )
+    {
+      std::stringstream ss;
+      ss << "Expected stream size " << expectedSize << " but got " << outputStream.str( ).size( ) << "." << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
+    if ( outputStream.str( ) != EXPECTED_TEXT )
+    {
+      std::stringstream ss;
+      ss << "Expected: '" << EXPECTED_TEXT << "' but got '" << outputStream.str( ) << "'." << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+  }
+
+  return DVS_NO_ERROR;
+}
+
 /* The test table.  */
 
 struct dvs_test_descriptor_t test_funcs[] =
@@ -110,5 +196,6 @@ struct dvs_test_descriptor_t test_funcs[] =
   DVS_TEST_NULL,
   DVS_TEST_PASS( test_dvs_init,          "Test DVS init command."          ),
   DVS_TEST_PASS( test_dvs_internal_hash, "Test DVS internal hash command." ),
+  DVS_TEST_PASS( test_dvs_internal_cat,  "Test DVS internal cat <hash> command." ),
   DVS_TEST_NULL
 };

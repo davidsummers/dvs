@@ -14,14 +14,22 @@ class CatCommand
     enum class PrintType
     {
       contents,
+      size,
       type,
+    };
+
+    using CatResult = struct
+    {
+      std::string err;
+      size_t      size;
+      std::string type;
     };
 
     std::string ParseArgs( std::map< std::string, docopt::value > & );
 
     std::string operator ( ) ( DVS & );
 
-    std::string GetHash( DVS &, const std::string &hashID );
+    CatResult GetHash( DVS &, const std::string &hashID, std::ostream * );
 
   protected:
 

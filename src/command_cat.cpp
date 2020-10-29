@@ -11,14 +11,20 @@ std::string CatCommand::ParseArgs( std::map< std::string, docopt::value > &args_
 {
   std::string err;
 
-  if ( docopt::value typeOption = args_[ "-t" ];
-        typeOption && typeOption.isBool( ) && typeOption.asBool( ) )
+  if ( docopt::value sizeOption = args_[ "-s" ];
+       sizeOption && sizeOption.isBool( ) && sizeOption.asBool( ) )
   {
-    m_PrintType = CatCommand::PrintType::type; 
+    m_PrintType = PrintType::size;
+  }
+
+  if ( docopt::value typeOption = args_[ "-t" ];
+       typeOption && typeOption.isBool( ) && typeOption.asBool( ) )
+  {
+    m_PrintType = PrintType::type; 
   }
 
   if ( docopt::value hashOption = args_[ "<hash>" ];
-        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
+       hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
   {
       m_HashId = hashOption.asString( );
   }
@@ -41,21 +47,42 @@ std::string CatCommand::operator ( ) ( DVS &dvs_ )
     return validateError;
   }
 
-  std::string err = GetHash( dvs_, m_HashId );
+  std::ostream *outputStream = &std::cout;
 
-  return err;
+  if ( m_PrintType == PrintType::size ||
+       m_PrintType == PrintType::type )
+  {
+    outputStream = nullptr;
+  }
+
+  CatResult result = GetHash( dvs_, m_HashId, outputStream );
+
+  if ( m_PrintType == PrintType::type )
+  {
+    std::cout << result.type << std::endl;
+  }
+
+  if ( m_PrintType == PrintType::size )
+  {
+    std::cout << result.size << std::endl;
+  }
+
+  return result.err;
 }
 
 
-std::string CatCommand::GetHash( DVS &dvs_, const std::string &hashId_ )
+CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_, std::ostream *ostream_ )
 {
+  CatResult result;
+
   std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / hashId_.substr( 0, 2 ) / hashId_.substr( 2 );
 
   if ( !std::filesystem::exists( hashPath ) )
   {
     std::stringstream ss;
     ss << "Hash " << hashId_ << " does not exist.";
-    return ss.str( );
+    result.err = ss.str( );
+    return result;
   }
 
   std::ifstream inputFile( hashPath, std::ios_base::binary );
@@ -64,7 +91,8 @@ std::string CatCommand::GetHash( DVS &dvs_, const std::string &hashId_ )
   {
     std::stringstream ss;
     ss << "Can't open file " << hashPath << ".";
-    return ss.str( );
+    result.err = ss.str( );
+    return result;
   }
 
   std::string header;
@@ -72,30 +100,35 @@ std::string CatCommand::GetHash( DVS &dvs_, const std::string &hashId_ )
   // Read header.
   std::getline( inputFile, header, '\0' );
 
-  if ( m_PrintType == PrintType::type )
   {
     std::string::size_type pos = header.find( ' ' );
+    std::string sizeStr;
     if ( pos != std::string::npos )
     {
+      sizeStr = header.substr( pos + 1 );
       header = header.substr( 0, pos );
     }
 
-    std::cout << header << std::endl;
-    return "";
+    result.size = atoi( sizeStr.c_str( ) );
+    result.type = header;
   }
   
+  if ( ostream_ == nullptr )
+  {
+    return result;
+  }
+
   uint8_t buffer[ 4096 ];
 
   do
   {
-    memset( &buffer[ 0 ], 0, sizeof( buffer ) );
     inputFile.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
     if ( std::streamsize bytesRead = inputFile.gcount( );
          bytesRead > 0 )
     {
-      std::cout.write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
+      ostream_->write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
     }
   } while ( inputFile.good( ) );
 
-  return "";
+  return result;
 }

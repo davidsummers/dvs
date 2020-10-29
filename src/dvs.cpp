@@ -29,7 +29,7 @@ R"(DVS - David's Versioning System.
       dvs pull
       dvs push
       dvs status
-      dvs internal cat [ -t ] <hash>
+      dvs internal cat [ -s | -t ] <hash>
       dvs internal hash <file>
       dvs internal read-tree <hash>
       dvs internal write-tree
@@ -38,9 +38,8 @@ R"(DVS - David's Versioning System.
 
     Options:
       -h --help              Show this help information.
-      -i                     Take input from stdin.
+      -s                     Size of hash content.
       -t                     Type of hash content (blob, commit, tag, tree).
-      -w                     Write output to .dvs/object hash store.
       --version              Show version.
 )";
 
