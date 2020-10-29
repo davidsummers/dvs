@@ -24,6 +24,8 @@ std::string WriteTreeCommand::operator ( ) ( DVS &dvs_ )
 
 OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 {
+  OidResult result;
+
   using DirEntry = struct
   {
     std::string           oid;
@@ -50,7 +52,8 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 
       if ( !err.empty( ) )
       {
-        return { err, "" };
+        result.err = err;
+        return result;
       }
 
       DirEntry dirEntry;
@@ -61,10 +64,11 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
     }
     else if ( entry.is_directory( ) )
     {
-      OidResult result = WriteTree( dvs_, entry.path( ).string( ) );
-      if ( !result.err.empty( ) )
+      OidResult writeResult = WriteTree( dvs_, entry.path( ).string( ) );
+      if ( !writeResult.err.empty( ) )
       {
-        return { result.err, "" };
+        result.err = writeResult.err; 
+        return result;
       }
 
       DirEntry dirEntry;
@@ -77,7 +81,8 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
     {
       std::stringstream ss;
       ss << "Unknown file type for " << entry.path( ) << ".";
-      return { ss.str( ), "" };
+      result.err = ss.str( );
+      return result;
     }
   }
 
@@ -97,7 +102,9 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 
   // std::cout << "Directory End: " << oid << std::endl;
   
-  return { hashErr, oid };
+  result.err = hashErr;
+  result.oid = oid;
+  return result;
 }
 
 

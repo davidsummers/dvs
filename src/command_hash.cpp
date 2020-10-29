@@ -58,26 +58,29 @@ std::string HashCommand::operator ( ) ( DVS &dvs_ )
 
 OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const HashType hashType_ )
 {
+  OidResult result;
   std::ifstream inputFileStream( filename_, std::ios_base::binary );
 
   if ( !inputFileStream.is_open( ) )
   {
     std::stringstream ss;
     ss << "Couldn't open input file '" << filename_ << "'";
-    std::string err = ss.str( );
-    return { err, "" };
+    result.err = ss.str( );
+     
+    return result;
   }
 
   size_t size = std::filesystem::file_size( filename_ );
 
-  auto [ err, oid ] = Hash( dvs_, inputFileStream, size, hashType_ );
+  result = Hash( dvs_, inputFileStream, size, hashType_ );
 
-  return { err, oid };
+  return result;
 }
 
 
 OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_, HashType hashType_ )
 {
+  OidResult result;
   std::ostringstream hashSs;
 
   const int SHA_BUF_SIZE = 4096;
@@ -98,7 +101,8 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
       break;
 
     case HashType::none:
-      return { "HashType: none", "" }; // Illegal - return errror.
+      result.err = "HashType: none"; // Illegal - return errror.
+      return result;
 
     case HashType::tag:
       headerSs << "tag" << '\0';
@@ -139,6 +143,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
   }
 
   {
+    OidResult result;
     inputStream_.seekg( std::ios_base::beg );
 
     std::filesystem::path objectPath = dvs_.GetDvsDirectory( );
@@ -155,7 +160,8 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
       std::stringstream ss;
       ss << "Warning: File '" << objectPath << "' already exists.";
       std::cerr << ss.str( ) << std::endl;
-      return { "", hashSs.str( ) };
+      result.oid = hashSs.str( );
+      return result;
     }
 
     std::ofstream outputFile( objectPath,  std::ios_base::binary );
@@ -178,7 +184,8 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
     }
   }
 
-  return { "", hashSs.str( ) };
+  result.oid = hashSs.str( );
+  return result;
 }
 
 
