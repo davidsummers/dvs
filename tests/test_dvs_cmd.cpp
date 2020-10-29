@@ -22,13 +22,27 @@
 
 #include "dvs.h"
 #include "dvs_test.h"
+#include "command_init.h"
 
 // The tests.
 
 // Tests the 'dvs init' command.
 static dvs_error_t test_dvs_init( )
 {
-  DVS dvs;
+  {
+    DVS dvs;
+
+    InitCommand initCommand;
+
+    std::string err = initCommand.InitDvs( dvs, "test" );
+
+    if ( !err.empty( ) )
+    {
+      std::stringstream ss;
+      ss << "Error creating dvs 'test' directory: " << err << std::endl; 
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+  }
 
   return DVS_NO_ERROR;
 }
