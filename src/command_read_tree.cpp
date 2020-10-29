@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 
@@ -31,12 +32,23 @@ std::string ReadTreeCommand::operator ( ) ( DVS &dvs_ )
     return validateError;
   }
 
-  ReadTreeResult result = ReadTree( dvs_, m_HashId );
+#if 0
+  OidResult result = ReadTree( dvs_, m_HashId );
+#endif
 
-  return result.err;
+  return "Not Yet Implemented.";
 }
 
-ReadTreeCommand::ReadTreeResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
+#if 0
+OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
 {
+  ReadTreeGenerator readTreeGenerator;
+
+  for ( auto [ err, path, hash ] : readTreeGenerator.GetTree( hashId_, "./" ) )
+  {
+    std::filesystem::create_directories( path.dirname( ) );
+  }
+
   return { "Not Yet Implemented.", "" };
 }
+#endif

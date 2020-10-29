@@ -8,6 +8,7 @@ set( SOURCE_FILES
      command_write_tree.cpp
      dvs.cpp
      main.cpp
+     read_tree_generator.cpp
    )
 
 set( HEADER_FILES
@@ -19,6 +20,7 @@ set( HEADER_FILES
      command_write_tree.h
      common.h
      dvs.h
+     read_tree_generator.h
    )
 
 add_executable( dvs

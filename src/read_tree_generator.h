@@ -8,7 +8,7 @@
 
 class DVS;
 
-class ReadTreeCommand
+class ReadTreeGenerator
 {
   public:
 
@@ -19,17 +19,9 @@ class ReadTreeCommand
       std::string           oid;
     };
 
-    std::string ParseArgs( std::map< std::string, docopt::value > & );
-
-    std::string operator ( ) ( DVS & );
-
-    OidResult ReadTree( DVS &, const std::string &hashId );
-
     GetTreeResult GetTree( const std::filesystem::path, const std::string &hashId );
 
   protected:
 
   private:
-
-    std::string m_HashId;
 };
