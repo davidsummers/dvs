@@ -21,13 +21,13 @@ std::string InitCommand::ParseArgs( std::map< std::string, docopt::value > &args
 
 std::string InitCommand::operator ( ) ( DVS &dvs_ )
 {
-  std::string err = InitDvs( dvs_, m_Directory );
+  std::string err = InitDvs( dvs_, m_Directory, &std::cout );
 
   return err;
 }
 
 
-std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_ )
+std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::ostream *outStream_ )
 {
   std::string rootPath = rootPath_;
 
@@ -75,9 +75,12 @@ std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_ )
     return validate_error;
   }
 
-  std::cout << "Initialized empty DVS repository in " <<
-    ( rootPath == "." ? "current directory" : std::filesystem::absolute( rootPath ) ) <<
-    std::endl;
+  if ( outStream_ != nullptr )
+  {
+    std::cout << "Initialized empty DVS repository in " <<
+      ( rootPath == "." ? "current directory" : std::filesystem::absolute( rootPath ) ) <<
+      std::endl;
+  }
 
   return ""; // No error.
 }

@@ -15,7 +15,7 @@ class InitCommand
 
     std::string operator ( ) ( DVS & );
 
-    std::string InitDvs( DVS &, const std::string rootPath = "" );
+    std::string InitDvs( DVS &, const std::string rootPath = "", std::ostream *outStream = nullptr );
 
   protected:
 
