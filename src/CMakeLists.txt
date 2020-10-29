@@ -10,7 +10,6 @@ set( SOURCE_FILES
      file_system_base.cpp
      file_system_memory.cpp
      file_system_normal.cpp
-     main.cpp
      read_tree_generator.cpp
    )
 
@@ -29,14 +28,29 @@ set( HEADER_FILES
      read_tree_generator.h
    )
 
-add_executable( dvs
-                ${SOURCE_FILES}
-                ${HEADER_FILES}
-              )
 
-target_compile_definitions( dvs PRIVATE
+# DVS LIBRARY
+
+add_library( dvslib
+             ${SOURCE_FILES}
+             ${HEADER_FILES}
+           )
+
+target_compile_definitions( dvslib PRIVATE
                            _CRT_SECURE_NO_WARNINGS
                          )
+
+
+target_include_directories( dvslib PRIVATE
+                            ../lib/docopt
+                            ../lib/SHA-3/SHA-3
+                          )
+
+# DVS command
+
+add_executable( dvs
+                main.cpp
+              )
 
 target_include_directories( dvs PRIVATE
                             ../lib/docopt
@@ -44,6 +58,7 @@ target_include_directories( dvs PRIVATE
                           )
 
 target_link_libraries( dvs
+                       dvslib
                        docopt_s
                        sha3lib
                      )

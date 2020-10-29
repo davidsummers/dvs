@@ -20,4 +20,13 @@ add_executable( test_dvs_command
 
 target_include_directories( test_dvs_command PRIVATE
                             ../src
+                            ../lib/docopt
+                            ../lib/SHA-3
                           )
+
+target_link_libraries( test_dvs_command
+                       dvslib
+                       docopt_s
+                       sha3lib
+                     )
+
