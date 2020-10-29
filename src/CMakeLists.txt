@@ -7,6 +7,9 @@ set( SOURCE_FILES
      command_status.cpp
      command_write_tree.cpp
      dvs.cpp
+     file_system_base.cpp
+     file_system_memory.cpp
+     file_system_normal.cpp
      main.cpp
      read_tree_generator.cpp
    )
@@ -20,6 +23,9 @@ set( HEADER_FILES
      command_write_tree.h
      common.h
      dvs.h
+     file_system_base.h
+     file_system_memory.h
+     file_system_normal.h
      read_tree_generator.h
    )
 
