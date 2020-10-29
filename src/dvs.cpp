@@ -175,7 +175,7 @@ std::string DVS::Validate( const std::string &dir_ )
 
   if ( !dir_.empty( ) )
   {
-    currentPath = dir_;
+    currentPath = currentPath / dir_;
   }
 
   for ( ; !currentPath.empty( ); currentPath = RemoveLastPathElement( currentPath ) )

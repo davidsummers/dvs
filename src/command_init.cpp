@@ -46,7 +46,7 @@ std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::o
     return ss.str( );
   }
 
-  std::filesystem::path dvsDir = rootPath;
+  std::filesystem::path dvsDir = dvs_.GetDvsDirectory( ) / rootPath;
   dvsDir /= DVS_DIR;
 
   // Create DVS directory.
