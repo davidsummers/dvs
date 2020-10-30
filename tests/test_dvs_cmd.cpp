@@ -370,6 +370,7 @@ static dvs_error_t test_dvs_commit( )
       DVS_ERROR( ss.str( ).c_str( ) );
     }
 
+    const std::string expectedCommitOid = "8ae2c7831cfbbce01e922ece6b7e73b62b85f717822c379a016f76ff67c50f62";
     CommitCommand commitCommand;
 
     OidResult commitResult = commitCommand.Commit( dvs, "This is a commit message." );
@@ -377,6 +378,13 @@ static dvs_error_t test_dvs_commit( )
     if ( !commitResult.err.empty( ) )
     {
       DVS_ERROR( commitResult.err.c_str( ) );
+    }
+
+    if ( commitResult.oid != expectedCommitOid )
+    {
+      std::stringstream ss;
+      ss << "Expected Commit Oid '" << expectedCommitOid << "' but got '" << commitResult.oid << "'." << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
     }
   }
 

@@ -57,7 +57,7 @@ std::string CommitCommand::operator ( ) ( DVS &dvs_ )
 
   OidResult result = Commit( dvs_, m_Msg );
 
-  std::cout << "Top Level Directory: " << result.oid << std::endl;
+  std::cout << "Commit Oid: " << result.oid << std::endl;
 
   return result.err;
 }
@@ -92,7 +92,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
   }
   else
   {
-    std::cout << "Commit Hash: " << commitHashResult.oid << std::endl;
+    result.oid = commitHashResult.oid;
   }
 
   return result;

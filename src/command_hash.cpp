@@ -157,9 +157,11 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
 
     if ( std::filesystem::exists( objectPath ) )
     {
+#if 0
       std::stringstream ss;
       ss << "Warning: File '" << objectPath << "' already exists.";
       std::cerr << ss.str( ) << std::endl;
+#endif
       result.oid = hashSs.str( );
       return result;
     }
