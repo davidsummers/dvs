@@ -1,6 +1,7 @@
 
 set( SOURCE_FILES
      command_cat.cpp
+     command_commit.cpp
      command_hash.cpp
      command_init.cpp
      command_read_tree.cpp
@@ -15,6 +16,7 @@ set( SOURCE_FILES
 
 set( HEADER_FILES
      command_cat.h
+     command_commit.h
      command_hash.h
      command_init.h
      command_read_tree.h

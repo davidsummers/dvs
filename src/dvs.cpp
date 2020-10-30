@@ -23,7 +23,7 @@ R"(DVS - David's Versioning System.
 
     Usage:
       dvs checkout
-      dvs commit
+      dvs commit ( -m | --message ) <message>
       dvs fetch
       dvs init [<directory>]
       dvs pull
@@ -38,6 +38,7 @@ R"(DVS - David's Versioning System.
 
     Options:
       -h --help              Show this help information.
+      -m, --message          Commit message.
       -s                     Size of hash content.
       -t                     Type of hash content (blob, commit, tag, tree).
       --version              Show version.

@@ -24,6 +24,7 @@
 #include "dvs.h"
 #include "dvs_test.h"
 #include "command_cat.h"
+#include "command_commit.h"
 #include "command_init.h"
 #include "command_hash.h"
 #include "command_read_tree.h"
@@ -315,6 +316,73 @@ static dvs_error_t test_dvs_internal_read_tree( )
   return DVS_NO_ERROR;
 }
 
+
+// Tests the 'dvs commit' command.
+static dvs_error_t test_dvs_commit( )
+{
+  std::filesystem::remove_all( TEST_DIR );
+  {
+    DVS dvs;
+
+    InitCommand initCommand;
+
+    std::string err = initCommand.InitDvs( dvs, TEST_DIR );
+
+    if ( !err.empty( ) )
+    {
+      std::stringstream ss;
+      ss << "Error creating dvs '" << TEST_DIR << "' directory: " << err << std::endl; 
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
+    std::filesystem::current_path( TEST_DIR );
+
+    const char *EXPECTED_FILE_NAME = "README.txt";
+    const char *EXPECTED_TEXT = "This is a test file.\r\n";
+    {
+      std::ofstream readmeFile( EXPECTED_FILE_NAME, std::ios_base::binary );
+      readmeFile << EXPECTED_TEXT;
+    }
+
+    std::filesystem::create_directory( "dir1" );
+
+    const std::string EXPECTED_FILE_NAME_2 = "FILE_2.txt";
+    const char *EXPECTED_TEXT_2 = "This is another test file.\r\n";
+    {
+      std::ofstream readmeFile2( "dir1/" + EXPECTED_FILE_NAME_2, std::ios_base::binary );
+      readmeFile2 << EXPECTED_TEXT_2;
+    }
+
+    WriteTreeCommand writeTreeCommand;
+
+    const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
+    OidResult result = writeTreeCommand.WriteTree( dvs, "." );
+    
+    if ( !result.err.empty( ) )
+    {
+      DVS_ERROR( result.err.c_str( ) );
+    }
+
+    if ( result.oid != expectedDirOid )
+    {
+      std::stringstream ss;
+      ss << "Expected dir oid '" << expectedDirOid << "' but got '" << result.oid << "'" << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
+    CommitCommand commitCommand;
+
+    OidResult commitResult = commitCommand.Commit( dvs, "This is a commit message." );
+
+    if ( !commitResult.err.empty( ) )
+    {
+      DVS_ERROR( commitResult.err.c_str( ) );
+    }
+  }
+
+  return DVS_NO_ERROR;
+}
+
 /* The test table.  */
 
 struct dvs_test_descriptor_t test_funcs[] =
@@ -325,5 +393,6 @@ struct dvs_test_descriptor_t test_funcs[] =
   DVS_TEST_PASS( test_dvs_internal_cat,        "Test DVS internal cat <hash> command." ),
   DVS_TEST_PASS( test_dvs_internal_write_tree, "Test DVS internal write-tree command." ),
   DVS_TEST_PASS( test_dvs_internal_read_tree,  "Test DVS internal read-tree command."  ),
+  DVS_TEST_PASS( test_dvs_commit,              "Test DVS commit command."              ),
   DVS_TEST_NULL
 };
