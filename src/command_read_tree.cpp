@@ -41,6 +41,8 @@ std::string ReadTreeCommand::operator ( ) ( DVS &dvs_ )
 
 OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
 {
+  EmptyCurrentDirectory( dvs_ );
+
   std::stringstream dirSs;
   {
     CatCommand::CatResult catResult;
@@ -93,4 +95,28 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
 
   OidResult result;
   return result;
+}
+
+
+void ReadTreeCommand::EmptyCurrentDirectory( DVS &dvs_ )
+{
+  for ( auto const &entry : std::filesystem::directory_iterator( "." ) )
+  {
+    if ( dvs_.IsIgnored( entry.path( ) ) )
+    {
+      continue;
+    }
+
+    if ( entry.is_regular_file( ) )
+    {
+      std::filesystem::remove( entry.path( ) );
+    }
+    else if ( entry.is_directory( ) )
+    {
+      std::filesystem::path saveDir = std::filesystem::current_path( );
+      std::filesystem::current_path( entry.path( ).filename( ) );
+      EmptyCurrentDirectory( dvs_ );
+      std::filesystem::current_path( saveDir );
+    }
+  }
 }

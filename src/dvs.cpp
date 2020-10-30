@@ -231,3 +231,15 @@ std::filesystem::path DVS::GetDvsDirectory( )
 {
   return m_DvsDirectory;
 }
+
+
+bool DVS::IsIgnored( const std::filesystem::path &path_ )
+{
+  const std::string filename = path_.filename( ).string( );
+  if ( filename == DVS_DIR )
+  {
+    return true;
+  }
+
+  return false;
+}

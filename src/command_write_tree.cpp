@@ -39,7 +39,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 
   for ( auto const &entry : std::filesystem::directory_iterator( dir_ ) )
   {
-    if ( IsIgnored( entry.path( ) ) )
+    if ( dvs_.IsIgnored( entry.path( ) ) )
     {
       continue;
     }
@@ -102,16 +102,4 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
   result.err = hashErr;
   result.oid = oid;
   return result;
-}
-
-
-bool WriteTreeCommand::IsIgnored( const std::filesystem::path &path_ )
-{
-  const std::string filename = path_.filename( ).string( );
-  if ( filename == DVS_DIR )
-  {
-    return true;
-  }
-
-  return false;
 }

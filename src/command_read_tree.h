@@ -32,4 +32,6 @@ class ReadTreeCommand
   private:
 
     std::string m_HashId;
+
+    void EmptyCurrentDirectory( DVS & );
 };

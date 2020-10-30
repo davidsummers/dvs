@@ -27,6 +27,8 @@ class DVS
 
     std::filesystem::path GetDvsDirectory( );
 
+    bool IsIgnored( const std::filesystem::path & );
+
   protected:
 
   private:

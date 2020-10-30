@@ -19,6 +19,4 @@ class WriteTreeCommand
   protected:
 
   private:
-
-    bool IsIgnored( const std::filesystem::path & );
 };
