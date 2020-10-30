@@ -74,7 +74,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
       DirEntry dirEntry;
       dirEntry.filename = entry.path( ).filename( ).string( );
       dirEntry.type = HashCommand::HashType::tree;
-      dirEntry.oid = result.oid;
+      dirEntry.oid = writeResult.oid;
       dirList[ dirEntry.filename ] = dirEntry;
     }
     else
@@ -94,9 +94,6 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
   {
     ss << hashCommand.LookupType( entry.second.type ) << " " << entry.second.oid << " " << entry.second.filename << std::endl;
   }
-
-  std::cout << "tree" << std::endl;
-  std::cout << ss.str( ) << std::endl;
 
   auto [ hashErr, oid ] = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), HashCommand::HashType::tree );
 

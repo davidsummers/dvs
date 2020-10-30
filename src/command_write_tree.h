@@ -14,10 +14,11 @@ class WriteTreeCommand
 
     std::string operator ( ) ( DVS & );
 
+    OidResult WriteTree( DVS &, const std::string &dir = "." );
+
   protected:
 
   private:
 
-    OidResult WriteTree( DVS &, const std::string &dir = "." );
     bool IsIgnored( const std::filesystem::path & );
 };
