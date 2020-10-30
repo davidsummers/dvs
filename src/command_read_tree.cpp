@@ -1,8 +1,9 @@
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
-#include "command_hash.h"
+#include "command_cat.h"
 #include "command_read_tree.h"
 #include "dvs.h"
 
@@ -40,16 +41,56 @@ std::string ReadTreeCommand::operator ( ) ( DVS &dvs_ )
 
 OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
 {
-  OidResult result;
-
-#if 0
-  ReadTreeGenerator readTreeGenerator;
-
-  for ( auto [ err, path, hash ] : readTreeGenerator.GetTree( hashId_, "./" ) )
+  std::stringstream dirSs;
   {
-    std::filesystem::create_directories( path.dirname( ) );
+    CatCommand::CatResult catResult;
+    CatCommand catCommand;
+    catResult = catCommand.GetHash( dvs_, hashId_, &dirSs );
+
+    if ( !catResult.err.empty( ) )
+    {
+      OidResult result;
+      result.err = catResult.err;
+      return result;
+    }
   }
-#endif
-  result.err = "Not Yet Implemented.";
+
+  while ( dirSs )
+  {
+    std::string type;
+    std::string hash;
+    std::string filename;
+    dirSs >> type >> hash >> filename;
+
+    if ( type.empty( ) && hash.empty( ) && filename.empty( ) )
+    {
+      break;
+    }
+
+    if ( type == "blob" )
+    {
+       std::ofstream outFile( filename, std::ios_base::binary );
+       CatCommand fileCat;
+       fileCat.GetHash( dvs_, hash, &outFile );
+    }
+    else if ( type == "tree" )
+    {
+      std::filesystem::path curPath = std::filesystem::current_path( );
+      std::filesystem::create_directory( filename );
+      std::filesystem::current_path( filename );
+      ReadTree( dvs_, hash );
+      std::filesystem::current_path( curPath );
+    }
+    else
+    {
+      OidResult result;
+      std::stringstream ss;
+      ss << "Expected type 'blob' or 'tree' but got '" << type << "'." << std::endl;
+      result.err = ss.str( );
+      return result;
+    }
+  }
+
+  OidResult result;
   return result;
 }
