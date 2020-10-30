@@ -78,7 +78,7 @@ static dvs_error_t test_dvs_internal_hash( )
     const char *EXPECTED_FILE_NAME = "README.txt";
     const char *EXPECTED_TEXT = "This is a test file.\n";
     {
-      std::ofstream readmeFile( EXPECTED_FILE_NAME );
+      std::ofstream readmeFile( EXPECTED_FILE_NAME, std::ios_base::binary );
       readmeFile << EXPECTED_TEXT;
     }
 
@@ -91,7 +91,7 @@ static dvs_error_t test_dvs_internal_hash( )
       DVS_ERROR( result.err.c_str( ) );
     }
 
-    const char *EXPECTED_OID = "4489764f4231744fc5d7310cb208657282cfe45d943a65ac69b4d6404763193c";
+    const char *EXPECTED_OID = "330f2ed27c77204cac1ab567cfffbad0db5724f8254c2e9de155da5979c401d6";
     if ( result.oid != EXPECTED_OID )
     {
       std::stringstream ss;
