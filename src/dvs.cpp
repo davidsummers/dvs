@@ -10,6 +10,7 @@
 #include "dvs.h"
 
 #include "command_cat.h"
+#include "command_commit.h"
 #include "command_hash.h"
 #include "command_init.h"
 #include "command_read_tree.h"
@@ -73,7 +74,21 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
   std::string err;
 
-  if ( docopt::value initOption = args[ "init" ];
+  if ( docopt::value commitCommand = args[ "commit" ];
+       commitCommand && commitCommand.isBool( ) && commitCommand.asBool( ) )
+  {
+    CommitCommand commitCmd;
+
+    err = commitCmd.ParseArgs( args );
+
+    if ( !err.empty( ) )
+    {
+      return 1;
+    }
+
+    err = commitCmd( *this );
+  }
+  else if ( docopt::value initOption = args[ "init" ];
        initOption && initOption.isBool( ) && initOption.asBool( ) )
   {
     InitCommand initCommand;
