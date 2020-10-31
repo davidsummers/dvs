@@ -77,9 +77,22 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
     return result;
   }
 
+  std::string parentHash = dvs_.GetHead( );
+
   std::stringstream ss;
+
+  // Write out tree hash of this commit.
   ss << "tree " << writeTreeResult.oid << std::endl;
+
+  // If we have a parent hash, write it out.
+  if ( !parentHash.empty( ) )
+  {
+    ss << "parent " << parentHash << std::endl;
+  }
+
+  // Write out blank line to separate headers from message body content.
   ss << std::endl;
+  // Write out commit message.
   ss << message_ << std::endl;
 
   HashCommand hashCommand;
