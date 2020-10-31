@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 
+#include "common.h"
 #include "docopt.h"
 
 class DVS;
@@ -29,7 +30,7 @@ class CatCommand
 
     std::string operator ( ) ( DVS & );
 
-    CatResult GetHash( DVS &, const std::string &hashID, std::ostream * );
+    CatResult GetHash( DVS &, const std::string &hashID, std::ostream *, RecordType expectedHashType = RecordType::none );
 
   protected:
 

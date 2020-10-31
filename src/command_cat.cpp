@@ -71,7 +71,7 @@ std::string CatCommand::operator ( ) ( DVS &dvs_ )
 }
 
 
-CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_, std::ostream *ostream_ )
+CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_, std::ostream *ostream_, RecordType expectedHashType_ )
 {
   CatResult result;
 
@@ -113,6 +113,41 @@ CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_
     result.type = header;
   }
   
+  if ( expectedHashType_ != RecordType::none )
+  {
+    if ( expectedHashType_ == RecordType::blob && result.type != "blob" )
+    {
+      std::stringstream ss;
+      ss << "Expected type 'blob' but got '" << result.type << "'" << std::endl;
+      result.err = ss.str( );
+      return result;
+    }
+
+    if ( expectedHashType_ == RecordType::commit && result.type != "commit" )
+    {
+      std::stringstream ss;
+      ss << "Expected type 'commit' but got '" << result.type << "'" << std::endl;
+      result.err = ss.str( );
+      return result;
+    }
+
+    if ( expectedHashType_ == RecordType::tag && result.type != "tag" )
+    {
+      std::stringstream ss;
+      ss << "Expected type 'tag' but got '" << result.type << "'" << std::endl;
+      result.err = ss.str( );
+      return result;
+    }
+
+    if ( expectedHashType_ == RecordType::tree && result.type != "tree" )
+    {
+      std::stringstream ss;
+      ss << "Expected type 'tree' but got '" << result.type << "'" << std::endl;
+      result.err = ss.str( );
+      return result;
+    }
+  }
+
   if ( ostream_ == nullptr )
   {
     return result;

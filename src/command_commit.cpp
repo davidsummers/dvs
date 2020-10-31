@@ -97,7 +97,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
 
   HashCommand hashCommand;
 
-  OidResult commitHashResult = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), HashCommand::HashType::commit );
+  OidResult commitHashResult = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::commit );
 
   if ( !commitHashResult.err.empty( ) )
   {

@@ -11,14 +11,14 @@
 #include "Keccak.h"
 
 
-using HashMapLookup = std::map< HashCommand::HashType, std::string >;
+using RecordMapLookup = std::map< RecordType, std::string >;
 
-HashMapLookup s_HashMapLookup =
+RecordMapLookup s_RecordMapLookup =
 {
-  { HashCommand::HashType::none, "none" },
-  { HashCommand::HashType::blob, "blob" },
-  { HashCommand::HashType::tag,  "tag"  },
-  { HashCommand::HashType::tree, "tree" },
+  { RecordType::none, "none" },
+  { RecordType::blob, "blob" },
+  { RecordType::tag,  "tag"  },
+  { RecordType::tree, "tree" },
 };
 
 
@@ -56,7 +56,7 @@ std::string HashCommand::operator ( ) ( DVS &dvs_ )
 }
 
 
-OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const HashType hashType_ )
+OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const RecordType hashType_ )
 {
   OidResult result;
   std::ifstream inputFileStream( filename_, std::ios_base::binary );
@@ -78,7 +78,7 @@ OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const Hash
 }
 
 
-OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_, HashType hashType_ )
+OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_, RecordType recordType_ )
 {
   OidResult result;
   std::ostringstream hashSs;
@@ -90,25 +90,25 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
   // Add header (hash type) to buffer.
   std::stringstream headerSs;
 
-  switch ( hashType_ )
+  switch ( recordType_ )
   {
-    case HashType::blob:
+    case RecordType::blob:
       headerSs << "blob " << size_ << '\0';
       break;
 
-    case HashType::commit:
+    case RecordType::commit:
       headerSs << "commit" << '\0';
       break;
 
-    case HashType::none:
+    case RecordType::none:
       result.err = "HashType: none"; // Illegal - return errror.
       return result;
 
-    case HashType::tag:
+    case RecordType::tag:
       headerSs << "tag" << '\0';
       break;
 
-    case HashType::tree:
+    case RecordType::tree:
       headerSs << "tree" << '\0';
       break;
   }
@@ -191,7 +191,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
 }
 
 
-std::string HashCommand::LookupType( const HashType hashType_ )
+std::string HashCommand::LookupType( const RecordType recordType_ )
 {
-  return s_HashMapLookup[ hashType_ ];
+  return s_RecordMapLookup[ recordType_ ];
 }

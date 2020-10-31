@@ -28,9 +28,9 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 
   using DirEntry = struct
   {
-    std::string           oid;
-    HashCommand::HashType type;
-    std::string           filename;
+    std::string oid;
+    RecordType  type;
+    std::string filename;
   };
 
   using DirList = std::map< std::string, DirEntry >;
@@ -48,7 +48,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
     {
       HashCommand hashCommand;
 
-      auto [ err, hash ] = hashCommand.Hash( dvs_, entry.path( ).string( ), HashCommand::HashType::blob  );
+      auto [ err, hash ] = hashCommand.Hash( dvs_, entry.path( ).string( ), RecordType::blob  );
 
       if ( !err.empty( ) )
       {
@@ -58,7 +58,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 
       DirEntry dirEntry;
       dirEntry.filename = entry.path( ).filename( ).string( );
-      dirEntry.type = HashCommand::HashType::blob;
+      dirEntry.type = RecordType::blob;
       dirEntry.oid = hash;
       dirList[ dirEntry.filename ] = dirEntry;
     }
@@ -73,7 +73,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 
       DirEntry dirEntry;
       dirEntry.filename = entry.path( ).filename( ).string( );
-      dirEntry.type = HashCommand::HashType::tree;
+      dirEntry.type = RecordType::tree;
       dirEntry.oid = writeResult.oid;
       dirList[ dirEntry.filename ] = dirEntry;
     }
@@ -95,7 +95,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
     ss << hashCommand.LookupType( entry.second.type ) << " " << entry.second.oid << " " << entry.second.filename << std::endl;
   }
 
-  auto [ hashErr, oid ] = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), HashCommand::HashType::tree );
+  auto [ hashErr, oid ] = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::tree );
 
   // std::cout << "Directory End: " << oid << std::endl;
   

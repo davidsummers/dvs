@@ -10,6 +10,7 @@
 #include "dvs.h"
 
 #include "command_cat.h"
+#include "command_checkout.h"
 #include "command_commit.h"
 #include "command_hash.h"
 #include "command_init.h"
@@ -24,7 +25,7 @@ const char s_USAGE [] =
 R"(DVS - David's Versioning System.
 
     Usage:
-      dvs checkout
+      dvs checkout <hash>
       dvs commit ( -m | --message ) <message>
       dvs fetch
       dvs init [<directory>]
@@ -76,7 +77,21 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
   std::string err;
 
-  if ( docopt::value commitCommand = args[ "commit" ];
+  if ( docopt::value checkoutOption = args[ "checkout" ];
+       checkoutOption && checkoutOption.isBool( ) && checkoutOption.asBool( ) )
+  {
+    CheckoutCommand checkoutCmd;
+
+    err = checkoutCmd.ParseArgs( args );
+
+    if ( !err.empty( ) )
+    {
+      return 1;
+    }
+
+    err = checkoutCmd( *this );
+  }
+  else if ( docopt::value commitCommand = args[ "commit" ];
        commitCommand && commitCommand.isBool( ) && commitCommand.asBool( ) )
   {
     CommitCommand commitCmd;

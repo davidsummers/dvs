@@ -12,24 +12,15 @@ class HashCommand
 {
   public:
 
-    enum class HashType
-    {
-      none,
-      blob,
-      commit,
-      tree,
-      tag,
-    };
-
     std::string ParseArgs( std::map< std::string, docopt::value > & );
 
     std::string operator ( ) ( DVS & );
 
-    OidResult Hash( DVS &, const std::string &filename, const HashType type = HashType::blob );
+    OidResult Hash( DVS &, const std::string &filename, const RecordType type = RecordType::blob );
 
-    OidResult Hash( DVS &, std::istream &, size_t size, const HashType type = HashType::blob );
+    OidResult Hash( DVS &, std::istream &, size_t size, const RecordType type = RecordType::blob );
 
-    std::string LookupType( const HashType );
+    std::string LookupType( const RecordType );
 
   protected:
 

@@ -47,7 +47,7 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
   {
     CatCommand::CatResult catResult;
     CatCommand catCommand;
-    catResult = catCommand.GetHash( dvs_, hashId_, &dirSs );
+    catResult = catCommand.GetHash( dvs_, hashId_, &dirSs, RecordType::tree );
 
     if ( !catResult.err.empty( ) )
     {
@@ -73,7 +73,7 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
     {
        std::ofstream outFile( filename, std::ios_base::binary );
        CatCommand fileCat;
-       fileCat.GetHash( dvs_, hash, &outFile );
+       fileCat.GetHash( dvs_, hash, &outFile, RecordType::blob );
     }
     else if ( type == "tree" )
     {
