@@ -4,6 +4,7 @@ set( SOURCE_FILES
      command_commit.cpp
      command_hash.cpp
      command_init.cpp
+     command_log.cpp
      command_read_tree.cpp
      command_status.cpp
      command_write_tree.cpp
@@ -19,6 +20,7 @@ set( HEADER_FILES
      command_commit.h
      command_hash.h
      command_init.h
+     command_log.h
      command_read_tree.h
      command_status.h
      command_write_tree.h

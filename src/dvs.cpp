@@ -13,6 +13,7 @@
 #include "command_commit.h"
 #include "command_hash.h"
 #include "command_init.h"
+#include "command_log.h"
 #include "command_read_tree.h"
 #include "command_status.h"
 #include "command_write_tree.h"
@@ -27,6 +28,7 @@ R"(DVS - David's Versioning System.
       dvs commit ( -m | --message ) <message>
       dvs fetch
       dvs init [<directory>]
+      dvs log [<hash>]
       dvs pull
       dvs push
       dvs status
@@ -101,6 +103,20 @@ int DVS::ParseCommands( int argc_, char **argv_ )
     }
 
     err = initCommand( *this );
+  }
+  else if ( docopt::value logOption = args[ "log" ];
+            logOption && logOption.isBool( ) && logOption.asBool( ) )
+  {
+    LogCommand logCommand;
+
+    err = logCommand.ParseArgs( args );
+
+    if ( !err.empty( ) )
+    {
+        return 1;
+    }
+
+    err = logCommand( *this );
   }
   else if ( docopt::value statusOption = args[ "status" ];
             statusOption && statusOption.isBool( ) && statusOption.asBool( ) )
