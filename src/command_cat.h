@@ -30,7 +30,7 @@ class CatCommand
 
     std::string operator ( ) ( DVS & );
 
-    CatResult GetHash( DVS &, const std::string &hashID, std::ostream *, RecordType expectedHashType = RecordType::none );
+    CatResult GetHash( DVS &, const std::string &hashID, std::ostream *, RecordType expectedRecordType = RecordType::none );
 
   protected:
 

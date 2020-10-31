@@ -71,7 +71,7 @@ std::string CatCommand::operator ( ) ( DVS &dvs_ )
 }
 
 
-CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_, std::ostream *ostream_, RecordType expectedHashType_ )
+CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_, std::ostream *ostream_, RecordType expectedRecordType_ )
 {
   CatResult result;
 
@@ -113,9 +113,9 @@ CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_
     result.type = header;
   }
   
-  if ( expectedHashType_ != RecordType::none )
+  if ( expectedRecordType_ != RecordType::none )
   {
-    if ( expectedHashType_ == RecordType::blob && result.type != "blob" )
+    if ( expectedRecordType_ == RecordType::blob && result.type != "blob" )
     {
       std::stringstream ss;
       ss << "Expected type 'blob' but got '" << result.type << "'" << std::endl;
@@ -123,7 +123,7 @@ CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_
       return result;
     }
 
-    if ( expectedHashType_ == RecordType::commit && result.type != "commit" )
+    if ( expectedRecordType_ == RecordType::commit && result.type != "commit" )
     {
       std::stringstream ss;
       ss << "Expected type 'commit' but got '" << result.type << "'" << std::endl;
@@ -131,7 +131,7 @@ CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_
       return result;
     }
 
-    if ( expectedHashType_ == RecordType::tag && result.type != "tag" )
+    if ( expectedRecordType_ == RecordType::tag && result.type != "tag" )
     {
       std::stringstream ss;
       ss << "Expected type 'tag' but got '" << result.type << "'" << std::endl;
@@ -139,7 +139,7 @@ CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_
       return result;
     }
 
-    if ( expectedHashType_ == RecordType::tree && result.type != "tree" )
+    if ( expectedRecordType_ == RecordType::tree && result.type != "tree" )
     {
       std::stringstream ss;
       ss << "Expected type 'tree' but got '" << result.type << "'" << std::endl;
