@@ -124,7 +124,7 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
       msg += input;
     }
 
-    std::cout << "commit " << treeHash << std::endl;
+    std::cout << "commit " << hashId << std::endl;
     std::cout << std::endl;
     std::cout << msg << std::endl;
     std::cout << std::endl;
