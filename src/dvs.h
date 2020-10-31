@@ -29,6 +29,10 @@ class DVS
 
     bool IsIgnored( const std::filesystem::path & );
 
+    // Read and write the hash id to the .dvs/HEAD file.
+    void SetHead( const std::string &hashId );
+    std::string GetHead( );
+
   protected:
 
   private:

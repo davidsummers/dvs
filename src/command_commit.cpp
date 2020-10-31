@@ -93,6 +93,8 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
   else
   {
     result.oid = commitHashResult.oid;
+
+    dvs_.SetHead( result.oid );
   }
 
   return result;

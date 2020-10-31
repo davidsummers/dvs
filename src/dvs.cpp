@@ -18,7 +18,7 @@
 #include "CommandParser.h"
 
 
-const char USAGE [] =
+const char s_USAGE [] =
 R"(DVS - David's Versioning System.
 
     Usage:
@@ -45,6 +45,9 @@ R"(DVS - David's Versioning System.
 )";
 
 
+const char *s_HEAD_FILE = "HEAD";
+
+
 DVS::DVS( )
 {
   // Save current working directory.
@@ -62,7 +65,7 @@ DVS::~DVS( )
 int DVS::ParseCommands( int argc_, char **argv_ )
 {
   std::map< std::string, docopt::value > args =
-    docopt::docopt( USAGE,
+    docopt::docopt( s_USAGE,
                     { argv_ + 1, argv_ + argc_ },
                     true, // Show help if requested.
                     "dvs Version 1.0" // Version string.
@@ -243,4 +246,40 @@ bool DVS::IsIgnored( const std::filesystem::path &path_ )
   }
 
   return false;
+}
+
+
+void DVS::SetHead( const std::string &hashId_ )
+{
+  if ( !m_DvsDirectory.string( ).empty( ) )
+  {
+    std::filesystem::path headPath = m_DvsDirectory;
+    headPath /= s_HEAD_FILE;
+
+    std::ofstream headFile( headPath, std::ios_base::binary );
+
+    headFile << hashId_ << std::endl;
+  }
+}
+
+
+std::string DVS::GetHead( )
+{
+  std::string headHash;
+
+  if ( !m_DvsDirectory.string( ).empty( ) )
+  {
+    std::filesystem::path headPath = m_DvsDirectory;
+
+    headPath /= s_HEAD_FILE;
+
+    if ( std::filesystem::exists( headPath ) )
+    {
+      std::ifstream headFile( headPath, std::ios_base::binary );
+
+      headFile >> headHash;
+    }
+  }
+
+  return headHash;
 }
