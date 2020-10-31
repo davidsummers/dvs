@@ -105,8 +105,13 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
     err = commitCmd( *this );
   }
+  else if ( docopt::value fetchOption = args[ "fetch" ];
+            fetchOption && fetchOption.isBool( ) && fetchOption.asBool( ) )
+  {
+    err = "'fetch' subcommand not yet implemented.";
+  }
   else if ( docopt::value initOption = args[ "init" ];
-       initOption && initOption.isBool( ) && initOption.asBool( ) )
+            initOption && initOption.isBool( ) && initOption.asBool( ) )
   {
     InitCommand initCommand;
 
@@ -132,6 +137,16 @@ int DVS::ParseCommands( int argc_, char **argv_ )
     }
 
     err = logCommand( *this );
+  }
+  else if ( docopt::value pullOption = args[ "pull" ];
+            pullOption && pullOption.isBool( ) && pullOption.asBool( ) )
+  {
+    err = "'pull' subcommand not yet implemented.";
+  }
+  else if ( docopt::value pushOption = args[ "push" ];
+            pushOption && pushOption.isBool( ) && pushOption.asBool( ) )
+  {
+    err = "'push' subcommand not yet implemented.";
   }
   else if ( docopt::value statusOption = args[ "status" ];
             statusOption && statusOption.isBool( ) && statusOption.asBool( ) )
