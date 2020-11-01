@@ -51,5 +51,14 @@ std::string TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::
 {
   std::string result;
 
+  std::string oid = hashId_;
+
+  if ( oid.empty( ) )
+  {
+      oid = dvs_.GetRef( s_HEAD_REF );
+  }
+
+  dvs_.SetRef( "refs/tags/" + tagName_, oid );
+
   return result;
 }

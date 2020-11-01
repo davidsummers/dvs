@@ -329,10 +329,14 @@ void DVS::SetRef( const std::string &ref_, const std::string &hashId_ )
 {
   if ( !m_DvsDirectory.string( ).empty( ) )
   {
-    std::filesystem::path headPath = m_DvsDirectory;
-    headPath /= ref_;
+    std::filesystem::path refPath = m_DvsDirectory;
+    refPath /= ref_;
 
-    std::ofstream headFile( headPath, std::ios_base::binary );
+    std::filesystem::path dirPath = refPath;
+    dirPath = dirPath.remove_filename( );
+    std::filesystem::create_directories( dirPath );
+
+    std::ofstream headFile( refPath, std::ios_base::binary );
 
     headFile << hashId_ << std::endl;
   }
