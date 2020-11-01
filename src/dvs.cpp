@@ -367,7 +367,24 @@ std::string DVS::GetRef( const std::string &ref_ )
 
 std::string DVS::GetOid( const std::string &name_ )
 {
-  std::string result = GetRef( "refs/tags/" + name_ );
+  std::string result;
+
+  std::vector< std::string > refsToTry
+  {
+    name_,
+    "refs/" + name_,
+    "refs/tags/" + name_,
+    "refs/heads/" + name_,
+  };
+
+  for ( auto &refTry : refsToTry )
+  {
+    if ( result = GetRef( refTry );
+         !result.empty( ) )
+    {
+      break;
+    }
+  }
 
   if ( result.empty( ) )
   {
