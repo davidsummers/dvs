@@ -34,6 +34,8 @@ class DVS
     void SetRef( const std::string &ref, const std::string &hashId );
     std::string GetRef( const std::string &ref );
 
+    std::string GetOid( const std::string &name );
+
   protected:
 
   private:

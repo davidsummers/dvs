@@ -47,6 +47,8 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
     hashId = dvs_.GetRef( s_HEAD_REF );
   }
 
+  hashId = dvs_.GetOid( hashId );
+
   while ( !hashId.empty( ) )
   {
     CatCommand catCommand;

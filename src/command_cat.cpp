@@ -75,12 +75,16 @@ CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_
 {
   CatResult result;
 
-  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / hashId_.substr( 0, 2 ) / hashId_.substr( 2 );
+  std::string hashId = hashId_;
+
+  hashId = dvs_.GetOid( hashId );
+
+  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / hashId.substr( 0, 2 ) / hashId.substr( 2 );
 
   if ( !std::filesystem::exists( hashPath ) )
   {
     std::stringstream ss;
-    ss << "Hash " << hashId_ << " does not exist.";
+    ss << "Hash " << hashId << " does not exist.";
     result.err = ss.str( );
     return result;
   }

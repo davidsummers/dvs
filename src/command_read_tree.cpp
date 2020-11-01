@@ -43,11 +43,14 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
 {
   EmptyCurrentDirectory( dvs_ );
 
+  std::string hashId = hashId_;
+  hashId = dvs_.GetOid( hashId );
+
   std::stringstream dirSs;
   {
     CatCommand::CatResult catResult;
     CatCommand catCommand;
-    catResult = catCommand.GetHash( dvs_, hashId_, &dirSs, RecordType::tree );
+    catResult = catCommand.GetHash( dvs_, hashId, &dirSs, RecordType::tree );
 
     if ( !catResult.err.empty( ) )
     {

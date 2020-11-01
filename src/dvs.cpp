@@ -363,3 +363,16 @@ std::string DVS::GetRef( const std::string &ref_ )
 
   return headHash;
 }
+
+
+std::string DVS::GetOid( const std::string &name_ )
+{
+  std::string result = GetRef( "refs/tags/" + name_ );
+
+  if ( result.empty( ) )
+  {
+    result = name_;
+  }
+
+  return result;
+}

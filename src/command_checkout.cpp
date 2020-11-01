@@ -53,6 +53,8 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &hashId_ )
     return "Expected non-empty Hash ID.";
   }
 
+  hashId = dvs_.GetOid( hashId );
+
   CatCommand catCommand;
   std::stringstream commitSs;
 
