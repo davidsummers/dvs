@@ -8,6 +8,7 @@ set( SOURCE_FILES
      command_log.cpp
      command_read_tree.cpp
      command_status.cpp
+     command_tag.cpp
      command_write_tree.cpp
      dvs.cpp
      file_system_base.cpp
@@ -25,6 +26,7 @@ set( HEADER_FILES
      command_log.h
      command_read_tree.h
      command_status.h
+     command_tag.h
      command_write_tree.h
      common.h
      dvs.h

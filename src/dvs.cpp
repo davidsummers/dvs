@@ -17,6 +17,7 @@
 #include "command_log.h"
 #include "command_read_tree.h"
 #include "command_status.h"
+#include "command_tag.h"
 #include "command_write_tree.h"
 #include "CommandParser.h"
 
@@ -33,10 +34,13 @@ R"(DVS - David's Versioning System.
       dvs pull
       dvs push
       dvs status
+      dvs tag <tag> [<hash>]
+
       dvs internal cat [ -s | -t ] <hash>
       dvs internal hash <file>
       dvs internal read-tree <hash>
       dvs internal write-tree
+
       dvs (-h | --help)
       dvs --version
 
@@ -154,6 +158,20 @@ int DVS::ParseCommands( int argc_, char **argv_ )
     StatusCommand statusCommand;
 
     err = statusCommand( *this );
+  }
+  else if ( docopt::value tagOption = args[ "tag" ];
+            tagOption && tagOption.isBool( ) && tagOption.asBool( ) )
+  {
+    TagCommand tagCommand;
+
+    err = tagCommand.ParseArgs( args );
+
+    if ( !err.empty( ) )
+    {
+        return 1;
+    }
+
+    err = tagCommand( *this );
   }
   else if ( docopt::value internalOption = args[ "internal" ];
        internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
