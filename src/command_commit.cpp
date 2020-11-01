@@ -77,7 +77,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
     return result;
   }
 
-  std::string parentHash = dvs_.GetHead( );
+  std::string parentHash = dvs_.GetRef( s_HEAD_REF );
 
   std::stringstream ss;
 
@@ -107,7 +107,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
   {
     result.oid = commitHashResult.oid;
 
-    dvs_.SetHead( result.oid );
+    dvs_.SetRef( s_HEAD_REF, result.oid );
   }
 
   return result;

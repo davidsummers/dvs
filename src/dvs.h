@@ -10,6 +10,7 @@
 #include "docopt.h"
 
 constexpr const char *DVS_DIR = ".dvs";
+constexpr const char *s_HEAD_REF = "HEAD";
 
 class DVS
 {
@@ -30,8 +31,8 @@ class DVS
     bool IsIgnored( const std::filesystem::path & );
 
     // Read and write the hash id to the .dvs/HEAD file.
-    void SetHead( const std::string &hashId );
-    std::string GetHead( );
+    void SetRef( const std::string &ref, const std::string &hashId );
+    std::string GetRef( const std::string &ref );
 
   protected:
 

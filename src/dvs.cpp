@@ -53,9 +53,6 @@ R"(DVS - David's Versioning System.
 )";
 
 
-const char *s_HEAD_FILE = "HEAD";
-
-
 DVS::DVS( )
 {
   // Save current working directory.
@@ -328,12 +325,12 @@ bool DVS::IsIgnored( const std::filesystem::path &path_ )
 }
 
 
-void DVS::SetHead( const std::string &hashId_ )
+void DVS::SetRef( const std::string &ref_, const std::string &hashId_ )
 {
   if ( !m_DvsDirectory.string( ).empty( ) )
   {
     std::filesystem::path headPath = m_DvsDirectory;
-    headPath /= s_HEAD_FILE;
+    headPath /= ref_;
 
     std::ofstream headFile( headPath, std::ios_base::binary );
 
@@ -342,7 +339,7 @@ void DVS::SetHead( const std::string &hashId_ )
 }
 
 
-std::string DVS::GetHead( )
+std::string DVS::GetRef( const std::string &ref_ )
 {
   std::string headHash;
 
@@ -350,7 +347,7 @@ std::string DVS::GetHead( )
   {
     std::filesystem::path headPath = m_DvsDirectory;
 
-    headPath /= s_HEAD_FILE;
+    headPath /= ref_;
 
     if ( std::filesystem::exists( headPath ) )
     {

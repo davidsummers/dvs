@@ -45,7 +45,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &hashId_ )
 
   if ( hashId.empty( ) )
   {
-    hashId = dvs_.GetHead( );
+    hashId = dvs_.GetRef( s_HEAD_REF );
   }
 
   if ( hashId.empty( ) )
@@ -139,7 +139,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &hashId_ )
   }
 
   // Now save the commit hash in .dvs/HEAD
-  dvs_.SetHead( hashId );
+  dvs_.SetRef( s_HEAD_REF, hashId );
 
   return result;
 }

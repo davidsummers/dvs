@@ -44,7 +44,7 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 
   if ( hashId.empty( ) )
   {
-    hashId = dvs_.GetHead( );
+    hashId = dvs_.GetRef( s_HEAD_REF );
   }
 
   while ( !hashId.empty( ) )
