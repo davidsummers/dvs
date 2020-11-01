@@ -9,7 +9,7 @@
 
 #include "docopt.h"
 
-constexpr const char *DVS_DIR = ".dvs";
+constexpr const char *s_DVS_DIR = ".dvs";
 constexpr const char *s_HEAD_REF = "HEAD";
 
 class DVS

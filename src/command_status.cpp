@@ -11,7 +11,7 @@ std::string StatusCommand::operator ( ) ( DVS &dvs_ )
        !validate_error.empty( ) )
   {
     std::stringstream ss;
-    ss << "Can't validate " << DVS_DIR << " directory: " + validate_error;
+    ss << "Can't validate " << s_DVS_DIR << " directory: " + validate_error;
     return ss.str( );
   }
 

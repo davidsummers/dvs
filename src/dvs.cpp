@@ -259,7 +259,7 @@ std::string DVS::Validate( const std::string &dir_ )
 
   for ( ; !currentPath.empty( ); currentPath = RemoveLastPathElement( currentPath ) )
   {
-    std::filesystem::path testPath = currentPath / DVS_DIR;
+    std::filesystem::path testPath = currentPath / s_DVS_DIR;
     if ( std::filesystem::exists( testPath ) )
     {
       m_DvsDirectory = testPath;
@@ -270,7 +270,7 @@ std::string DVS::Validate( const std::string &dir_ )
   if ( currentPath.empty( ) )
   {
     std::stringstream ss;
-    ss << "Directory " << DVS_DIR << " does not exist.";
+    ss << "Directory " << s_DVS_DIR << " does not exist.";
     return ss.str( );
   }
 
@@ -316,7 +316,7 @@ std::filesystem::path DVS::GetDvsDirectory( )
 bool DVS::IsIgnored( const std::filesystem::path &path_ )
 {
   const std::string filename = path_.filename( ).string( );
-  if ( filename == DVS_DIR )
+  if ( filename == s_DVS_DIR )
   {
     return true;
   }
