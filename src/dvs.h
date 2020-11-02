@@ -33,8 +33,8 @@ class DVS
     bool IsIgnored( const std::filesystem::path & );
 
     // Read and write the hash id to the .dvs/HEAD file.
-    void SetRef( const std::string &ref, const RefValue & );
-    RefValue GetRef( const std::string &ref );
+    void SetRef( const std::string &ref, const RefValue &, const bool deref = true );
+    RefValue GetRef( const std::string &ref, const bool deref = true );
 
     std::string GetOid( const std::string &name );
 
@@ -63,5 +63,5 @@ class DVS
     std::filesystem::path RemoveLastPathElement( const std::filesystem::path & );
     int NumPathElements( const std::filesystem::path & );
 
-    RefIntRet GetRefInternal( const std::string &ref );
+    RefIntRet GetRefInternal( const std::string &ref, const bool deref );
 };
