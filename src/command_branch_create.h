@@ -16,9 +16,12 @@ class CreateBranchCommand
 
     std::string operator ( ) ( DVS & );
 
-    std::string Branch( DVS &, const std::string &branchName );
+    std::string CreateBranch( DVS &, const std::string &branchName, const std::string &oid_ = "@" );
 
   protected:
 
   private:
+
+    std::string m_BranchName;
+    std::string m_Oid = "@";
 };

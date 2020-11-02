@@ -358,6 +358,8 @@ bool DVS::IsIgnored( const std::filesystem::path &path_ )
 
 void DVS::SetRef( const std::string &ref_, const RefValue &refValue_, const bool deref_ )
 {
+  std::string ref = GetRefInternal( ref_, deref_ ).ref;
+
   assert( ( (void)"reValue_.value should not be empty.", !refValue_.value.empty( ) ) );
 
   if ( !m_DvsDirectory.string( ).empty( ) )
@@ -373,7 +375,6 @@ void DVS::SetRef( const std::string &ref_, const RefValue &refValue_, const bool
       value = refValue_.value;
     }
 
-    std::string ref = GetRefInternal( ref_, deref_ ).ref;
 
     std::filesystem::path refPath = m_DvsDirectory;
     refPath /= ref;

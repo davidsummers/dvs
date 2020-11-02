@@ -14,7 +14,7 @@ std::string CreateBranchCommand::ParseArgs( std::map< std::string, docopt::value
   if ( docopt::value hashOption = args_[ "<BranchName>" ];
        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
   {
-      // m_HashId = hashOption.asString( );
+      m_BranchName = hashOption.asString( );
   }
   else
   {
@@ -34,14 +34,16 @@ std::string CreateBranchCommand::operator ( ) ( DVS &dvs_ )
   {
     return validateError;
   }
-
-  return "branch create Not Implemented Yet.";
+  
+  return CreateBranch( dvs_, m_BranchName, m_Oid );
 }
 
 
-std::string CreateBranchCommand::Branch( DVS &dvs_, const std::string &branchName_ )
+std::string CreateBranchCommand::CreateBranch( DVS &dvs_, const std::string &branchName_, const std::string &oid_ )
 {
   std::string result;
+  std::string oid = dvs_.GetOid( oid_ );
+  dvs_.SetRef( s_BRANCHES_LOCAL + branchName_, RefValue{ false, oid } );
   std::cout << "Create branch name '" << branchName_ << "'" << std::endl;
   return result;
 }
