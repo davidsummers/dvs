@@ -41,24 +41,24 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &hashId_ )
 {
   std::string result;
 
-  std::string hashId = hashId_;
+  RefValue refValue{ false, hashId_ };
 
-  if ( hashId.empty( ) )
+  if ( refValue.value.empty( ) )
   {
-    hashId = dvs_.GetRef( s_HEAD_REF );
+    refValue = dvs_.GetRef( s_HEAD_REF );
   }
 
-  if ( hashId.empty( ) )
+  if ( refValue.value.empty( ) )
   {
     return "Expected non-empty Hash ID.";
   }
 
-  hashId = dvs_.GetOid( hashId );
+  refValue.value = dvs_.GetOid( refValue.value );
 
   CatCommand catCommand;
   std::stringstream commitSs;
 
-  CatCommand::CatResult catResult = catCommand.GetHash( dvs_, hashId, &commitSs, RecordType::commit );
+  CatCommand::CatResult catResult = catCommand.GetHash( dvs_, refValue.value, &commitSs, RecordType::commit );
 
   if ( !catResult.err.empty( ) )
   {
@@ -69,7 +69,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &hashId_ )
   if ( catResult.type != "commit" )
   {
     std::stringstream ss;
-    ss << "Dvs log command expected 'commit' type for Hash ID '" << hashId << "'" << std::endl;
+    ss << "Dvs log command expected 'commit' type for Hash ID '" << refValue.value << "'" << std::endl;
     return ss.str( );
   }
 
@@ -141,7 +141,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &hashId_ )
   }
 
   // Now save the commit hash in .dvs/HEAD
-  dvs_.SetRef( s_HEAD_REF, hashId );
+  dvs_.SetRef( s_HEAD_REF, RefValue{ false, refValue.value } );
 
   return result;
 }

@@ -51,14 +51,14 @@ std::string TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::
 {
   std::string result;
 
-  std::string oid = hashId_;
+  RefValue refValue = RefValue{ false, hashId_ };
 
-  if ( oid.empty( ) )
+  if ( refValue.value.empty( ) )
   {
-      oid = dvs_.GetRef( s_HEAD_REF );
+      refValue = dvs_.GetRef( s_HEAD_REF );
   }
 
-  dvs_.SetRef( "refs/tags/" + tagName_, oid );
+  dvs_.SetRef( "refs/tags/" + tagName_, refValue );
 
   return result;
 }

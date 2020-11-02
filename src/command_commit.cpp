@@ -77,7 +77,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
     return result;
   }
 
-  std::string parentHash = dvs_.GetRef( s_HEAD_REF );
+  RefValue parentRef = dvs_.GetRef( s_HEAD_REF );
 
   std::stringstream ss;
 
@@ -85,9 +85,9 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
   ss << "tree " << writeTreeResult.oid << std::endl;
 
   // If we have a parent hash, write it out.
-  if ( !parentHash.empty( ) )
+  if ( !parentRef.value.empty( ) )
   {
-    ss << "parent " << parentHash << std::endl;
+    ss << "parent " << parentRef.value << std::endl;
   }
 
   // Write out blank line to separate headers from message body content.
@@ -107,7 +107,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
   {
     result.oid = commitHashResult.oid;
 
-    dvs_.SetRef( s_HEAD_REF, result.oid );
+    dvs_.SetRef( s_HEAD_REF, RefValue{ false, result.oid } );
   }
 
   return result;

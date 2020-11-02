@@ -355,7 +355,7 @@ bool DVS::IsIgnored( const std::filesystem::path &path_ )
 }
 
 
-void DVS::SetRef( const std::string &ref_, const std::string &hashId_ )
+void DVS::SetRef( const std::string &ref_, const RefValue &refValue_ )
 {
   if ( !m_DvsDirectory.string( ).empty( ) )
   {
@@ -368,14 +368,14 @@ void DVS::SetRef( const std::string &ref_, const std::string &hashId_ )
 
     std::ofstream headFile( refPath, std::ios_base::binary );
 
-    headFile << hashId_ << std::endl;
+    headFile << refValue_.value << std::endl;
   }
 }
 
 
-std::string DVS::GetRef( const std::string &ref_ )
+RefValue DVS::GetRef( const std::string &ref_ )
 {
-  std::string headHash;
+  RefValue headHash;
 
   if ( !m_DvsDirectory.string( ).empty( ) )
   {
@@ -387,7 +387,7 @@ std::string DVS::GetRef( const std::string &ref_ )
     {
       std::ifstream headFile( headPath, std::ios_base::binary );
 
-      headFile >> headHash;
+      headFile >> headHash.value;
     }
   }
 
@@ -409,7 +409,7 @@ std::string DVS::GetOid( const std::string &name_ )
 
   for ( auto &refTry : refsToTry )
   {
-    if ( result = GetRef( refTry );
+    if ( result = GetRef( refTry ).value;
          !result.empty( ) )
     {
       break;

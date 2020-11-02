@@ -40,21 +40,21 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 {
   std::string result;
 
-  std::string hashId = hashId_;
+  RefValue refValue{ false, hashId_ };
 
-  if ( hashId.empty( ) )
+  if ( refValue.value.empty( ) )
   {
-    hashId = dvs_.GetRef( s_HEAD_REF );
+    refValue = dvs_.GetRef( s_HEAD_REF );
   }
 
-  hashId = dvs_.GetOid( hashId );
+  refValue.value = dvs_.GetOid( refValue.value );
 
-  while ( !hashId.empty( ) )
+  while ( !refValue.value.empty( ) )
   {
     CatCommand catCommand;
     std::stringstream commitSs;
 
-    CatCommand::CatResult catResult = catCommand.GetHash( dvs_, hashId, &commitSs );
+    CatCommand::CatResult catResult = catCommand.GetHash( dvs_, refValue.value, &commitSs );
 
     if ( !catResult.err.empty( ) )
     {
@@ -65,7 +65,7 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
     if ( catResult.type != "commit" )
     {
       std::stringstream ss;
-      ss << "Dvs log command expected 'commit' type for Hash ID '" << hashId << "'" << std::endl;
+      ss << "Dvs log command expected 'commit' type for Hash ID '" << refValue.value << "'" << std::endl;
       return ss.str( );
     }
 
@@ -126,12 +126,12 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
       msg += input;
     }
 
-    std::cout << "commit " << hashId << std::endl;
+    std::cout << "commit " << refValue.value << std::endl;
     std::cout << std::endl;
     std::cout << msg << std::endl;
     std::cout << std::endl;
 
-    hashId = parentHash;
+    refValue.value = parentHash;
   }
 
   // The rest of the contents of the commit is the commit message;

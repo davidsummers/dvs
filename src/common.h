@@ -22,3 +22,10 @@ using OidResult = struct
   std::string err;
   std::string oid;
 };
+
+
+using RefValue = struct
+{
+  bool        symbolic = false;
+  std::string value;
+};
