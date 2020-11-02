@@ -21,6 +21,7 @@ class DVS
 
     int ParseCommands( int argc, char **argv );
 
+    std::string ParseBranchCommands( std::map< std::string, docopt::value > &args_ );
     std::string ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
 
     // Helpers

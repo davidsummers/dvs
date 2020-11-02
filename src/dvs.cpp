@@ -9,6 +9,7 @@
 
 #include "dvs.h"
 
+#include "command_branch_create.h"
 #include "command_cat.h"
 #include "command_checkout.h"
 #include "command_commit.h"
@@ -26,6 +27,7 @@ const char s_USAGE [] =
 R"(DVS - David's Versioning System.
 
     Usage:
+      dvs branch create <BranchName>
       dvs checkout <hash>
       dvs commit ( -m | --message ) <message>
       dvs fetch
@@ -78,7 +80,12 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
   std::string err;
 
-  if ( docopt::value checkoutOption = args[ "checkout" ];
+  if ( docopt::value branchOption = args[ "branch" ];
+       branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
+  {
+    err = ParseBranchCommands( args );
+  }
+  else if ( docopt::value checkoutOption = args[ "checkout" ];
        checkoutOption && checkoutOption.isBool( ) && checkoutOption.asBool( ) )
   {
     CheckoutCommand checkoutCmd;
@@ -188,6 +195,29 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   }
 
   return 0;
+}
+
+
+std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
+{
+  std::string err;
+
+  if ( docopt::value createOption = args_[ "create" ];
+       createOption && createOption.isBool( ) && createOption.asBool( ) )
+  {
+      CreateBranchCommand createBranchCommand;
+
+      err = createBranchCommand.ParseArgs( args_ );
+
+      if ( !err.empty( ) )
+      {
+        return err;
+      }
+
+      err = createBranchCommand( *this );
+  }
+
+  return err;
 }
 
 
