@@ -357,10 +357,14 @@ bool DVS::IsIgnored( const std::filesystem::path &path_ )
 
 void DVS::SetRef( const std::string &ref_, const RefValue &refValue_ )
 {
+  assert( ( (void)"Should not be symbolic reference.", !refValue_.symbolic ) );
+
   if ( !m_DvsDirectory.string( ).empty( ) )
   {
+    std::string ref = GetRefInternal( ref_ ).ref;
+
     std::filesystem::path refPath = m_DvsDirectory;
-    refPath /= ref_;
+    refPath /= ref;
 
     std::filesystem::path dirPath = refPath;
     dirPath = dirPath.remove_filename( );
@@ -374,6 +378,12 @@ void DVS::SetRef( const std::string &ref_, const RefValue &refValue_ )
 
 
 RefValue DVS::GetRef( const std::string &ref_ )
+{
+  return GetRefInternal( ref_ ).refValue;
+}
+
+
+DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_ )
 {
   RefValue headHash;
 
@@ -389,9 +399,16 @@ RefValue DVS::GetRef( const std::string &ref_ )
 
       headFile >> headHash.value;
     }
+
+    if ( size_t pos = headHash.value.find( "ref:" );
+         pos == 0 )
+    {
+      headHash.value = headHash.value.substr( headHash.value.find( ":" ) + 1 );
+      return GetRefInternal( headHash.value );
+    }
   }
 
-  return headHash;
+  return RefIntRet{ ref_, headHash };
 }
 
 
