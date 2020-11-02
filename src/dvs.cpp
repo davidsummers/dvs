@@ -358,10 +358,21 @@ bool DVS::IsIgnored( const std::filesystem::path &path_ )
 
 void DVS::SetRef( const std::string &ref_, const RefValue &refValue_, const bool deref_ )
 {
-  assert( ( (void)"Should not be symbolic reference.", !refValue_.symbolic ) );
+  assert( ( (void)"reValue_.value should not be empty.", !refValue_.value.empty( ) ) );
 
   if ( !m_DvsDirectory.string( ).empty( ) )
   {
+    std::string value;
+
+    if ( refValue_.symbolic )
+    {
+      value = "ref: " + refValue_.value;
+    }
+    else
+    {
+      value = refValue_.value;
+    }
+
     std::string ref = GetRefInternal( ref_, deref_ ).ref;
 
     std::filesystem::path refPath = m_DvsDirectory;
@@ -373,7 +384,7 @@ void DVS::SetRef( const std::string &ref_, const RefValue &refValue_, const bool
 
     std::ofstream headFile( refPath, std::ios_base::binary );
 
-    headFile << refValue_.value << std::endl;
+    headFile << value << std::endl;
   }
 }
 
