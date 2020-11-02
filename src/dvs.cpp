@@ -432,14 +432,16 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
 
 std::string DVS::GetOid( const std::string &name_ )
 {
+  std::string name = name_ == "@" ? "HEAD" : name_;
+
   std::string result;
 
   std::vector< std::string > refsToTry
   {
-    name_,
-    "refs/" + name_,
-    "refs/tags/" + name_,
-    "refs/heads/" + name_,
+    name,
+    "refs/" + name,
+    "refs/tags/" + name,
+    "refs/heads/" + name,
   };
 
   for ( auto &refTry : refsToTry )
@@ -453,7 +455,7 @@ std::string DVS::GetOid( const std::string &name_ )
 
   if ( result.empty( ) )
   {
-    result = name_;
+    result = name;
   }
 
   return result;
