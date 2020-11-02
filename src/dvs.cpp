@@ -432,7 +432,7 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
 
 std::string DVS::GetOid( const std::string &name_ )
 {
-  std::string name = name_ == "@" ? "HEAD" : name_;
+  std::string name = name_ == "@" ? s_HEAD_REF : name_;
 
   std::string result;
 
