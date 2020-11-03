@@ -43,7 +43,7 @@ std::string CreateBranchCommand::CreateBranch( DVS &dvs_, const std::string &bra
 {
   std::string result;
   std::string oid = dvs_.GetOid( oid_ );
-  dvs_.SetRef( s_BRANCHES_LOCAL + branchName_, RefValue{ false, oid } );
+  dvs_.SetRef( s_REFS_BRANCHES_LOCAL + branchName_, RefValue{ false, oid } );
   std::cout << "Create branch name '" << branchName_ << "'" << std::endl;
   return result;
 }

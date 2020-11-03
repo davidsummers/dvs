@@ -29,7 +29,7 @@ R"(DVS - David's Versioning System.
 
     Usage:
       dvs branch create <BranchName>
-      dvs checkout <hash>
+      dvs checkout <BranchName>
       dvs commit ( -m | --message ) <message>
       dvs fetch
       dvs init [<directory>]
@@ -38,12 +38,10 @@ R"(DVS - David's Versioning System.
       dvs push
       dvs status
       dvs tag <tag> [<hash>]
-
       dvs internal cat [ -s | -t ] <hash>
       dvs internal hash <file>
       dvs internal read-tree <hash>
       dvs internal write-tree
-
       dvs (-h | --help)
       dvs --version
 
@@ -441,8 +439,8 @@ std::string DVS::GetOid( const std::string &name_ )
   {
     name,
     "refs/" + name,
-    "refs/tags/" + name,
-    "refs/heads/" + name,
+    s_REFS_TAGS + name,
+    s_REFS_BRANCHES_LOCAL + name,
   };
 
   for ( auto &refTry : refsToTry )

@@ -15,11 +15,21 @@ class CheckoutCommand
 
     std::string operator ( ) ( DVS & );
 
-    std::string Checkout( DVS &, const std::string &hashID );
+    std::string Checkout( DVS &, const std::string &name );
 
   protected:
 
   private:
 
-    std::string m_HashId;
+    //
+    // Data
+    //
+
+    std::string m_BranchName;
+
+    //
+    // Methods
+    //
+
+    bool IsBranch( DVS &, const std::string &branchName );
 };

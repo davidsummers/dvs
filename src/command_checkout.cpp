@@ -13,10 +13,10 @@ std::string CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &
 {
   std::string err;
 
-  if ( docopt::value hashOption = args_[ "<hash>" ];
-       hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
+  if ( docopt::value branchNameOption = args_[ "<BranchName>" ];
+       branchNameOption && branchNameOption.isString( ) && !branchNameOption.asString( ).empty( ) )
   {
-      m_HashId = hashOption.asString( );
+      m_BranchName = branchNameOption.asString( );
   }
 
   return err;
@@ -31,17 +31,19 @@ std::string CheckoutCommand::operator ( ) ( DVS &dvs_ )
     return validateError;
   }
 
-  std::string result = Checkout( dvs_, m_HashId );
+  std::string result = Checkout( dvs_, m_BranchName );
 
   return result;
 }
 
 
-std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &hashId_ )
+std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_ )
 {
   std::string result;
 
-  RefValue refValue{ false, hashId_ };
+  std::string oid = dvs_.GetOid( branchName_ );
+
+  RefValue refValue{ false, oid };
 
   if ( refValue.value.empty( ) )
   {
@@ -140,8 +142,28 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &hashId_ )
     return result;
   }
 
+  if ( IsBranch( dvs_, branchName_ ) )
+  {
+    std::string branchName = s_REFS_BRANCHES_LOCAL;
+    branchName += branchName_;
+    refValue = RefValue{ true, branchName };
+  }
+  else
+  {
+    refValue = RefValue{ false, oid };
+  }
+
   // Now save the commit hash in .dvs/HEAD
-  dvs_.SetRef( s_HEAD_REF, RefValue{ false, refValue.value } );
+  const bool deref = false;
+  dvs_.SetRef( s_HEAD_REF, refValue, deref );
 
   return result;
+}
+
+
+bool CheckoutCommand::IsBranch( DVS &dvs_, const std::string &branchName_ )
+{
+  RefValue refValue = dvs_.GetRef( s_REFS_BRANCHES_LOCAL + branchName_ );
+  bool isBranch = !refValue.value.empty( );
+  return isBranch;
 }

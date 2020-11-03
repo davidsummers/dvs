@@ -58,7 +58,7 @@ std::string TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::
       refValue = dvs_.GetRef( s_HEAD_REF );
   }
 
-  dvs_.SetRef( "refs/tags/" + tagName_, refValue );
+  dvs_.SetRef( s_REFS_TAGS + tagName_, refValue );
 
   return result;
 }
