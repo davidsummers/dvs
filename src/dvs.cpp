@@ -408,8 +408,7 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
     if ( std::filesystem::exists( headPath ) )
     {
       std::ifstream headFile( headPath, std::ios_base::binary );
-
-      headFile >> headHash.value;
+      std::getline( headFile, headHash.value );
     }
 
     if ( size_t pos = headHash.value.find( "ref:" );
@@ -417,7 +416,7 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
     {
       symbolic = true;
 
-      headHash.value = headHash.value.substr( headHash.value.find( ":" ) + 1 );
+      headHash.value = headHash.value.substr( headHash.value.find( ":" ) + 2 );
       if ( deref_ )
       {
         return GetRefInternal( headHash.value, true );
