@@ -20,7 +20,7 @@ class HashCommand
 
     OidResult Hash( DVS &, std::istream &, size_t size, const RecordType type = RecordType::blob );
 
-    std::string LookupType( const RecordType );
+    static std::string LookupType( const RecordType );
 
   protected:
 
