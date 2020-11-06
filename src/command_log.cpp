@@ -6,6 +6,7 @@
 #include "command_cat.h"
 #include "command_log.h"
 #include "dvs.h"
+#include "record_commit.h"
 
 
 std::string LogCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
@@ -69,69 +70,21 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
       return ss.str( );
     }
 
-    std::string treeHash;
-    std::string parentHash;
-    std::string msg;
+    CommitRecord commitRecord;
 
-    std::string type;
-    std::string hash;
+    result = commitRecord.Parse( commitSs );
 
-    // Get the tree hash and the parent hash (if any).
-    while ( true )
+    if ( result.empty( ) )
     {
-      std::string line;
-
-      std::getline( commitSs, line );
-
-      size_t pos = line.find( ' ' );
-      if ( pos == std::string::npos )
-      {
-        break;
-      } 
-
-      type = line.substr( 0, pos );
-      hash = line.substr( pos + 1 );
-
-      if ( type.empty( ) && hash.empty( ) )
-      {
-        break;
-      }
-
-      if ( type == "tree" )
-      {
-        treeHash = hash;
-      }
-      else if ( type == "parent" )
-      {
-        parentHash = hash;
-      }
-      else
-      {
-        std::stringstream ss;
-        ss << "Log command: Unknown type '" << type << "'." << std::endl;
-        return ss.str( );
-      }
-    }
-
-    while ( true )
-    {
-      std::string input;
-      std::getline( commitSs, input );
-
-      if ( input.empty( ) )
-      {
-        break;
-      }
-
-      msg += input;
+      return result;
     }
 
     std::cout << "commit " << refValue.value << std::endl;
     std::cout << std::endl;
-    std::cout << msg << std::endl;
+    std::cout << commitRecord.GetMsg( ) << std::endl;
     std::cout << std::endl;
 
-    refValue.value = parentHash;
+    refValue.value = commitRecord.GetParentOid( );
   }
 
   // The rest of the contents of the commit is the commit message;

@@ -16,6 +16,7 @@ set( SOURCE_FILES
      file_system_memory.cpp
      file_system_normal.cpp
      read_tree_generator.cpp
+     record_commit.cpp
    )
 
 set( HEADER_FILES
@@ -36,6 +37,7 @@ set( HEADER_FILES
      file_system_memory.h
      file_system_normal.h
      read_tree_generator.h
+     record_commit.h
    )
 
 
