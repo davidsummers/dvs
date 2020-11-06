@@ -1,0 +1,10 @@
+Now:
+dvs branch list
+dvs branch delete
+
+
+Future Ideas:
+
+Should 'dvs checkout <BranchName>' be 'dvs branch checkout <BranchName>'???
+
+
