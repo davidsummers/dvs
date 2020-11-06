@@ -1,6 +1,9 @@
 Now:
 dvs branch list
 dvs branch delete
+dvs tag create
+dvs tag list
+dvs tag delete
 
 
 Future Ideas:
