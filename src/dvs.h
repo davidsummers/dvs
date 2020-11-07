@@ -10,10 +10,12 @@
 #include "common.h"
 #include "docopt.h"
 
-constexpr const char *s_REFS_BRANCHES_LOCAL = "refs/branches-local/";
-constexpr const char *s_DVS_DIR             = ".dvs";
-constexpr const char *s_HEAD_REF            = "HEAD";
-constexpr const char *s_REFS_TAGS           = "refs/tags/";
+constexpr const char *s_REFS                 = "refs/";
+constexpr const char *s_REFS_BRANCHES_LOCAL  = "refs/branches-local/";
+constexpr const char *s_REFS_BRANCHES_REMOTE = "refs/branches-remote/";
+constexpr const char *s_DVS_DIR              = ".dvs";
+constexpr const char *s_HEAD_REF             = "HEAD";
+constexpr const char *s_REFS_TAGS            = "refs/tags/";
 
 class DVS
 {

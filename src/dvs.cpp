@@ -11,6 +11,7 @@
 #include "dvs.h"
 
 #include "command_branch_create.h"
+#include "command_branch_list.h"
 #include "command_cat.h"
 #include "command_checkout.h"
 #include "command_commit.h"
@@ -30,6 +31,7 @@ R"(DVS - David's Versioning System.
     Usage:
       dvs branch checkout <BranchName>
       dvs branch create <BranchName>
+      dvs branch list
       dvs commit ( -m | --message ) <message>
       dvs fetch
       dvs init [<directory>]
@@ -195,17 +197,32 @@ std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &ar
   else if ( docopt::value createOption = args_[ "create" ];
        createOption && createOption.isBool( ) && createOption.asBool( ) )
   {
-      CreateBranchCommand createBranchCommand;
+    CreateBranchCommand createBranchCommand;
 
-      err = createBranchCommand.ParseArgs( args_ );
+    err = createBranchCommand.ParseArgs( args_ );
 
-      if ( !err.empty( ) )
-      {
-        return err;
-      }
+    if ( !err.empty( ) )
+    {
+      return err;
+    }
 
-      err = createBranchCommand( *this );
+    err = createBranchCommand( *this );
   }
+  else if ( docopt::value branchListOption = args_[ "list" ];
+            branchListOption && branchListOption.isBool( ) && branchListOption.asBool( ) )
+  {
+    ListBranchCommand listBranchCommand;
+
+    err = listBranchCommand.ParseArgs( args_ );
+
+    if ( !err.empty( ) )
+    {
+      return err;
+    }
+
+    err = listBranchCommand( *this );
+  }
+
 
   return err;
 }
