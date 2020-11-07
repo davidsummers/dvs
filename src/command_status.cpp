@@ -59,7 +59,7 @@ std::string StatusCommand::GetBranchName( DVS &dvs_ )
     return "";
   }
 
-  assert( ("Head starts with refs/branches-local", head.value.find( s_REFS_BRANCHES_LOCAL ) == 0) );
+  assert( ((void)"Head starts with refs/branches-local", head.value.find( s_REFS_BRANCHES_LOCAL ) == 0) );
 
   std::string result = head.value.substr( head.value.find( s_REFS_BRANCHES_LOCAL ) );
 
