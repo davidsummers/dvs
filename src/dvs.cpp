@@ -28,8 +28,8 @@ const char s_USAGE [] =
 R"(DVS - David's Versioning System.
 
     Usage:
+      dvs branch checkout <BranchName>
       dvs branch create <BranchName>
-      dvs checkout <BranchName>
       dvs commit ( -m | --message ) <message>
       dvs fetch
       dvs init [<directory>]
@@ -83,20 +83,6 @@ int DVS::ParseCommands( int argc_, char **argv_ )
        branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
   {
     err = ParseBranchCommands( args );
-  }
-  else if ( docopt::value checkoutOption = args[ "checkout" ];
-       checkoutOption && checkoutOption.isBool( ) && checkoutOption.asBool( ) )
-  {
-    CheckoutCommand checkoutCmd;
-
-    err = checkoutCmd.ParseArgs( args );
-
-    if ( !err.empty( ) )
-    {
-      return 1;
-    }
-
-    err = checkoutCmd( *this );
   }
   else if ( docopt::value commitCommand = args[ "commit" ];
        commitCommand && commitCommand.isBool( ) && commitCommand.asBool( ) )
@@ -201,7 +187,21 @@ std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &ar
 {
   std::string err;
 
-  if ( docopt::value createOption = args_[ "create" ];
+  if ( docopt::value checkoutOption = args_[ "checkout" ];
+       checkoutOption && checkoutOption.isBool( ) && checkoutOption.asBool( ) )
+  {
+    CheckoutCommand checkoutCmd;
+
+    err = checkoutCmd.ParseArgs( args_ );
+
+    if ( !err.empty( ) )
+    {
+      return err;
+    }
+
+    err = checkoutCmd( *this );
+  }
+  else if ( docopt::value createOption = args_[ "create" ];
        createOption && createOption.isBool( ) && createOption.asBool( ) )
   {
       CreateBranchCommand createBranchCommand;
