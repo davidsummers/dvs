@@ -26,6 +26,7 @@ class DVS
 
     std::string ParseBranchCommands( std::map< std::string, docopt::value > &args_ );
     std::string ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
+    std::string ParseTagCommands( std::map< std::string, docopt::value > &args_ );
 
     // Helpers
     std::string Validate( const std::string &dir = "" );

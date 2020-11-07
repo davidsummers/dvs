@@ -37,7 +37,7 @@ R"(DVS - David's Versioning System.
       dvs pull
       dvs push
       dvs status
-      dvs tag <tag> [<hash>]
+      dvs tag create <tag> [<hash>]
       dvs internal cat [ -s | -t ] <hash>
       dvs internal hash <file>
       dvs internal read-tree <hash>
@@ -151,16 +151,7 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   else if ( docopt::value tagOption = args[ "tag" ];
             tagOption && tagOption.isBool( ) && tagOption.asBool( ) )
   {
-    TagCommand tagCommand;
-
-    err = tagCommand.ParseArgs( args );
-
-    if ( !err.empty( ) )
-    {
-        return 1;
-    }
-
-    err = tagCommand( *this );
+    err = ParseTagCommands( args );
   }
   else if ( docopt::value internalOption = args[ "internal" ];
        internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
@@ -272,6 +263,29 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
    WriteTreeCommand writeTreeCommand;
    err = writeTreeCommand( *this );
  }
+
+  return err;
+}
+
+
+std::string DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_ )
+{
+  std::string err;
+
+  if ( docopt::value tagCreateOption = args_[ "create" ];
+       tagCreateOption && tagCreateOption.isBool( ) && tagCreateOption.asBool( ) )
+  {
+      TagCommand tagCommand;
+
+      err = tagCommand.ParseArgs( args_ );
+
+      if ( !err.empty( ) )
+      {
+        return err;
+      }
+
+      err = tagCommand( *this );
+  }
 
   return err;
 }
