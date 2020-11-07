@@ -11,6 +11,7 @@
 #include "dvs.h"
 
 #include "command_branch_create.h"
+#include "command_branch_delete.h"
 #include "command_branch_list.h"
 #include "command_cat.h"
 #include "command_checkout.h"
@@ -31,6 +32,7 @@ R"(DVS - David's Versioning System.
     Usage:
       dvs branch checkout <BranchName>
       dvs branch create <BranchName>
+      dvs branch delete <BranchName>
       dvs branch list
       dvs commit ( -m | --message ) <message>
       dvs fetch
@@ -207,6 +209,20 @@ std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &ar
     }
 
     err = createBranchCommand( *this );
+  }
+  else if ( docopt::value branchDeleteOption = args_[ "delete" ];
+            branchDeleteOption && branchDeleteOption.isBool( ) && branchDeleteOption.asBool( ) )
+  {
+    DeleteBranchCommand deleteBranchCommand;
+
+    err = deleteBranchCommand.ParseArgs( args_ );
+
+    if ( !err.empty( ) )
+    {
+      return err;
+    }
+
+    err = deleteBranchCommand( *this );
   }
   else if ( docopt::value branchListOption = args_[ "list" ];
             branchListOption && branchListOption.isBool( ) && branchListOption.asBool( ) )

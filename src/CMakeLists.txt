@@ -1,6 +1,7 @@
 
 set( SOURCE_FILES
      command_branch_create.cpp
+     command_branch_delete.cpp
      command_branch_list.cpp
      command_cat.cpp
      command_checkout.cpp
@@ -23,6 +24,7 @@ set( SOURCE_FILES
 
 set( HEADER_FILES
      command_branch_create.h
+     command_branch_delete.h
      command_branch_list.h
      command_cat.h
      command_checkout.h
