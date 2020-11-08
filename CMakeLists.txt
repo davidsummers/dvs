@@ -10,6 +10,7 @@ set( CMAKE_CXX_STANDARD_REQUIRED ON  )
 set( CMAKE_CXX_EXTENSIONS        OFF )
 
 add_subdirectory( lib/docopt )
+add_subdirectory( lib/dtl )
 add_subdirectory( lib/SHA-3/SHA-3 )
 add_subdirectory( src )
 add_subdirectory( tests )
