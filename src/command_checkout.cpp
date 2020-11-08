@@ -8,7 +8,6 @@
 #include "command_read_tree.h"
 #include "dvs.h"
 
-
 std::string CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
@@ -16,17 +15,15 @@ std::string CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &
   if ( docopt::value branchNameOption = args_[ "<BranchName>" ];
        branchNameOption && branchNameOption.isString( ) && !branchNameOption.asString( ).empty( ) )
   {
-      m_BranchName = branchNameOption.asString( );
+    m_BranchName = branchNameOption.asString( );
   }
 
   return err;
 }
 
-
-std::string CheckoutCommand::operator ( ) ( DVS &dvs_ )
+std::string CheckoutCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -35,7 +32,6 @@ std::string CheckoutCommand::operator ( ) ( DVS &dvs_ )
 
   return result;
 }
-
 
 std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_ )
 {
@@ -57,7 +53,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
 
   refValue.value = dvs_.GetOid( refValue.value );
 
-  CatCommand catCommand;
+  CatCommand        catCommand;
   std::stringstream commitSs;
 
   CatCommand::CatResult catResult = catCommand.GetHash( dvs_, refValue.value, &commitSs, RecordType::commit );
@@ -93,7 +89,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
     if ( pos == std::string::npos )
     {
       break;
-    } 
+    }
 
     type = line.substr( 0, pos );
     hash = line.substr( pos + 1 );
@@ -134,7 +130,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
 
   // Now read the resulting tree
   ReadTreeCommand readTreeCommand;
-  OidResult readTreeResult = readTreeCommand.ReadTree( dvs_, treeHash );
+  OidResult       readTreeResult = readTreeCommand.ReadTree( dvs_, treeHash );
 
   if ( !readTreeResult.err.empty( ) )
   {
@@ -160,10 +156,9 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
   return result;
 }
 
-
 bool CheckoutCommand::IsBranch( DVS &dvs_, const std::string &branchName_ )
 {
   RefValue refValue = dvs_.GetRef( s_REFS_BRANCHES_LOCAL + branchName_ );
-  bool isBranch = !refValue.value.empty( );
+  bool     isBranch = !refValue.value.empty( );
   return isBranch;
 }

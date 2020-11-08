@@ -3,6 +3,7 @@ project( dvs_tests )
 
 message( "DVS_TESTS: ${CMAKE_CURRENT_SOURCE_DIR}" )
 
+
 set( DVS_TEST_SOURCE_FILES
      dvs_tests_helpers.cpp
      dvs_tests_main.cpp
@@ -17,6 +18,14 @@ add_executable( test_dvs_command
                 ${DVS_TEST_SOURCE_FILES}
                 ${DVS_TEST_HEADER_FILES}
               )
+
+if ( MSVC )
+
+  target_compile_definitions( test_dvs_command PRIVATE
+                              _CRT_SECURE_NO_WARNINGS
+                            )
+
+endif( )
 
 target_include_directories( test_dvs_command PRIVATE
                             ../src

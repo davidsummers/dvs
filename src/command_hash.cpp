@@ -1,18 +1,18 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #ifdef WIN32
 #include <io.h>
 #define mktemp _mktemp
 #endif
 
-#include "command_hash.h"
-#include "dvs.h"
 #include "Hex.h"
 #include "Keccak.h"
-
+#include "command_hash.h"
+#include "dvs.h"
 
 using RecordMapLookup = std::map< RecordType, std::string >;
 
+// clang-format off
 RecordMapLookup s_RecordMapLookup =
 {
   { RecordType::none, "none" },
@@ -20,6 +20,7 @@ RecordMapLookup s_RecordMapLookup =
   { RecordType::tag,  "tag"  },
   { RecordType::tree, "tree" },
 };
+//clang-format on
 
 
 std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
@@ -27,7 +28,7 @@ std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > &args
   std::string err;
 
   if ( docopt::value fileOption = args_[ "<file>" ];
-        fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
+       fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
   {
     m_Filename = fileOption.asString( );
   }
@@ -39,11 +40,9 @@ std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > &args
   return err;
 }
 
-
-std::string HashCommand::operator ( ) ( DVS &dvs_ )
+std::string HashCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validate_error = dvs_.Validate( );
-       !validate_error.empty( ) )
+  if ( std::string validate_error = dvs_.Validate( ); !validate_error.empty( ) )
   {
     return validate_error;
   }
@@ -55,7 +54,6 @@ std::string HashCommand::operator ( ) ( DVS &dvs_ )
   return err;
 }
 
-
 OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const RecordType hashType_ )
 {
   OidResult result;
@@ -66,7 +64,7 @@ OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const Reco
     std::stringstream ss;
     ss << "Couldn't open input file '" << filename_ << "'";
     result.err = ss.str( );
-     
+
     return result;
   }
 
@@ -77,7 +75,6 @@ OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const Reco
   return result;
 }
 
-
 OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_, RecordType recordType_ )
 {
   OidResult result;
@@ -86,7 +83,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
   const int SHA_BUF_SIZE = 4096;
   Keccak hashObj( 256 );
   std::vector< uint8_t > buffer( SHA_BUF_SIZE );
-  
+
   // Add header (hash type) to buffer.
   std::stringstream headerSs;
 
@@ -123,23 +120,19 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
   {
     memset( &buffer[ 0 ], 0, sizeof( buffer ) );
     inputStream_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-    if ( std::streamsize bytesRead = inputStream_.gcount( );
-          bytesRead > 0 )
+    if ( std::streamsize bytesRead = inputStream_.gcount( ); bytesRead > 0 )
     {
-      hashObj.addData( &buffer[ 0 ], 0, static_cast< unsigned int>( bytesRead ) );
+      hashObj.addData( &buffer[ 0 ], 0, static_cast< unsigned int >( bytesRead ) );
     }
   } while ( inputStream_.good( ) );
 
   inputStream_.clear( );
 
-  std::vector< unsigned char > op = hashObj.digest();
+  std::vector< unsigned char > op = hashObj.digest( );
 
   for ( auto &oi : op )
   {
-    Hex( oi, [ &hashSs ] ( unsigned char a_ )
-    {
-      hashSs << a_;
-    } );
+    Hex( oi, [ &hashSs ]( unsigned char a_ ) { hashSs << a_; } );
   }
 
   {
@@ -166,7 +159,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
       return result;
     }
 
-    std::ofstream outputFile( objectPath,  std::ios_base::binary );
+    std::ofstream outputFile( objectPath, std::ios_base::binary );
 
     outputFile.write( &header[ 0 ], headerSize );
 
@@ -174,8 +167,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
     {
       memset( &buffer[ 0 ], 0, sizeof( buffer ) );
       inputStream_.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-      if ( std::streamsize bytesRead = inputStream_.gcount( );
-            bytesRead > 0 )
+      if ( std::streamsize bytesRead = inputStream_.gcount( ); bytesRead > 0 )
       {
         outputFile.write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
       }
@@ -189,7 +181,6 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
   result.oid = hashSs.str( );
   return result;
 }
-
 
 std::string HashCommand::LookupType( const RecordType recordType_ )
 {

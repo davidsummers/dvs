@@ -1,6 +1,8 @@
 
 set( SOURCE_FILES
      command_branch_create.cpp
+     command_branch_delete.cpp
+     command_branch_list.cpp
      command_cat.cpp
      command_checkout.cpp
      command_commit.cpp
@@ -16,10 +18,14 @@ set( SOURCE_FILES
      file_system_memory.cpp
      file_system_normal.cpp
      read_tree_generator.cpp
+     record_commit.cpp
+     record_tree.cpp
    )
 
 set( HEADER_FILES
      command_branch_create.h
+     command_branch_delete.h
+     command_branch_list.h
      command_cat.h
      command_checkout.h
      command_commit.h
@@ -36,6 +42,8 @@ set( HEADER_FILES
      file_system_memory.h
      file_system_normal.h
      read_tree_generator.h
+     record_commit.h
+     record_tree.h
    )
 
 

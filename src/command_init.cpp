@@ -18,14 +18,12 @@ std::string InitCommand::ParseArgs( std::map< std::string, docopt::value > &args
   return err;
 }
 
-
-std::string InitCommand::operator ( ) ( DVS &dvs_ )
+std::string InitCommand::operator( )( DVS &dvs_ )
 {
   std::string err = InitDvs( dvs_, m_Directory, &std::cout );
 
   return err;
 }
-
 
 std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::ostream *outStream_ )
 {
@@ -35,11 +33,9 @@ std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::o
   {
     rootPath = ".";
   }
- 
+
   // Create initial control directory structure
-  if ( rootPath != "." &&
-       std::filesystem::exists( rootPath ) &&
-       std::filesystem::is_directory( rootPath ) )
+  if ( rootPath != "." && std::filesystem::exists( rootPath ) && std::filesystem::is_directory( rootPath ) )
   {
     std::stringstream ss;
     ss << "Directory '" << rootPath << "' already exists.";
@@ -68,25 +64,22 @@ std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::o
     return ss.str( );
   }
 
-
-  if ( std::string validate_error = dvs_.Validate( dvsDir.string( ) );
-       !validate_error.empty( ) )
+  if ( std::string validate_error = dvs_.Validate( dvsDir.string( ) ); !validate_error.empty( ) )
   {
     return validate_error;
   }
 
   if ( outStream_ != nullptr )
   {
-    std::cout << "Initialized empty DVS repository in " <<
-      ( rootPath == "." ? "current directory" : std::filesystem::absolute( rootPath ) ) <<
-      std::endl;
+    std::cout << "Initialized empty DVS repository in "
+              << ( rootPath == "." ? "current directory" : std::filesystem::absolute( rootPath ) ) << std::endl;
   }
 
   // Create first (default) branch
-  const bool symbolic = true;
+  const bool  symbolic    = true;
   std::string newRefValue = s_REFS_BRANCHES_LOCAL;
   newRefValue += "master";
   dvs_.SetRef( s_HEAD_REF, RefValue{ symbolic, newRefValue } );
- 
+
   return "";
 }

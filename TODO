@@ -1,0 +1,12 @@
+Now:
+dvs tag create
+dvs tag list
+dvs tag delete
+dvs diff
+
+
+Future Ideas:
+
+Should 'dvs checkout <BranchName>' be 'dvs branch checkout <BranchName>'???
+
+

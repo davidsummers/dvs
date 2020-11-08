@@ -7,14 +7,11 @@ class DVS;
 class StatusCommand
 {
   public:
+  std::string operator( )( DVS & );
 
-    std::string operator( ) ( DVS & );
-
-    std::string Status( DVS & );
+  std::string Status( DVS & );
 
   protected:
-
   private:
-
-    std::string GetBranchName( DVS & );
+  std::string GetBranchName( DVS & );
 };

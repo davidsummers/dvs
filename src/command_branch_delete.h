@@ -3,20 +3,21 @@
 #include <map>
 #include <string>
 
+#include "common.h"
 #include "docopt.h"
 
 class DVS;
 
-class InitCommand
+class DeleteBranchCommand
 {
   public:
   std::string ParseArgs( std::map< std::string, docopt::value > & );
 
   std::string operator( )( DVS & );
 
-  std::string InitDvs( DVS &, const std::string rootPath = "", std::ostream *outStream = nullptr );
+  std::string DeleteBranch( DVS &, const std::string &branchName );
 
   protected:
   private:
-  std::string m_Directory;
+  std::string m_Branch;
 };

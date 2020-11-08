@@ -1,15 +1,12 @@
 #include "file_system_normal.h"
 
-
 NormalFileSystem::NormalFileSystem( )
 {
 }
 
-
 NormalFileSystem::~NormalFileSystem( )
 {
 }
-
 
 int NormalFileSystem::mkdir( const std::filesystem::path & )
 {

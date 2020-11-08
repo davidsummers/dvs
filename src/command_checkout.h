@@ -10,26 +10,23 @@ class DVS;
 class CheckoutCommand
 {
   public:
+  std::string ParseArgs( std::map< std::string, docopt::value > & );
 
-    std::string ParseArgs( std::map< std::string, docopt::value > & );
+  std::string operator( )( DVS & );
 
-    std::string operator ( ) ( DVS & );
-
-    std::string Checkout( DVS &, const std::string &name );
+  std::string Checkout( DVS &, const std::string &name );
 
   protected:
-
   private:
+  //
+  // Data
+  //
 
-    //
-    // Data
-    //
+  std::string m_BranchName;
 
-    std::string m_BranchName;
+  //
+  // Methods
+  //
 
-    //
-    // Methods
-    //
-
-    bool IsBranch( DVS &, const std::string &branchName );
+  bool IsBranch( DVS &, const std::string &branchName );
 };

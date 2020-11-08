@@ -6,7 +6,6 @@
 #include "command_branch_create.h"
 #include "dvs.h"
 
-
 std::string CreateBranchCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
@@ -14,30 +13,27 @@ std::string CreateBranchCommand::ParseArgs( std::map< std::string, docopt::value
   if ( docopt::value hashOption = args_[ "<BranchName>" ];
        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
   {
-      m_BranchName = hashOption.asString( );
+    m_BranchName = hashOption.asString( );
   }
   else
   {
-      std::stringstream ss;
-      ss << "Missing hash identifier.";
-      err = ss.str( );
+    std::stringstream ss;
+    ss << "Missing hash identifier.";
+    err = ss.str( );
   }
 
   return err;
 }
 
-
-std::string CreateBranchCommand::operator ( ) ( DVS &dvs_ )
+std::string CreateBranchCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
-  
+
   return CreateBranch( dvs_, m_BranchName, m_Oid );
 }
-
 
 std::string CreateBranchCommand::CreateBranch( DVS &dvs_, const std::string &branchName_, const std::string &oid_ )
 {

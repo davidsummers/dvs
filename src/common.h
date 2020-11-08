@@ -23,7 +23,6 @@ using OidResult = struct
   std::string oid;
 };
 
-
 using RefValue = struct RefValue
 {
   bool        symbolic = false;

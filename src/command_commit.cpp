@@ -5,7 +5,7 @@
 #include "command_hash.h"
 #include "command_write_tree.h"
 #include "dvs.h"
-
+#include "record_commit.h"
 
 std::string CommitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
@@ -13,13 +13,11 @@ std::string CommitCommand::ParseArgs( std::map< std::string, docopt::value > &ar
 
   bool msgFlag = false;
 
-  if ( docopt::value msgOption = args_[ "-m" ];
-       msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
+  if ( docopt::value msgOption = args_[ "-m" ]; msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
   {
     msgFlag = true;
   }
-  else if ( docopt::value msgOption = args_[ "--message" ];
-       msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
+  else if ( docopt::value msgOption = args_[ "--message" ]; msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
   {
     msgFlag = true;
   }
@@ -38,19 +36,17 @@ std::string CommitCommand::ParseArgs( std::map< std::string, docopt::value > &ar
   }
   else
   {
-      std::stringstream ss;
-      ss << "Missing hash identifier.";
-      err = ss.str( );
+    std::stringstream ss;
+    ss << "Missing hash identifier.";
+    err = ss.str( );
   }
 
   return err;
 }
 
-
-std::string CommitCommand::operator ( ) ( DVS &dvs_ )
+std::string CommitCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -62,10 +58,12 @@ std::string CommitCommand::operator ( ) ( DVS &dvs_ )
   return result.err;
 }
 
-
 OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
 {
-  OidResult result;
+  OidResult    result;
+  CommitRecord commitRecord;
+
+  commitRecord.SetMsg( message_ );
 
   WriteTreeCommand writeTreeCommand;
 
@@ -77,23 +75,15 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
     return result;
   }
 
+  commitRecord.SetTreeOid( writeTreeResult.oid );
+
   RefValue parentRef = dvs_.GetRef( s_HEAD_REF );
+
+  commitRecord.SetParentOid( parentRef.value );
 
   std::stringstream ss;
 
-  // Write out tree hash of this commit.
-  ss << "tree " << writeTreeResult.oid << std::endl;
-
-  // If we have a parent hash, write it out.
-  if ( !parentRef.value.empty( ) )
-  {
-    ss << "parent " << parentRef.value << std::endl;
-  }
-
-  // Write out blank line to separate headers from message body content.
-  ss << std::endl;
-  // Write out commit message.
-  ss << message_ << std::endl;
+  ss << commitRecord;
 
   HashCommand hashCommand;
 
