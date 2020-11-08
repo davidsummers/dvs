@@ -11,6 +11,12 @@ if ( MSVC )
                               DTL_MAIN
                             )
 
+else ( )
+
+    target_compile_definitions( unidiff PRIVATE
+                                DTL_MAIN
+                              )
+
 endif( )
 
 target_include_directories( unidiff PRIVATE
@@ -20,6 +26,10 @@ target_include_directories( unidiff PRIVATE
 add_library( unidifflib
              unidiff.cpp
            )
+
+target_include_directories( unidifflib PRIVATE
+                            ..
+                          )
 
 if ( MSVC )
 
