@@ -12,3 +12,14 @@ Initial sub-commands:
 - pull     - Pull from server.
 - push     - Push to server.
 - status   - Print status.
+
+References:
+
+Originally:
+https://www.leshenko.net/p/ugit/#
+
+Later on I found these:
+
+https://wyag.thb.lt/
+https://benhoyt.com/writings/pygit/
+https://thoughtbot.com/blog/rebuilding-git-in-ruby
