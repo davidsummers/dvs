@@ -80,6 +80,7 @@ static void unifiedDiff (string fp1, string fp2)
     diff.printUnifiedFormat();
 }
 
+#ifdef DTL_MAIN
 
 int main(int argc, char *argv[])
 {
@@ -109,3 +110,5 @@ int main(int argc, char *argv[])
     unifiedDiff(s1, s2);
     return 0;
 }
+
+#endif

@@ -8,6 +8,7 @@ if ( MSVC )
 
   target_compile_definitions( unidiff PRIVATE
                               _CRT_SECURE_NO_WARNINGS
+                              DTL_MAIN
                             )
 
 endif( )
@@ -15,3 +16,15 @@ endif( )
 target_include_directories( unidiff PRIVATE
                             ..
                           )
+
+add_library( unidifflib
+             unidiff.cpp
+           )
+
+if ( MSVC )
+
+  target_compile_definitions( unidifflib PRIVATE
+                               _CRT_SECURE_NO_WARNINGS
+                             )
+
+endif( )
