@@ -12,7 +12,7 @@ std::string ReadTreeCommand::ParseArgs( std::map< std::string, docopt::value > &
   std::string err;
 
   if ( docopt::value hashOption = args_[ "<hash>" ];
-        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
+       hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
   {
     m_HashId = hashOption.asString( );
   }
@@ -24,11 +24,9 @@ std::string ReadTreeCommand::ParseArgs( std::map< std::string, docopt::value > &
   return err;
 }
 
-
-std::string ReadTreeCommand::operator ( ) ( DVS &dvs_ )
+std::string ReadTreeCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -37,7 +35,6 @@ std::string ReadTreeCommand::operator ( ) ( DVS &dvs_ )
 
   return result.err;
 }
-
 
 OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
 {
@@ -74,9 +71,9 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
 
     if ( type == "blob" )
     {
-       std::ofstream outFile( filename, std::ios_base::binary );
-       CatCommand fileCat;
-       fileCat.GetHash( dvs_, hash, &outFile, RecordType::blob );
+      std::ofstream outFile( filename, std::ios_base::binary );
+      CatCommand fileCat;
+      fileCat.GetHash( dvs_, hash, &outFile, RecordType::blob );
     }
     else if ( type == "tree" )
     {
@@ -99,7 +96,6 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
   OidResult result;
   return result;
 }
-
 
 void ReadTreeCommand::EmptyCurrentDirectory( DVS &dvs_ )
 {

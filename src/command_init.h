@@ -10,16 +10,13 @@ class DVS;
 class InitCommand
 {
   public:
+  std::string ParseArgs( std::map< std::string, docopt::value > & );
 
-    std::string ParseArgs( std::map< std::string, docopt::value > & );
+  std::string operator( )( DVS & );
 
-    std::string operator ( ) ( DVS & );
-
-    std::string InitDvs( DVS &, const std::string rootPath = "", std::ostream *outStream = nullptr );
+  std::string InitDvs( DVS &, const std::string rootPath = "", std::ostream *outStream = nullptr );
 
   protected:
-
   private:
-
-    std::string m_Directory;
+  std::string m_Directory;
 };

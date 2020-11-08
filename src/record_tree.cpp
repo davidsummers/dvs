@@ -10,7 +10,6 @@
 #include "command_hash.h"
 #include "record_tree.h"
 
-
 void TreeRecord::AddEntry( const std::string filename_, const RecordType &type_, std::string &hash_ )
 {
   DirEntry entry;
@@ -20,17 +19,16 @@ void TreeRecord::AddEntry( const std::string filename_, const RecordType &type_,
   m_DirList[ filename_ ] = entry;
 }
 
-
-std::ostream &TreeRecord::operator <<( std::ostream &s_ ) const
+std::ostream &TreeRecord::operator<<( std::ostream &s_ ) const
 {
   for ( auto &entry : m_DirList )
   {
-    s_ << HashCommand::LookupType( entry.second.type ) << " " << entry.second.oid << " " << entry.second.filename << std::endl;
+    s_ << HashCommand::LookupType( entry.second.type ) << " " << entry.second.oid << " " << entry.second.filename
+       << std::endl;
   }
 
   return s_;
 }
-
 
 std::string TreeRecord::Parse( std::istream &s_ )
 {
@@ -94,9 +92,8 @@ std::string TreeRecord::Parse( std::istream &s_ )
   return "";
 }
 
-
-std::ostream &operator <<( std::ostream &s_, const TreeRecord &treeRecord_ )
+std::ostream &operator<<( std::ostream &s_, const TreeRecord &treeRecord_ )
 {
-  treeRecord_.operator <<( s_ );
+  treeRecord_.operator<<( s_ );
   return s_;
 }

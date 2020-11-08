@@ -7,20 +7,17 @@
 #include "dvs.h"
 #include "record_commit.h"
 
-
 std::string CommitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
 
   bool msgFlag = false;
 
-  if ( docopt::value msgOption = args_[ "-m" ];
-       msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
+  if ( docopt::value msgOption = args_[ "-m" ]; msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
   {
     msgFlag = true;
   }
-  else if ( docopt::value msgOption = args_[ "--message" ];
-       msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
+  else if ( docopt::value msgOption = args_[ "--message" ]; msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
   {
     msgFlag = true;
   }
@@ -39,19 +36,17 @@ std::string CommitCommand::ParseArgs( std::map< std::string, docopt::value > &ar
   }
   else
   {
-      std::stringstream ss;
-      ss << "Missing hash identifier.";
-      err = ss.str( );
+    std::stringstream ss;
+    ss << "Missing hash identifier.";
+    err = ss.str( );
   }
 
   return err;
 }
 
-
-std::string CommitCommand::operator ( ) ( DVS &dvs_ )
+std::string CommitCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -62,7 +57,6 @@ std::string CommitCommand::operator ( ) ( DVS &dvs_ )
 
   return result.err;
 }
-
 
 OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
 {

@@ -6,7 +6,6 @@
 #include "command_branch_list.h"
 #include "dvs.h"
 
-
 std::string ListBranchCommand::ParseArgs( std::map< std::string, docopt::value > & /* args_ */ )
 {
   std::string err;
@@ -14,18 +13,15 @@ std::string ListBranchCommand::ParseArgs( std::map< std::string, docopt::value >
   return err;
 }
 
-
-std::string ListBranchCommand::operator ( ) ( DVS &dvs_ )
+std::string ListBranchCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
-  
+
   return ListBranch( dvs_ );
 }
-
 
 std::string ListBranchCommand::ListBranch( DVS &dvs_ )
 {

@@ -10,6 +10,7 @@
 
 #include "dvs.h"
 
+#include "CommandParser.h"
 #include "command_branch_create.h"
 #include "command_branch_delete.h"
 #include "command_branch_list.h"
@@ -23,11 +24,9 @@
 #include "command_status.h"
 #include "command_tag.h"
 #include "command_write_tree.h"
-#include "CommandParser.h"
 
-
-const char s_USAGE [] =
-R"(DVS - David's Versioning System.
+const char s_USAGE[] =
+  R"(DVS - David's Versioning System.
 
     Usage:
       dvs branch checkout <BranchName>
@@ -57,13 +56,11 @@ R"(DVS - David's Versioning System.
       --version              Show version.
 )";
 
-
 DVS::DVS( )
 {
   // Save current working directory.
   m_OriginalDirectory = std::filesystem::current_path( );
 }
-
 
 DVS::~DVS( )
 {
@@ -71,25 +68,23 @@ DVS::~DVS( )
   std::filesystem::current_path( m_OriginalDirectory );
 }
 
-
 int DVS::ParseCommands( int argc_, char **argv_ )
 {
-  std::map< std::string, docopt::value > args =
-    docopt::docopt( s_USAGE,
-                    { argv_ + 1, argv_ + argc_ },
-                    true, // Show help if requested.
-                    "dvs Version 1.0" // Version string.
-                  );
+  std::map< std::string, docopt::value > args = docopt::docopt(
+    s_USAGE,
+    { argv_ + 1, argv_ + argc_ },
+    true,             // Show help if requested.
+    "dvs Version 1.0" // Version string.
+  );
 
   std::string err;
 
-  if ( docopt::value branchOption = args[ "branch" ];
-       branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
+  if ( docopt::value branchOption = args[ "branch" ]; branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
   {
     err = ParseBranchCommands( args );
   }
   else if ( docopt::value commitCommand = args[ "commit" ];
-       commitCommand && commitCommand.isBool( ) && commitCommand.asBool( ) )
+            commitCommand && commitCommand.isBool( ) && commitCommand.asBool( ) )
   {
     CommitCommand commitCmd;
 
@@ -102,13 +97,11 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
     err = commitCmd( *this );
   }
-  else if ( docopt::value fetchOption = args[ "fetch" ];
-            fetchOption && fetchOption.isBool( ) && fetchOption.asBool( ) )
+  else if ( docopt::value fetchOption = args[ "fetch" ]; fetchOption && fetchOption.isBool( ) && fetchOption.asBool( ) )
   {
     err = "'fetch' subcommand not yet implemented.";
   }
-  else if ( docopt::value initOption = args[ "init" ];
-            initOption && initOption.isBool( ) && initOption.asBool( ) )
+  else if ( docopt::value initOption = args[ "init" ]; initOption && initOption.isBool( ) && initOption.asBool( ) )
   {
     InitCommand initCommand;
 
@@ -121,8 +114,7 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
     err = initCommand( *this );
   }
-  else if ( docopt::value logOption = args[ "log" ];
-            logOption && logOption.isBool( ) && logOption.asBool( ) )
+  else if ( docopt::value logOption = args[ "log" ]; logOption && logOption.isBool( ) && logOption.asBool( ) )
   {
     LogCommand logCommand;
 
@@ -130,18 +122,16 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
     if ( !err.empty( ) )
     {
-        return 1;
+      return 1;
     }
 
     err = logCommand( *this );
   }
-  else if ( docopt::value pullOption = args[ "pull" ];
-            pullOption && pullOption.isBool( ) && pullOption.asBool( ) )
+  else if ( docopt::value pullOption = args[ "pull" ]; pullOption && pullOption.isBool( ) && pullOption.asBool( ) )
   {
     err = "'pull' subcommand not yet implemented.";
   }
-  else if ( docopt::value pushOption = args[ "push" ];
-            pushOption && pushOption.isBool( ) && pushOption.asBool( ) )
+  else if ( docopt::value pushOption = args[ "push" ]; pushOption && pushOption.isBool( ) && pushOption.asBool( ) )
   {
     err = "'push' subcommand not yet implemented.";
   }
@@ -152,13 +142,12 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
     err = statusCommand( *this );
   }
-  else if ( docopt::value tagOption = args[ "tag" ];
-            tagOption && tagOption.isBool( ) && tagOption.asBool( ) )
+  else if ( docopt::value tagOption = args[ "tag" ]; tagOption && tagOption.isBool( ) && tagOption.asBool( ) )
   {
     err = ParseTagCommands( args );
   }
   else if ( docopt::value internalOption = args[ "internal" ];
-       internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
+            internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
   {
     err = ParseInternalCommands( args );
   }
@@ -176,7 +165,6 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
   return 0;
 }
-
 
 std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
 {
@@ -197,7 +185,7 @@ std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &ar
     err = checkoutCmd( *this );
   }
   else if ( docopt::value createOption = args_[ "create" ];
-       createOption && createOption.isBool( ) && createOption.asBool( ) )
+            createOption && createOption.isBool( ) && createOption.asBool( ) )
   {
     CreateBranchCommand createBranchCommand;
 
@@ -239,28 +227,25 @@ std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &ar
     err = listBranchCommand( *this );
   }
 
-
   return err;
 }
-
 
 std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
 
-  if ( docopt::value catOption = args_[ "cat" ];
-       catOption && catOption.isBool( ) && catOption.asBool( ) )
+  if ( docopt::value catOption = args_[ "cat" ]; catOption && catOption.isBool( ) && catOption.asBool( ) )
   {
-      CatCommand catCommand;
+    CatCommand catCommand;
 
-      err = catCommand.ParseArgs( args_ );
+    err = catCommand.ParseArgs( args_ );
 
-      if ( !err.empty( ) )
-      {
-        return err;
-      }
+    if ( !err.empty( ) )
+    {
+      return err;
+    }
 
-      err = catCommand( *this );
+    err = catCommand( *this );
   }
   else if ( docopt::value readTreeOption = args_[ "read-tree" ];
             readTreeOption && readTreeOption.isBool( ) && readTreeOption.asBool( ) )
@@ -276,8 +261,7 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
 
     err = readTreeCommand( *this );
   }
-  else if ( docopt::value hashOption = args_[ "hash" ];
-            hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
+  else if ( docopt::value hashOption = args_[ "hash" ]; hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
   {
     HashCommand hashCommand;
 
@@ -292,14 +276,13 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
   }
   else if ( docopt::value writeTreeOption = args_[ "write-tree" ];
             writeTreeOption && writeTreeOption.isBool( ) && writeTreeOption.asBool( ) )
- {
-   WriteTreeCommand writeTreeCommand;
-   err = writeTreeCommand( *this );
- }
+  {
+    WriteTreeCommand writeTreeCommand;
+    err = writeTreeCommand( *this );
+  }
 
   return err;
 }
-
 
 std::string DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_ )
 {
@@ -308,21 +291,20 @@ std::string DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_
   if ( docopt::value tagCreateOption = args_[ "create" ];
        tagCreateOption && tagCreateOption.isBool( ) && tagCreateOption.asBool( ) )
   {
-      TagCommand tagCommand;
+    TagCommand tagCommand;
 
-      err = tagCommand.ParseArgs( args_ );
+    err = tagCommand.ParseArgs( args_ );
 
-      if ( !err.empty( ) )
-      {
-        return err;
-      }
+    if ( !err.empty( ) )
+    {
+      return err;
+    }
 
-      err = tagCommand( *this );
+    err = tagCommand( *this );
   }
 
   return err;
 }
-
 
 std::string DVS::Validate( const std::string &dir_ )
 {
@@ -353,7 +335,6 @@ std::string DVS::Validate( const std::string &dir_ )
   return ""; // No errors.
 }
 
-
 std::filesystem::path DVS::RemoveLastPathElement( const std::filesystem::path &path_ )
 {
   int num = NumPathElements( path_ );
@@ -362,32 +343,27 @@ std::filesystem::path DVS::RemoveLastPathElement( const std::filesystem::path &p
 
   for ( int i = 0; i < num - 1; ++i, ++itr )
   {
-      newPath /= *itr;
+    newPath /= *itr;
   }
 
   return newPath;
 }
 
-
 int DVS::NumPathElements( const std::filesystem::path &path_ )
 {
-    int num = 0;
-    for ( std::filesystem::path::iterator itr = path_.begin( );
-          itr != path_.end( );
-          ++itr )
-    {
-      num++;
-    }
+  int num = 0;
+  for ( std::filesystem::path::iterator itr = path_.begin( ); itr != path_.end( ); ++itr )
+  {
+    num++;
+  }
 
   return num;
 }
-
 
 std::filesystem::path DVS::GetDvsDirectory( )
 {
   return m_DvsDirectory;
 }
-
 
 bool DVS::IsIgnored( const std::filesystem::path &path_ )
 {
@@ -400,12 +376,11 @@ bool DVS::IsIgnored( const std::filesystem::path &path_ )
   return false;
 }
 
-
 void DVS::SetRef( const std::string &ref_, const RefValue &refValue_, const bool deref_ )
 {
   std::string ref = GetRefInternal( ref_, deref_ ).ref;
 
-  assert( ( (void)"reValue_.value should not be empty.", !refValue_.value.empty( ) ) );
+  assert( ( (void) "reValue_.value should not be empty.", !refValue_.value.empty( ) ) );
 
   if ( !m_DvsDirectory.string( ).empty( ) )
   {
@@ -420,7 +395,6 @@ void DVS::SetRef( const std::string &ref_, const RefValue &refValue_, const bool
       value = refValue_.value;
     }
 
-
     std::filesystem::path refPath = m_DvsDirectory;
     refPath /= ref;
 
@@ -434,12 +408,10 @@ void DVS::SetRef( const std::string &ref_, const RefValue &refValue_, const bool
   }
 }
 
-
 RefValue DVS::GetRef( const std::string &ref_, const bool deref_ )
 {
   return GetRefInternal( ref_, deref_ ).refValue;
 }
-
 
 DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
 {
@@ -458,8 +430,7 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
       std::getline( headFile, headHash.value );
     }
 
-    if ( size_t pos = headHash.value.find( "ref:" );
-         pos == 0 )
+    if ( size_t pos = headHash.value.find( "ref:" ); pos == 0 )
     {
       symbolic = true;
 
@@ -474,15 +445,13 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
   return RefIntRet{ ref_, RefValue{ symbolic, headHash.value } };
 }
 
-
 std::string DVS::GetOid( const std::string &name_ )
 {
   std::string name = name_ == "@" ? s_HEAD_REF : name_;
 
   std::string result;
 
-  std::vector< std::string > refsToTry
-  {
+  std::vector< std::string > refsToTry{
     name,
     "refs/" + name,
     s_REFS_TAGS + name,
@@ -491,8 +460,7 @@ std::string DVS::GetOid( const std::string &name_ )
 
   for ( auto &refTry : refsToTry )
   {
-    if ( result = GetRef( refTry, false ).value;
-         !result.empty( ) )
+    if ( result = GetRef( refTry, false ).value; !result.empty( ) )
     {
       break;
     }

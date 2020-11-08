@@ -6,7 +6,6 @@
 #include "command_tag.h"
 #include "dvs.h"
 
-
 std::string TagCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
@@ -14,13 +13,13 @@ std::string TagCommand::ParseArgs( std::map< std::string, docopt::value > &args_
   if ( docopt::value tagOption = args_[ "<tag>" ];
        tagOption && tagOption.isString( ) && !tagOption.asString( ).empty( ) )
   {
-      m_TagName = tagOption.asString( );
+    m_TagName = tagOption.asString( );
   }
   else
   {
-      std::stringstream ss;
-      ss << "Missing tag identifier.";
-      err = ss.str( );
+    std::stringstream ss;
+    ss << "Missing tag identifier.";
+    err = ss.str( );
   }
 
   if ( docopt::value hashOption = args_[ "<hash>" ];
@@ -32,11 +31,9 @@ std::string TagCommand::ParseArgs( std::map< std::string, docopt::value > &args_
   return err;
 }
 
-
-std::string TagCommand::operator ( ) ( DVS &dvs_ )
+std::string TagCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -46,7 +43,6 @@ std::string TagCommand::operator ( ) ( DVS &dvs_ )
   return result;
 }
 
-
 std::string TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
 {
   std::string result;
@@ -55,7 +51,7 @@ std::string TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::
 
   if ( refValue.value.empty( ) )
   {
-      refValue = dvs_.GetRef( s_HEAD_REF );
+    refValue = dvs_.GetRef( s_HEAD_REF );
   }
 
   dvs_.SetRef( s_REFS_TAGS + tagName_, refValue );

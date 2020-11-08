@@ -9,42 +9,35 @@
 // Commit Record
 //
 
-
 std::string CommitRecord::GetTreeOid( ) const
 {
   return m_TreeOid;
 }
-
 
 void CommitRecord::SetTreeOid( const std::string &oid_ )
 {
   m_TreeOid = oid_;
 }
 
-
 std::string CommitRecord::GetParentOid( ) const
 {
   return m_ParentOid;
 }
-
 
 void CommitRecord::SetParentOid( const std::string &oid_ )
 {
   m_ParentOid = oid_;
 }
 
-
 std::string CommitRecord::GetMsg( ) const
 {
   return m_Msg;
 }
 
-
 void CommitRecord::SetMsg( const std::string &msg_ )
 {
   m_Msg = msg_;
 }
-
 
 std::string CommitRecord::Parse( std::istream &s_ )
 {
@@ -108,8 +101,7 @@ std::string CommitRecord::Parse( std::istream &s_ )
   return "";
 }
 
-
-std::ostream &operator <<( std::ostream &s_, const CommitRecord &commitRecord_ )
+std::ostream &operator<<( std::ostream &s_, const CommitRecord &commitRecord_ )
 {
   // Write out tree hash of this commit.
   s_ << "tree " << commitRecord_.GetTreeOid( ) << std::endl;

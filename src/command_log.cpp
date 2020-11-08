@@ -8,7 +8,6 @@
 #include "dvs.h"
 #include "record_commit.h"
 
-
 std::string LogCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
@@ -16,17 +15,15 @@ std::string LogCommand::ParseArgs( std::map< std::string, docopt::value > &args_
   if ( docopt::value hashOption = args_[ "<hash>" ];
        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
   {
-      m_HashId = hashOption.asString( );
+    m_HashId = hashOption.asString( );
   }
 
   return err;
 }
 
-
-std::string LogCommand::operator ( ) ( DVS &dvs_ )
+std::string LogCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -35,7 +32,6 @@ std::string LogCommand::operator ( ) ( DVS &dvs_ )
 
   return result;
 }
-
 
 std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 {

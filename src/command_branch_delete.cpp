@@ -6,7 +6,6 @@
 #include "command_branch_delete.h"
 #include "dvs.h"
 
-
 std::string DeleteBranchCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
@@ -24,18 +23,15 @@ std::string DeleteBranchCommand::ParseArgs( std::map< std::string, docopt::value
   return err;
 }
 
-
-std::string DeleteBranchCommand::operator ( ) ( DVS &dvs_ )
+std::string DeleteBranchCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
-  
+
   return DeleteBranch( dvs_, m_Branch );
 }
-
 
 std::string DeleteBranchCommand::DeleteBranch( DVS &dvs_, const std::string &branchName_ )
 {
@@ -62,7 +58,7 @@ std::string DeleteBranchCommand::DeleteBranch( DVS &dvs_, const std::string &bra
   else
   {
     std::stringstream ss;
-    ss << "Branch '" << branchName_ << "' does not exist." << std::endl;;
+    ss << "Branch '" << branchName_ << "' does not exist." << std::endl;
     result = ss.str( );
   }
 

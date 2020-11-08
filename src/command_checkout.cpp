@@ -8,7 +8,6 @@
 #include "command_read_tree.h"
 #include "dvs.h"
 
-
 std::string CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
@@ -16,17 +15,15 @@ std::string CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &
   if ( docopt::value branchNameOption = args_[ "<BranchName>" ];
        branchNameOption && branchNameOption.isString( ) && !branchNameOption.asString( ).empty( ) )
   {
-      m_BranchName = branchNameOption.asString( );
+    m_BranchName = branchNameOption.asString( );
   }
 
   return err;
 }
 
-
-std::string CheckoutCommand::operator ( ) ( DVS &dvs_ )
+std::string CheckoutCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -35,7 +32,6 @@ std::string CheckoutCommand::operator ( ) ( DVS &dvs_ )
 
   return result;
 }
-
 
 std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_ )
 {
@@ -93,7 +89,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
     if ( pos == std::string::npos )
     {
       break;
-    } 
+    }
 
     type = line.substr( 0, pos );
     hash = line.substr( pos + 1 );
@@ -159,7 +155,6 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
 
   return result;
 }
-
 
 bool CheckoutCommand::IsBranch( DVS &dvs_, const std::string &branchName_ )
 {

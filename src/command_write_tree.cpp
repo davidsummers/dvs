@@ -6,11 +6,9 @@
 #include "dvs.h"
 #include "record_tree.h"
 
-
-std::string WriteTreeCommand::operator ( ) ( DVS &dvs_ )
+std::string WriteTreeCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -21,7 +19,6 @@ std::string WriteTreeCommand::operator ( ) ( DVS &dvs_ )
 
   return result.err;
 }
-
 
 OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
 {
@@ -40,7 +37,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
     {
       HashCommand hashCommand;
 
-      auto [ err, hash ] = hashCommand.Hash( dvs_, entry.path( ).string( ), RecordType::blob  );
+      auto [ err, hash ] = hashCommand.Hash( dvs_, entry.path( ).string( ), RecordType::blob );
 
       if ( !err.empty( ) )
       {
@@ -55,7 +52,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
       OidResult writeResult = WriteTree( dvs_, entry.path( ).string( ) );
       if ( !writeResult.err.empty( ) )
       {
-        result.err = writeResult.err; 
+        result.err = writeResult.err;
         return result;
       }
 
@@ -79,7 +76,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
   auto [ hashErr, oid ] = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::tree );
 
   // std::cout << "Directory End: " << oid << std::endl;
-  
+
   result.err = hashErr;
   result.oid = oid;
   return result;

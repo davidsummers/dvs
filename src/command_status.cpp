@@ -5,11 +5,9 @@
 #include "command_status.h"
 #include "dvs.h"
 
-
-std::string StatusCommand::operator ( ) ( DVS &dvs_ )
+std::string StatusCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validate_error = dvs_.Validate( );
-       !validate_error.empty( ) )
+  if ( std::string validate_error = dvs_.Validate( ); !validate_error.empty( ) )
   {
     std::stringstream ss;
     ss << "Can't validate " << s_DVS_DIR << " directory: " + validate_error;
@@ -21,7 +19,6 @@ std::string StatusCommand::operator ( ) ( DVS &dvs_ )
   return result;
 }
 
-
 std::string StatusCommand::Status( DVS &dvs_ )
 {
   std::cout << "Status: " << std::endl;
@@ -32,7 +29,6 @@ std::string StatusCommand::Status( DVS &dvs_ )
   {
     return "Can't find head branch.";
   }
-
 
   std::string branch = GetBranchName( dvs_ );
 
@@ -48,7 +44,6 @@ std::string StatusCommand::Status( DVS &dvs_ )
   return "";
 }
 
-
 std::string StatusCommand::GetBranchName( DVS &dvs_ )
 {
   const bool deref = false;
@@ -59,7 +54,7 @@ std::string StatusCommand::GetBranchName( DVS &dvs_ )
     return "";
   }
 
-  assert( ((void)"Head starts with refs/branches-local", head.value.find( s_REFS_BRANCHES_LOCAL ) == 0) );
+  assert( ( (void) "Head starts with refs/branches-local", head.value.find( s_REFS_BRANCHES_LOCAL ) == 0 ) );
 
   std::string result = head.value.substr( head.value.find( s_REFS_BRANCHES_LOCAL ) );
 

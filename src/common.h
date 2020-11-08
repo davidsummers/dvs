@@ -23,9 +23,8 @@ using OidResult = struct
   std::string oid;
 };
 
-
 using RefValue = struct RefValue
 {
-  bool        symbolic = false;
+  bool symbolic = false;
   std::string value;
 };

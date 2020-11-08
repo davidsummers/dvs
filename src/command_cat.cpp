@@ -6,51 +6,45 @@
 #include "command_cat.h"
 #include "dvs.h"
 
-
 std::string CatCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
 
-  if ( docopt::value sizeOption = args_[ "-s" ];
-       sizeOption && sizeOption.isBool( ) && sizeOption.asBool( ) )
+  if ( docopt::value sizeOption = args_[ "-s" ]; sizeOption && sizeOption.isBool( ) && sizeOption.asBool( ) )
   {
     m_PrintType = PrintType::size;
   }
 
-  if ( docopt::value typeOption = args_[ "-t" ];
-       typeOption && typeOption.isBool( ) && typeOption.asBool( ) )
+  if ( docopt::value typeOption = args_[ "-t" ]; typeOption && typeOption.isBool( ) && typeOption.asBool( ) )
   {
-    m_PrintType = PrintType::type; 
+    m_PrintType = PrintType::type;
   }
 
   if ( docopt::value hashOption = args_[ "<hash>" ];
        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
   {
-      m_HashId = hashOption.asString( );
+    m_HashId = hashOption.asString( );
   }
   else
   {
-      std::stringstream ss;
-      ss << "Missing hash identifier.";
-      err = ss.str( );
+    std::stringstream ss;
+    ss << "Missing hash identifier.";
+    err = ss.str( );
   }
 
   return err;
 }
 
-
-std::string CatCommand::operator ( ) ( DVS &dvs_ )
+std::string CatCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( );
-       !validateError.empty( ) )
+  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
 
   std::ostream *outputStream = &std::cout;
 
-  if ( m_PrintType == PrintType::size ||
-       m_PrintType == PrintType::type )
+  if ( m_PrintType == PrintType::size || m_PrintType == PrintType::type )
   {
     outputStream = nullptr;
   }
@@ -70,8 +64,11 @@ std::string CatCommand::operator ( ) ( DVS &dvs_ )
   return result.err;
 }
 
-
-CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_, std::ostream *ostream_, RecordType expectedRecordType_ )
+CatCommand::CatResult CatCommand::GetHash(
+  DVS &dvs_,
+  const std::string &hashId_,
+  std::ostream *ostream_,
+  RecordType expectedRecordType_ )
 {
   CatResult result;
 
@@ -116,7 +113,7 @@ CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_
     result.size = atoi( sizeStr.c_str( ) );
     result.type = header;
   }
-  
+
   if ( expectedRecordType_ != RecordType::none )
   {
     if ( expectedRecordType_ == RecordType::blob && result.type != "blob" )
@@ -162,8 +159,7 @@ CatCommand::CatResult CatCommand::GetHash( DVS &dvs_, const std::string &hashId_
   do
   {
     inputFile.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-    if ( std::streamsize bytesRead = inputFile.gcount( );
-         bytesRead > 0 )
+    if ( std::streamsize bytesRead = inputFile.gcount( ); bytesRead > 0 )
     {
       ostream_->write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
     }
