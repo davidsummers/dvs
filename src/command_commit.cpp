@@ -60,7 +60,7 @@ std::string CommitCommand::operator( )( DVS &dvs_ )
 
 OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
 {
-  OidResult result;
+  OidResult    result;
   CommitRecord commitRecord;
 
   commitRecord.SetMsg( message_ );

@@ -53,7 +53,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
 
   refValue.value = dvs_.GetOid( refValue.value );
 
-  CatCommand catCommand;
+  CatCommand        catCommand;
   std::stringstream commitSs;
 
   CatCommand::CatResult catResult = catCommand.GetHash( dvs_, refValue.value, &commitSs, RecordType::commit );
@@ -130,7 +130,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
 
   // Now read the resulting tree
   ReadTreeCommand readTreeCommand;
-  OidResult readTreeResult = readTreeCommand.ReadTree( dvs_, treeHash );
+  OidResult       readTreeResult = readTreeCommand.ReadTree( dvs_, treeHash );
 
   if ( !readTreeResult.err.empty( ) )
   {
@@ -159,6 +159,6 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
 bool CheckoutCommand::IsBranch( DVS &dvs_, const std::string &branchName_ )
 {
   RefValue refValue = dvs_.GetRef( s_REFS_BRANCHES_LOCAL + branchName_ );
-  bool isBranch = !refValue.value.empty( );
+  bool     isBranch = !refValue.value.empty( );
   return isBranch;
 }

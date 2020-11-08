@@ -12,9 +12,9 @@ class ReadTreeCommand
   public:
   using GetTreeResult = struct
   {
-    std::string err;
+    std::string           err;
     std::filesystem::path path;
-    std::string oid;
+    std::string           oid;
   };
 
   std::string ParseArgs( std::map< std::string, docopt::value > & );

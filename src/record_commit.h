@@ -10,13 +10,13 @@ class CommitRecord
 {
   public:
   std::string GetTreeOid( ) const;
-  void SetTreeOid( const std::string & );
+  void        SetTreeOid( const std::string & );
 
   std::string GetParentOid( ) const;
-  void SetParentOid( const std::string & );
+  void        SetParentOid( const std::string & );
 
   std::string GetMsg( ) const;
-  void SetMsg( const std::string & );
+  void        SetMsg( const std::string & );
 
   std::string Parse( std::istream & );
 

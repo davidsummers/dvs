@@ -21,7 +21,7 @@ class CatCommand
   using CatResult = struct
   {
     std::string err;
-    size_t size;
+    size_t      size;
     std::string type;
   };
 
@@ -29,14 +29,13 @@ class CatCommand
 
   std::string operator( )( DVS & );
 
-  CatResult GetHash(
-    DVS &,
-    const std::string &hashID,
-    std::ostream *,
-    RecordType expectedRecordType = RecordType::none );
+  CatResult GetHash( DVS &,
+                     const std::string &hashID,
+                     std::ostream *,
+                     RecordType expectedRecordType = RecordType::none );
 
   protected:
   private:
-  PrintType m_PrintType = PrintType::contents;
+  PrintType   m_PrintType = PrintType::contents;
   std::string m_HashId;
 };

@@ -76,7 +76,7 @@ std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::o
   }
 
   // Create first (default) branch
-  const bool symbolic = true;
+  const bool  symbolic    = true;
   std::string newRefValue = s_REFS_BRANCHES_LOCAL;
   newRefValue += "master";
   dvs_.SetRef( s_HEAD_REF, RefValue{ symbolic, newRefValue } );

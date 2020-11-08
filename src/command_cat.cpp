@@ -64,11 +64,10 @@ std::string CatCommand::operator( )( DVS &dvs_ )
   return result.err;
 }
 
-CatCommand::CatResult CatCommand::GetHash(
-  DVS &dvs_,
-  const std::string &hashId_,
-  std::ostream *ostream_,
-  RecordType expectedRecordType_ )
+CatCommand::CatResult CatCommand::GetHash( DVS &              dvs_,
+                                           const std::string &hashId_,
+                                           std::ostream *     ostream_,
+                                           RecordType         expectedRecordType_ )
 {
   CatResult result;
 
@@ -103,11 +102,12 @@ CatCommand::CatResult CatCommand::GetHash(
 
   {
     std::string::size_type pos = header.find( ' ' );
-    std::string sizeStr;
+    std::string            sizeStr;
+
     if ( pos != std::string::npos )
     {
       sizeStr = header.substr( pos + 1 );
-      header = header.substr( 0, pos );
+      header  = header.substr( 0, pos );
     }
 
     result.size = atoi( sizeStr.c_str( ) );

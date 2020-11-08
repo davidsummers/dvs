@@ -39,8 +39,8 @@ std::string ListBranchCommand::ListBranch( DVS &dvs_ )
       if ( entry.is_regular_file( ) )
       {
         std::string branchName = entry.path( ).string( );
-        size_t len = newDir.native( ).length( );
-        branchName = branchName.substr( len );
+        size_t      len        = newDir.native( ).length( );
+        branchName             = branchName.substr( len );
         std::cout << branchName << std::endl;
       }
     }
@@ -60,8 +60,8 @@ std::string ListBranchCommand::ListBranch( DVS &dvs_ )
       if ( entry.is_regular_file( ) )
       {
         std::string branchName = entry.path( ).string( );
-        size_t len = newDir.native( ).length( );
-        branchName = branchName.substr( len );
+        size_t      len        = newDir.native( ).length( );
+        branchName             = branchName.substr( len );
         std::cout << branchName << std::endl;
       }
     }

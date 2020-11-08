@@ -48,7 +48,7 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 
   while ( !refValue.value.empty( ) )
   {
-    CatCommand catCommand;
+    CatCommand        catCommand;
     std::stringstream commitSs;
 
     CatCommand::CatResult catResult = catCommand.GetHash( dvs_, refValue.value, &commitSs );

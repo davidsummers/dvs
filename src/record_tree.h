@@ -24,7 +24,7 @@ class TreeRecord
   using DirEntry = struct
   {
     std::string oid;
-    RecordType type;
+    RecordType  type;
     std::string filename;
   };
 

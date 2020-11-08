@@ -41,12 +41,12 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
   EmptyCurrentDirectory( dvs_ );
 
   std::string hashId = hashId_;
-  hashId = dvs_.GetOid( hashId );
+  hashId             = dvs_.GetOid( hashId );
 
   std::stringstream dirSs;
   {
     CatCommand::CatResult catResult;
-    CatCommand catCommand;
+    CatCommand            catCommand;
     catResult = catCommand.GetHash( dvs_, hashId, &dirSs, RecordType::tree );
 
     if ( !catResult.err.empty( ) )
@@ -72,7 +72,7 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
     if ( type == "blob" )
     {
       std::ofstream outFile( filename, std::ios_base::binary );
-      CatCommand fileCat;
+      CatCommand    fileCat;
       fileCat.GetHash( dvs_, hash, &outFile, RecordType::blob );
     }
     else if ( type == "tree" )
@@ -85,7 +85,7 @@ OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
     }
     else
     {
-      OidResult result;
+      OidResult         result;
       std::stringstream ss;
       ss << "Expected type 'blob' or 'tree' but got '" << type << "'." << std::endl;
       result.err = ss.str( );

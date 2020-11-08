@@ -47,7 +47,7 @@ std::string StatusCommand::Status( DVS &dvs_ )
 std::string StatusCommand::GetBranchName( DVS &dvs_ )
 {
   const bool deref = false;
-  RefValue head = dvs_.GetRef( s_HEAD_REF, deref );
+  RefValue   head  = dvs_.GetRef( s_HEAD_REF, deref );
 
   if ( !head.symbolic )
   {

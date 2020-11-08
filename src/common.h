@@ -25,6 +25,6 @@ using OidResult = struct
 
 using RefValue = struct RefValue
 {
-  bool symbolic = false;
+  bool        symbolic = false;
   std::string value;
 };

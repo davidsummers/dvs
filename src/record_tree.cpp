@@ -13,9 +13,9 @@
 void TreeRecord::AddEntry( const std::string filename_, const RecordType &type_, std::string &hash_ )
 {
   DirEntry entry;
-  entry.filename = filename_;
-  entry.type = type_;
-  entry.oid = hash_;
+  entry.filename         = filename_;
+  entry.type             = type_;
+  entry.oid              = hash_;
   m_DirList[ filename_ ] = entry;
 }
 

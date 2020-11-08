@@ -70,11 +70,10 @@ DVS::~DVS( )
 
 int DVS::ParseCommands( int argc_, char **argv_ )
 {
-  std::map< std::string, docopt::value > args = docopt::docopt(
-    s_USAGE,
-    { argv_ + 1, argv_ + argc_ },
-    true,             // Show help if requested.
-    "dvs Version 1.0" // Version string.
+  std::map< std::string, docopt::value > args = docopt::docopt( s_USAGE,
+                                                                { argv_ + 1, argv_ + argc_ },
+                                                                true,             // Show help if requested.
+                                                                "dvs Version 1.0" // Version string.
   );
 
   std::string err;
@@ -337,8 +336,8 @@ std::string DVS::Validate( const std::string &dir_ )
 
 std::filesystem::path DVS::RemoveLastPathElement( const std::filesystem::path &path_ )
 {
-  int num = NumPathElements( path_ );
-  std::filesystem::path newPath;
+  int                             num = NumPathElements( path_ );
+  std::filesystem::path           newPath;
   std::filesystem::path::iterator itr = path_.begin( );
 
   for ( int i = 0; i < num - 1; ++i, ++itr )
@@ -399,7 +398,7 @@ void DVS::SetRef( const std::string &ref_, const RefValue &refValue_, const bool
     refPath /= ref;
 
     std::filesystem::path dirPath = refPath;
-    dirPath = dirPath.remove_filename( );
+    dirPath                       = dirPath.remove_filename( );
     std::filesystem::create_directories( dirPath );
 
     std::ofstream headFile( refPath, std::ios_base::binary );
@@ -416,7 +415,7 @@ RefValue DVS::GetRef( const std::string &ref_, const bool deref_ )
 DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
 {
   RefValue headHash;
-  bool symbolic = false;
+  bool     symbolic = false;
 
   if ( !m_DvsDirectory.string( ).empty( ) )
   {
