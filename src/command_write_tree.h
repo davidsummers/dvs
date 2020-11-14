@@ -10,7 +10,7 @@ class DVS;
 class WriteTreeCommand
 {
   public:
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
   OidResult WriteTree( DVS &, const std::string &dir = "." );
 

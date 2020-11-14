@@ -6,16 +6,16 @@
 #include "command_branch_list.h"
 #include "dvs.h"
 
-std::string ListBranchCommand::ParseArgs( std::map< std::string, docopt::value > & /* args_ */ )
+Error ListBranchCommand::ParseArgs( std::map< std::string, docopt::value > & /* args_ */ )
 {
-  std::string err;
+  Error err;
 
   return err;
 }
 
-std::string ListBranchCommand::operator( )( DVS &dvs_ )
+Error ListBranchCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -23,9 +23,9 @@ std::string ListBranchCommand::operator( )( DVS &dvs_ )
   return ListBranch( dvs_ );
 }
 
-std::string ListBranchCommand::ListBranch( DVS &dvs_ )
+Error ListBranchCommand::ListBranch( DVS &dvs_ )
 {
-  std::string result;
+  Error err;
 
   std::filesystem::path newDir = dvs_.GetDvsDirectory( );
   newDir /= s_REFS_BRANCHES_LOCAL;
@@ -69,5 +69,5 @@ std::string ListBranchCommand::ListBranch( DVS &dvs_ )
     std::cout << std::endl;
   }
 
-  return result;
+  return err;
 }

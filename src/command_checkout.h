@@ -10,11 +10,11 @@ class DVS;
 class CheckoutCommand
 {
   public:
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
-  std::string Checkout( DVS &, const std::string &name );
+  Error Checkout( DVS &, const std::string &name );
 
   protected:
   private:

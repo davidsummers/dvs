@@ -5,21 +5,21 @@
 #include "command_status.h"
 #include "dvs.h"
 
-std::string StatusCommand::operator( )( DVS &dvs_ )
+Error StatusCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validate_error = dvs_.Validate( ); !validate_error.empty( ) )
+  if ( Error validate_error = dvs_.Validate( ); !validate_error.empty( ) )
   {
     std::stringstream ss;
     ss << "Can't validate " << s_DVS_DIR << " directory: " + validate_error;
     return ss.str( );
   }
 
-  std::string result = Status( dvs_ );
+  Error err = Status( dvs_ );
 
-  return result;
+  return err;
 }
 
-std::string StatusCommand::Status( DVS &dvs_ )
+Error StatusCommand::Status( DVS &dvs_ )
 {
   std::cout << "Status: " << std::endl;
 

@@ -7,9 +7,9 @@
 #include "command_read_tree.h"
 #include "dvs.h"
 
-std::string ReadTreeCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error ReadTreeCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value hashOption = args_[ "<hash>" ];
        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
@@ -24,9 +24,9 @@ std::string ReadTreeCommand::ParseArgs( std::map< std::string, docopt::value > &
   return err;
 }
 
-std::string ReadTreeCommand::operator( )( DVS &dvs_ )
+Error ReadTreeCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }

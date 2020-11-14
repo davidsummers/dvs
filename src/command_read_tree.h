@@ -4,6 +4,7 @@
 #include <string>
 
 #include "common.h"
+#include "docopt.h"
 
 class DVS;
 
@@ -12,14 +13,14 @@ class ReadTreeCommand
   public:
   using GetTreeResult = struct
   {
-    std::string           err;
+    Error                 err;
     std::filesystem::path path;
-    std::string           oid;
+    Oid                   oid;
   };
 
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
   OidResult ReadTree( DVS &, const std::string &hashId );
 

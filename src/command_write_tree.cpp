@@ -6,9 +6,9 @@
 #include "dvs.h"
 #include "record_tree.h"
 
-std::string WriteTreeCommand::operator( )( DVS &dvs_ )
+Error WriteTreeCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }

@@ -5,7 +5,7 @@
 #include "command_init.h"
 #include "dvs.h"
 
-std::string InitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error InitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   std::string err;
 
@@ -18,14 +18,14 @@ std::string InitCommand::ParseArgs( std::map< std::string, docopt::value > &args
   return err;
 }
 
-std::string InitCommand::operator( )( DVS &dvs_ )
+Error InitCommand::operator( )( DVS &dvs_ )
 {
-  std::string err = InitDvs( dvs_, m_Directory, &std::cout );
+  Error err = InitDvs( dvs_, m_Directory, &std::cout );
 
   return err;
 }
 
-std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::ostream *outStream_ )
+Error InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::ostream *outStream_ )
 {
   std::string rootPath = rootPath_;
 
@@ -64,7 +64,7 @@ std::string InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::o
     return ss.str( );
   }
 
-  if ( std::string validate_error = dvs_.Validate( dvsDir.string( ) ); !validate_error.empty( ) )
+  if ( Error validate_error = dvs_.Validate( dvsDir.string( ) ); !validate_error.empty( ) )
   {
     return validate_error;
   }

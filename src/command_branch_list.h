@@ -11,11 +11,11 @@ class DVS;
 class ListBranchCommand
 {
   public:
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
-  std::string ListBranch( DVS & );
+  Error ListBranch( DVS & );
 
   protected:
   private:

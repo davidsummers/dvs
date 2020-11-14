@@ -76,7 +76,7 @@ int DVS::ParseCommands( int argc_, char **argv_ )
                                                                 "dvs Version 1.0" // Version string.
   );
 
-  std::string err;
+  Error err;
 
   if ( docopt::value branchOption = args[ "branch" ]; branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
   {
@@ -165,9 +165,9 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   return 0;
 }
 
-std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value checkoutOption = args_[ "checkout" ];
        checkoutOption && checkoutOption.isBool( ) && checkoutOption.asBool( ) )
@@ -229,9 +229,9 @@ std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &ar
   return err;
 }
 
-std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseInternalCommands( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value catOption = args_[ "cat" ]; catOption && catOption.isBool( ) && catOption.asBool( ) )
   {
@@ -283,9 +283,9 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
   return err;
 }
 
-std::string DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value tagCreateOption = args_[ "create" ];
        tagCreateOption && tagCreateOption.isBool( ) && tagCreateOption.asBool( ) )
@@ -305,7 +305,7 @@ std::string DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_
   return err;
 }
 
-std::string DVS::Validate( const std::string &dir_ )
+Error DVS::Validate( const std::string &dir_ )
 {
   std::filesystem::path currentPath = m_OriginalDirectory;
 
@@ -444,11 +444,11 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
   return RefIntRet{ ref_, RefValue{ symbolic, headHash.value } };
 }
 
-std::string DVS::GetOid( const std::string &name_ )
+Oid DVS::GetOid( const std::string &name_ )
 {
   std::string name = name_ == "@" ? s_HEAD_REF : name_;
 
-  std::string result;
+  Oid oid;
 
   std::vector< std::string > refsToTry{
     name,
@@ -459,16 +459,21 @@ std::string DVS::GetOid( const std::string &name_ )
 
   for ( auto &refTry : refsToTry )
   {
-    if ( result = GetRef( refTry, false ).value; !result.empty( ) )
+    if ( oid = GetRef( refTry, false ).value; !oid.empty( ) )
     {
       break;
     }
   }
 
-  if ( result.empty( ) )
+  if ( oid.empty( ) )
   {
-    result = name;
+    oid = name;
   }
 
-  return result;
+  return oid;
+}
+
+
+void DVS::ForAllRefs( const std::string &prefix_, const bool deref, std::function< void ( const std::string &refname_, const RefValue & ) > func_ )
+{
 }

@@ -8,9 +8,9 @@
 #include "command_read_tree.h"
 #include "dvs.h"
 
-std::string CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value branchNameOption = args_[ "<BranchName>" ];
        branchNameOption && branchNameOption.isString( ) && !branchNameOption.asString( ).empty( ) )
@@ -21,23 +21,23 @@ std::string CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &
   return err;
 }
 
-std::string CheckoutCommand::operator( )( DVS &dvs_ )
+Error CheckoutCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
 
-  std::string result = Checkout( dvs_, m_BranchName );
+  Error err = Checkout( dvs_, m_BranchName );
 
-  return result;
+  return err;
 }
 
-std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_ )
+Error CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_ )
 {
-  std::string result;
+  Error err;
 
-  std::string oid = dvs_.GetOid( branchName_ );
+  Oid oid = dvs_.GetOid( branchName_ );
 
   RefValue refValue{ false, oid };
 
@@ -60,8 +60,8 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
 
   if ( !catResult.err.empty( ) )
   {
-    result = catResult.err;
-    return result;
+    err = catResult.err;
+    return err;
   }
 
   if ( catResult.type != "commit" )
@@ -134,8 +134,8 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
 
   if ( !readTreeResult.err.empty( ) )
   {
-    result = readTreeResult.err;
-    return result;
+    err = readTreeResult.err;
+    return err;
   }
 
   if ( IsBranch( dvs_, branchName_ ) )
@@ -153,7 +153,7 @@ std::string CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_
   const bool deref = false;
   dvs_.SetRef( s_HEAD_REF, refValue, deref );
 
-  return result;
+  return err;
 }
 
 bool CheckoutCommand::IsBranch( DVS &dvs_, const std::string &branchName_ )

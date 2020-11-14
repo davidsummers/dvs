@@ -2,14 +2,16 @@
 
 #include <string>
 
+#include "common.h"
+
 class DVS;
 
 class StatusCommand
 {
   public:
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
-  std::string Status( DVS & );
+  Error Status( DVS & );
 
   protected:
   private:

@@ -1,17 +1,19 @@
 #pragma once
 
+#include <map>
 #include <string>
 
 #include "common.h"
+#include "docopt.h"
 
 class DVS;
 
 class CommitCommand
 {
   public:
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
   OidResult Commit( DVS &, const std::string &message );
 
