@@ -35,7 +35,7 @@ Error CreateBranchCommand::operator( )( DVS &dvs_ )
   return CreateBranch( dvs_, m_BranchName, m_Oid );
 }
 
-Error CreateBranchCommand::CreateBranch( DVS &dvs_, const std::string &branchName_, const std::string &oid_ )
+Error CreateBranchCommand::CreateBranch( DVS &dvs_, const std::string &branchName_, const Oid &oid_ )
 {
   Error err;
   std::string oid = dvs_.GetOid( oid_ );

@@ -15,10 +15,10 @@ class CreateBranchCommand
 
   Error operator( )( DVS & );
 
-  Error CreateBranch( DVS &, const std::string &branchName, const std::string &oid_ = "@" );
+  Error CreateBranch( DVS &, const std::string &branchName, const Oid &oid_ = "@" );
 
   protected:
   private:
   std::string m_BranchName;
-  std::string m_Oid = "@";
+  Oid m_Oid = "@";
 };
