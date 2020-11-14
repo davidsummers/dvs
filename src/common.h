@@ -6,7 +6,8 @@
 
 #include <string>
 
-#include "docopt.h"
+using Error = std::string;
+using Oid   = std::string;
 
 enum class RecordType
 {
@@ -19,8 +20,8 @@ enum class RecordType
 
 using OidResult = struct
 {
-  std::string err;
-  std::string oid;
+  Error err;
+  Oid   oid;
 };
 
 using RefValue = struct RefValue

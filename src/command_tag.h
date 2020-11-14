@@ -11,11 +11,11 @@ class DVS;
 class TagCommand
 {
   public:
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
-  std::string Tag( DVS &, const std::string &tagName, const std::string &hashId = "" );
+  Error Tag( DVS &, const std::string &tagName, const std::string &hashId = "" );
 
   protected:
   private:

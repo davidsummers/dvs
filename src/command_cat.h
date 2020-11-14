@@ -20,14 +20,14 @@ class CatCommand
 
   using CatResult = struct
   {
-    std::string err;
+    Error       err;
     size_t      size;
     std::string type;
   };
 
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
   CatResult GetHash( DVS &,
                      const std::string &hashID,

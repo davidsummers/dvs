@@ -76,7 +76,7 @@ int DVS::ParseCommands( int argc_, char **argv_ )
                                                                 "dvs Version 1.0" // Version string.
   );
 
-  std::string err;
+  Error err;
 
   if ( docopt::value branchOption = args[ "branch" ]; branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
   {
@@ -165,9 +165,9 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   return 0;
 }
 
-std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value checkoutOption = args_[ "checkout" ];
        checkoutOption && checkoutOption.isBool( ) && checkoutOption.asBool( ) )
@@ -229,9 +229,9 @@ std::string DVS::ParseBranchCommands( std::map< std::string, docopt::value > &ar
   return err;
 }
 
-std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseInternalCommands( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value catOption = args_[ "cat" ]; catOption && catOption.isBool( ) && catOption.asBool( ) )
   {
@@ -283,9 +283,9 @@ std::string DVS::ParseInternalCommands( std::map< std::string, docopt::value > &
   return err;
 }
 
-std::string DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value tagCreateOption = args_[ "create" ];
        tagCreateOption && tagCreateOption.isBool( ) && tagCreateOption.asBool( ) )
@@ -305,7 +305,7 @@ std::string DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_
   return err;
 }
 
-std::string DVS::Validate( const std::string &dir_ )
+Error DVS::Validate( const std::string &dir_ )
 {
   std::filesystem::path currentPath = m_OriginalDirectory;
 
@@ -444,31 +444,93 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
   return RefIntRet{ ref_, RefValue{ symbolic, headHash.value } };
 }
 
-std::string DVS::GetOid( const std::string &name_ )
+Oid DVS::GetOid( const std::string &name_ )
 {
   std::string name = name_ == "@" ? s_HEAD_REF : name_;
 
-  std::string result;
+  Oid oid;
 
-  std::vector< std::string > refsToTry{
+  // clang-format off
+  std::vector< std::string > refsToTry
+  {
     name,
     "refs/" + name,
     s_REFS_TAGS + name,
     s_REFS_BRANCHES_LOCAL + name,
   };
+  // clang-format on
 
   for ( auto &refTry : refsToTry )
   {
-    if ( result = GetRef( refTry, false ).value; !result.empty( ) )
+    if ( oid = GetRef( refTry, false ).value; !oid.empty( ) )
     {
       break;
     }
   }
 
-  if ( result.empty( ) )
+  if ( oid.empty( ) )
   {
-    result = name;
+    oid = name;
   }
 
+  return oid;
+}
+
+
+void DVS::ForAllRefs( const std::string &prefix_, const bool deref_, std::function< void ( const std::string &refname_, const RefValue & ) > func_ )
+{
+  std::vector< std::string > refs { "HEAD" };
+
+  std::vector< std::filesystem::path > paths
+  {
+    GetDvsDirectory( ) / s_REFS_BRANCHES_LOCAL,
+    GetDvsDirectory( ) / s_REFS_BRANCHES_REMOTE,
+    GetDvsDirectory( ) / s_REFS_TAGS,
+  };
+
+  for ( auto &rootPath : paths )
+  {
+    std::error_code ec;
+    for ( auto &entry : std::filesystem::directory_iterator( rootPath, ec ) )
+    {
+      if ( ec )
+      {
+        continue;
+      }
+
+      std::string root = RelPath( entry.path( ).string( ), rootPath.parent_path( ).parent_path( ).parent_path( ).string( ) ).substr( 1 );
+      refs.push_back( root );
+    }
+  }
+
+  for ( auto &refname : refs )
+  {
+    if ( !StartsWith( refname, prefix_ ) )
+    {
+      continue;
+    }
+
+    if ( func_ )
+    {
+      func_( refname, GetRef( refname, deref_ ) );
+    }
+  }
+}
+
+
+std::string DVS::RelPath( const std::string &filename_, const std::string &dir_ )
+{
+  std::string result = filename_;
+
+  if ( StartsWith( filename_, dir_ ) )
+  {
+    result = filename_.substr( dir_.length( ) );
+  }
+ 
   return result;
+}
+
+bool DVS::StartsWith( const std::string &str_, const std::string &startsWith_ )
+{
+  return str_.find( startsWith_ ) == 0;
 }

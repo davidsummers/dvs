@@ -23,9 +23,9 @@ RecordMapLookup s_RecordMapLookup =
 //clang-format on
 
 
-std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error HashCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value fileOption = args_[ "<file>" ];
        fileOption && fileOption.isString( ) && !fileOption.asString( ).empty( ) )
@@ -40,9 +40,9 @@ std::string HashCommand::ParseArgs( std::map< std::string, docopt::value > &args
   return err;
 }
 
-std::string HashCommand::operator( )( DVS &dvs_ )
+Error HashCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validate_error = dvs_.Validate( ); !validate_error.empty( ) )
+  if ( Error validate_error = dvs_.Validate( ); !validate_error.empty( ) )
   {
     return validate_error;
   }

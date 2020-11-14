@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 
+#include "common.h"
 #include "docopt.h"
 
 class DVS;
@@ -10,11 +11,11 @@ class DVS;
 class InitCommand
 {
   public:
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
-  std::string InitDvs( DVS &, const std::string rootPath = "", std::ostream *outStream = nullptr );
+  Error InitDvs( DVS &, const std::string rootPath = "", std::ostream *outStream = nullptr );
 
   protected:
   private:

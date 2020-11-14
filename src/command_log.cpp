@@ -8,9 +8,9 @@
 #include "dvs.h"
 #include "record_commit.h"
 
-std::string LogCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error LogCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value hashOption = args_[ "<hash>" ];
        hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
@@ -21,21 +21,38 @@ std::string LogCommand::ParseArgs( std::map< std::string, docopt::value > &args_
   return err;
 }
 
-std::string LogCommand::operator( )( DVS &dvs_ )
+Error LogCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
 
-  std::string result = GetLog( dvs_, m_HashId );
+  Error err = GetLog( dvs_, m_HashId );
 
-  return result;
+  return err;
 }
 
-std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
+Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 {
-  std::string result;
+  using RefMap = std::map< Oid, std::string >;
+  RefMap refs;
+
+  dvs_.ForAllRefs( "", true, [ &refs ] ( const std::string &refname_, const RefValue &refVal_ )
+  {
+    RefMap::iterator itr = refs.find( refVal_.value );
+
+    if ( itr == refs.end( ) )
+    {
+      refs[ refVal_.value ] = refname_;
+    }
+    else
+    {
+      itr->second.append( ", " + refname_ );
+    }
+  } );
+
+  Error err;
 
   RefValue refValue{ false, hashId_ };
 
@@ -55,8 +72,8 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 
     if ( !catResult.err.empty( ) )
     {
-      result = catResult.err;
-      return result;
+      err = catResult.err;
+      return err;
     }
 
     if ( catResult.type != "commit" )
@@ -68,14 +85,16 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 
     CommitRecord commitRecord;
 
-    result = commitRecord.Parse( commitSs );
+    err = commitRecord.Parse( commitSs );
 
-    if ( !result.empty( ) )
+    if ( !err.empty( ) )
     {
-      return result;
+      return err;
     }
 
-    std::cout << "commit " << refValue.value << std::endl;
+    RefMap::iterator itr = refs.find( refValue.value );
+
+    std::cout << "commit " << refValue.value << ( itr == refs.end( ) ? "" : "( " + itr->second + " )" ) << std::endl;
     std::cout << std::endl;
     std::cout << commitRecord.GetMsg( ) << std::endl;
     std::cout << std::endl;
@@ -84,5 +103,5 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
   }
 
   // The rest of the contents of the commit is the commit message;
-  return result;
+  return err;
 }

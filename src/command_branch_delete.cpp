@@ -6,9 +6,9 @@
 #include "command_branch_delete.h"
 #include "dvs.h"
 
-std::string DeleteBranchCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error DeleteBranchCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value branchName = args_[ "<BranchName>" ];
        branchName && branchName.isString( ) && !branchName.asString( ).empty( ) )
@@ -23,9 +23,9 @@ std::string DeleteBranchCommand::ParseArgs( std::map< std::string, docopt::value
   return err;
 }
 
-std::string DeleteBranchCommand::operator( )( DVS &dvs_ )
+Error DeleteBranchCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
@@ -33,9 +33,9 @@ std::string DeleteBranchCommand::operator( )( DVS &dvs_ )
   return DeleteBranch( dvs_, m_Branch );
 }
 
-std::string DeleteBranchCommand::DeleteBranch( DVS &dvs_, const std::string &branchName_ )
+Error DeleteBranchCommand::DeleteBranch( DVS &dvs_, const std::string &branchName_ )
 {
-  std::string result;
+  Error err;
 
   std::filesystem::path localBranch = dvs_.GetDvsDirectory( );
   localBranch /= s_REFS_BRANCHES_LOCAL;
@@ -59,8 +59,8 @@ std::string DeleteBranchCommand::DeleteBranch( DVS &dvs_, const std::string &bra
   {
     std::stringstream ss;
     ss << "Branch '" << branchName_ << "' does not exist." << std::endl;
-    result = ss.str( );
+    err = ss.str( );
   }
 
-  return result;
+  return err;
 }

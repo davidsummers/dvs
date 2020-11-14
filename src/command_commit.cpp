@@ -7,9 +7,9 @@
 #include "dvs.h"
 #include "record_commit.h"
 
-std::string CommitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error CommitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   bool msgFlag = false;
 
@@ -44,9 +44,9 @@ std::string CommitCommand::ParseArgs( std::map< std::string, docopt::value > &ar
   return err;
 }
 
-std::string CommitCommand::operator( )( DVS &dvs_ )
+Error CommitCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }

@@ -11,11 +11,11 @@ class DVS;
 class DeleteBranchCommand
 {
   public:
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
-  std::string DeleteBranch( DVS &, const std::string &branchName );
+  Error DeleteBranch( DVS &, const std::string &branchName );
 
   protected:
   private:

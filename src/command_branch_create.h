@@ -11,14 +11,14 @@ class DVS;
 class CreateBranchCommand
 {
   public:
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
-  std::string CreateBranch( DVS &, const std::string &branchName, const std::string &oid_ = "@" );
+  Error CreateBranch( DVS &, const std::string &branchName, const Oid &oid_ = "@" );
 
   protected:
   private:
   std::string m_BranchName;
-  std::string m_Oid = "@";
+  Oid m_Oid = "@";
 };

@@ -6,9 +6,9 @@
 #include "command_cat.h"
 #include "dvs.h"
 
-std::string CatCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error CatCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value sizeOption = args_[ "-s" ]; sizeOption && sizeOption.isBool( ) && sizeOption.asBool( ) )
   {
@@ -35,9 +35,9 @@ std::string CatCommand::ParseArgs( std::map< std::string, docopt::value > &args_
   return err;
 }
 
-std::string CatCommand::operator( )( DVS &dvs_ )
+Error CatCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }

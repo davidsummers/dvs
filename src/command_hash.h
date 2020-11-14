@@ -10,9 +10,9 @@ class DVS;
 class HashCommand
 {
   public:
-  std::string ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( std::map< std::string, docopt::value > & );
 
-  std::string operator( )( DVS & );
+  Error operator( )( DVS & );
 
   OidResult Hash( DVS &, const std::string &filename, const RecordType type = RecordType::blob );
 

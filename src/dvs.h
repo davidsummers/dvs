@@ -13,9 +13,8 @@
 // clang-format off
 constexpr const char *s_DVS_DIR              = ".dvs";
 constexpr const char *s_HEAD_REF             = "HEAD";
-constexpr const char *s_REFS                 = "refs/";
-constexpr const char *s_REFS_BRANCHES_LOCAL  = "refs/branches-local/";
-constexpr const char *s_REFS_BRANCHES_REMOTE = "refs/branches-remote/";
+constexpr const char *s_REFS_BRANCHES_LOCAL  = "refs/locals/";
+constexpr const char *s_REFS_BRANCHES_REMOTE = "refs/remotes/";
 constexpr const char *s_REFS_TAGS            = "refs/tags/";
 //clang-format on
 
@@ -27,12 +26,12 @@ class DVS
 
   int ParseCommands( int argc, char **argv );
 
-  std::string ParseBranchCommands( std::map< std::string, docopt::value > &args_ );
-  std::string ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
-  std::string ParseTagCommands( std::map< std::string, docopt::value > &args_ );
+  Error ParseBranchCommands( std::map< std::string, docopt::value > &args_ );
+  Error ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
+  Error ParseTagCommands( std::map< std::string, docopt::value > &args_ );
 
   // Helpers
-  std::string Validate( const std::string &dir = "" );
+  Error Validate( const std::string &dir = "" );
 
   std::filesystem::path GetDvsDirectory( );
 
@@ -42,7 +41,10 @@ class DVS
   void SetRef( const std::string &ref, const RefValue &, const bool deref = true );
   RefValue GetRef( const std::string &ref, const bool deref = true );
 
-  std::string GetOid( const std::string &name );
+  Oid GetOid( const std::string &name );
+
+  // Iterate through all references.
+  void ForAllRefs( const std::string &prefix = "", const bool deref = true, std::function< void ( const std::string &refName, const RefValue & ) > func = nullptr );
 
   protected:
   private:
@@ -66,6 +68,8 @@ class DVS
   // Helpers
   std::filesystem::path RemoveLastPathElement( const std::filesystem::path & );
   int NumPathElements( const std::filesystem::path & );
+  std::string RelPath( const std::string &filename, const std::string &dirEntry );
+  bool StartsWith( const std::string &str, const std::string &startsWith );
 
   RefIntRet GetRefInternal( const std::string &ref, const bool deref );
 };

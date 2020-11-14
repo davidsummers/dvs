@@ -6,9 +6,9 @@
 #include "command_tag.h"
 #include "dvs.h"
 
-std::string TagCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error TagCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
-  std::string err;
+  Error err;
 
   if ( docopt::value tagOption = args_[ "<tag>" ];
        tagOption && tagOption.isString( ) && !tagOption.asString( ).empty( ) )
@@ -31,21 +31,21 @@ std::string TagCommand::ParseArgs( std::map< std::string, docopt::value > &args_
   return err;
 }
 
-std::string TagCommand::operator( )( DVS &dvs_ )
+Error TagCommand::operator( )( DVS &dvs_ )
 {
-  if ( std::string validateError = dvs_.Validate( ); !validateError.empty( ) )
+  if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
 
-  std::string result = Tag( dvs_, m_TagName, m_HashId );
+  Error err = Tag( dvs_, m_TagName, m_HashId );
 
-  return result;
+  return err;
 }
 
-std::string TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
+Error TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
 {
-  std::string result;
+  Error err;
 
   RefValue refValue = RefValue{ false, hashId_ };
 
@@ -56,5 +56,5 @@ std::string TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::
 
   dvs_.SetRef( s_REFS_TAGS + tagName_, refValue );
 
-  return result;
+  return err;
 }
