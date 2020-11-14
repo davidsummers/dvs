@@ -70,7 +70,7 @@ std::string LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 
     result = commitRecord.Parse( commitSs );
 
-    if ( result.empty( ) )
+    if ( !result.empty( ) )
     {
       return result;
     }
