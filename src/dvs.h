@@ -68,6 +68,8 @@ class DVS
   // Helpers
   std::filesystem::path RemoveLastPathElement( const std::filesystem::path & );
   int NumPathElements( const std::filesystem::path & );
+  std::string RelPath( const std::string &filename, const std::string &dirEntry );
+  bool StartsWith( const std::string &str, const std::string &startsWith );
 
   RefIntRet GetRefInternal( const std::string &ref, const bool deref );
 };

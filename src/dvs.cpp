@@ -450,12 +450,15 @@ Oid DVS::GetOid( const std::string &name_ )
 
   Oid oid;
 
-  std::vector< std::string > refsToTry{
+  // clang-format off
+  std::vector< std::string > refsToTry
+  {
     name,
     "refs/" + name,
     s_REFS_TAGS + name,
     s_REFS_BRANCHES_LOCAL + name,
   };
+  // clang-format on
 
   for ( auto &refTry : refsToTry )
   {
@@ -474,6 +477,60 @@ Oid DVS::GetOid( const std::string &name_ )
 }
 
 
-void DVS::ForAllRefs( const std::string &prefix_, const bool deref, std::function< void ( const std::string &refname_, const RefValue & ) > func_ )
+void DVS::ForAllRefs( const std::string &prefix_, const bool deref_, std::function< void ( const std::string &refname_, const RefValue & ) > func_ )
 {
+  std::vector< std::string > refs { "HEAD" };
+
+  std::vector< std::filesystem::path > paths
+  {
+    GetDvsDirectory( ) / s_REFS_BRANCHES_LOCAL,
+    GetDvsDirectory( ) / s_REFS_BRANCHES_REMOTE,
+    GetDvsDirectory( ) / s_REFS_TAGS,
+  };
+
+  for ( auto &rootPath : paths )
+  {
+    std::error_code ec;
+    for ( auto &entry : std::filesystem::directory_iterator( rootPath, ec ) )
+    {
+      if ( ec )
+      {
+        continue;
+      }
+
+      std::string root = RelPath( entry.path( ).string( ), rootPath.parent_path( ).parent_path( ).parent_path( ).string( ) ).substr( 1 );
+      refs.push_back( root );
+    }
+  }
+
+  for ( auto &refname : refs )
+  {
+    if ( !StartsWith( refname, prefix_ ) )
+    {
+      continue;
+    }
+
+    if ( func_ )
+    {
+      func_( refname, GetRef( refname, deref_ ) );
+    }
+  }
+}
+
+
+std::string DVS::RelPath( const std::string &filename_, const std::string &dir_ )
+{
+  std::string result = filename_;
+
+  if ( StartsWith( filename_, dir_ ) )
+  {
+    result = filename_.substr( dir_.length( ) );
+  }
+ 
+  return result;
+}
+
+bool DVS::StartsWith( const std::string &str_, const std::string &startsWith_ )
+{
+  return str_.find( startsWith_ ) == 0;
 }

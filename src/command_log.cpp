@@ -35,6 +35,23 @@ Error LogCommand::operator( )( DVS &dvs_ )
 
 Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
 {
+  using RefMap = std::map< Oid, std::string >;
+  RefMap refs;
+
+  dvs_.ForAllRefs( "", true, [ &refs ] ( const std::string &refname_, const RefValue &refVal_ )
+  {
+    RefMap::iterator itr = refs.find( refVal_.value );
+
+    if ( itr == refs.end( ) )
+    {
+      refs[ refVal_.value ] = refname_;
+    }
+    else
+    {
+      itr->second.append( ", " + refname_ );
+    }
+  } );
+
   Error err;
 
   RefValue refValue{ false, hashId_ };
@@ -75,7 +92,9 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_ )
       return err;
     }
 
-    std::cout << "commit " << refValue.value << std::endl;
+    RefMap::iterator itr = refs.find( refValue.value );
+
+    std::cout << "commit " << refValue.value << ( itr == refs.end( ) ? "" : "( " + itr->second + " )" ) << std::endl;
     std::cout << std::endl;
     std::cout << commitRecord.GetMsg( ) << std::endl;
     std::cout << std::endl;
