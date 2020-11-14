@@ -41,10 +41,6 @@ void CommitRecord::SetMsg( const std::string &msg_ )
 
 std::string CommitRecord::Parse( std::istream &s_ )
 {
-  std::string treeHash;
-  std::string parentHash;
-  std::string msg;
-
   std::string type;
   std::string hash;
 
@@ -71,11 +67,11 @@ std::string CommitRecord::Parse( std::istream &s_ )
 
     if ( type == "tree" )
     {
-      treeHash = hash;
+      m_TreeOid = hash;
     }
     else if ( type == "parent" )
     {
-      parentHash = hash;
+      m_ParentOid = hash;
     }
     else
     {
@@ -95,7 +91,7 @@ std::string CommitRecord::Parse( std::istream &s_ )
       break;
     }
 
-    msg += input;
+    m_Msg += input;
   }
 
   return "";
