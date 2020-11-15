@@ -22,6 +22,8 @@ class TreeRecord
 
   std::ostream &operator<<( std::ostream & ) const;
 
+  void ForAllEntries( std::function< void ( const RecordType &, const Oid &, const std::string &filename ) > ) const;
+
   protected:
   private:
   //

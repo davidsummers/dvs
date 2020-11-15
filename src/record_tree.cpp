@@ -22,13 +22,21 @@ void TreeRecord::AddEntry( const std::string filename_, const RecordType &type_,
 
 std::ostream &TreeRecord::operator<<( std::ostream &s_ ) const
 {
-  for ( auto &entry : m_DirList )
+  ForAllEntries( [ &s_ ] ( const RecordType type_, const Oid &oid_, const std::string &filename_ )
   {
-    s_ << HashCommand::LookupType( entry.second.type ) << " " << entry.second.oid << " " << entry.second.filename
+    s_ << HashCommand::LookupType( type_ ) << " " << oid_ << " " << filename_
        << std::endl;
-  }
+  } );
 
   return s_;
+}
+
+void TreeRecord::ForAllEntries( std::function< void ( const RecordType &, const Oid &, const std::string &filename ) > func_ ) const
+{
+  for ( const auto &entry : m_DirList )
+  {
+    func_( entry.second.type, entry.second.oid, entry.second.filename );
+  }
 }
 
 Error TreeRecord::Read( DVS &dvs_, const Oid &oid_ )
