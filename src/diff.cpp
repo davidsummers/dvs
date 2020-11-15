@@ -1,4 +1,6 @@
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "diff.h"
 #include "record_tree.h"
