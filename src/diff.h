@@ -17,5 +17,5 @@ class Diff
 
   protected:
   private:
-  static void CompareTrees( const TreeRecord &from, const TreeRecord &to, std::function< void ( const std::string &path, const TreeRecord &from, const TreeRecord &to ) > );
+  static void CompareTrees( const TreeRecord &from, const TreeRecord &to, std::function< void ( const std::string &path, const std::vector< Oid > & ) > );
 };
