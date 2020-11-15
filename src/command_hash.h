@@ -20,6 +20,8 @@ class HashCommand
 
   static std::string LookupType( const RecordType );
 
+  static RecordType LookupType( const std::string &type );
+
   protected:
   private:
   //

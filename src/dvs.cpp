@@ -36,7 +36,7 @@ const char s_USAGE[] =
       dvs commit ( -m | --message ) <message>
       dvs fetch
       dvs init [<directory>]
-      dvs log [<hash>]
+      dvs log [ -p ] [<hash>]
       dvs pull
       dvs push
       dvs status
@@ -51,6 +51,7 @@ const char s_USAGE[] =
     Options:
       -h --help              Show this help information.
       -m, --message          Commit message.
+      -p                     Show Patch Diff.
       -s                     Size of hash content.
       -t                     Type of hash content (blob, commit, tag, tree).
       --version              Show version.

@@ -5,25 +5,32 @@
 //
 
 #include <istream>
+#include <map>
 #include <ostream>
 #include <string>
 
 #include "common.h"
+
+class DVS;
 
 class TreeRecord
 {
   public:
   void AddEntry( const std::string filename_, const RecordType &, std::string &hash );
 
-  std::string Parse( std::istream & );
+  Error Read( DVS &, const Oid & );
 
   std::ostream &operator<<( std::ostream & ) const;
 
   protected:
   private:
+  //
+  // Data
+  //
+
   using DirEntry = struct
   {
-    std::string oid;
+    Oid         oid;
     RecordType  type;
     std::string filename;
   };
@@ -31,6 +38,12 @@ class TreeRecord
   using DirList = std::map< std::string, DirEntry >;
 
   DirList m_DirList;
+
+  //
+  // Methods
+  //
+
+  Error Parse( std::istream & );
 };
 
 std::ostream &operator<<( std::ostream &, const TreeRecord & );

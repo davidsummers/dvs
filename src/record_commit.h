@@ -6,25 +6,37 @@
 
 #include <string>
 
+#include "common.h"
+
 class CommitRecord
 {
   public:
-  std::string GetTreeOid( ) const;
-  void        SetTreeOid( const std::string & );
+  Oid  GetTreeOid( ) const;
+  void SetTreeOid( const Oid & );
 
-  std::string GetParentOid( ) const;
-  void        SetParentOid( const std::string & );
+  Oid  GetParentOid( ) const;
+  void SetParentOid( const Oid & );
 
   std::string GetMsg( ) const;
   void        SetMsg( const std::string & );
 
-  std::string Parse( std::istream & );
+  Error Read( DVS &, const Oid & );
 
   protected:
   private:
-  std::string m_TreeOid;
-  std::string m_ParentOid;
+  //
+  // Data
+  //
+
+  Oid m_TreeOid;
+  Oid m_ParentOid;
   std::string m_Msg;
+
+  //
+  // Methods
+  //
+
+  Error Parse( std::istream & );
 };
 
 std::ostream &operator<<( std::ostream &, const CommitRecord & );

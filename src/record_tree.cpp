@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 
+#include "command_cat.h"
 #include "command_hash.h"
 #include "record_tree.h"
 
@@ -30,18 +31,33 @@ std::ostream &TreeRecord::operator<<( std::ostream &s_ ) const
   return s_;
 }
 
-std::string TreeRecord::Parse( std::istream &s_ )
+Error TreeRecord::Read( DVS &dvs_, const Oid &oid_ )
 {
-  std::string treeHash;
-  std::string parentHash;
-  std::string msg;
+  Error             err;
+  CatCommand        catCommand;
+  std::stringstream treeSs;
 
-  std::string type;
-  std::string hash;
+  CatCommand::CatResult catResult = catCommand.GetHash( dvs_, oid_, &treeSs, RecordType::tree );
 
+  if ( !catResult.err.empty( ) )
+  {
+    err = catResult.err;
+    return err;
+  }
+
+  err = Parse( treeSs );
+
+  return err;
+}
+
+Error TreeRecord::Parse( std::istream &s_ )
+{
   // Get the tree hash and the parent hash (if any).
   while ( true )
   {
+    std::string type;
+    Oid         hash;
+    std::string filename;
     std::string line;
 
     std::getline( s_, line );
@@ -55,38 +71,31 @@ std::string TreeRecord::Parse( std::istream &s_ )
     type = line.substr( 0, pos );
     hash = line.substr( pos + 1 );
 
-    if ( type.empty( ) && hash.empty( ) )
+    pos = hash.find( ' ' );
+
+    if ( pos == std::string::npos )
     {
       break;
     }
 
-    if ( type == "tree" )
+    filename = hash.substr( pos + 1 );
+    hash     = hash.substr( 0, pos );
+
+    if ( type.empty( ) || hash.empty( ) || filename.empty( ) )
     {
-      treeHash = hash;
+      break;
     }
-    else if ( type == "parent" )
-    {
-      parentHash = hash;
-    }
-    else
+
+    RecordType recType = HashCommand::LookupType( type );
+
+    if ( recType == RecordType::none )
     {
       std::stringstream ss;
-      ss << "Log command: Unknown type '" << type << "'." << std::endl;
+      ss << "Error: RecordType == none while looking up record type.";
       return ss.str( );
     }
-  }
 
-  while ( true )
-  {
-    std::string input;
-    std::getline( s_, input );
-
-    if ( input.empty( ) )
-    {
-      break;
-    }
-
-    msg += input;
+    AddEntry( filename, recType, hash );
   }
 
   return "";

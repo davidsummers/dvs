@@ -186,3 +186,17 @@ std::string HashCommand::LookupType( const RecordType recordType_ )
 {
   return s_RecordMapLookup[ recordType_ ];
 }
+
+
+RecordType HashCommand::LookupType( const std::string &type_ )
+{
+  for ( const auto &entry : s_RecordMapLookup )
+  {
+    if ( entry.second == type_ )
+    {
+      return entry.first;
+    }
+  }
+
+  return RecordType::none;
+}

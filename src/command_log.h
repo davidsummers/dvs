@@ -14,9 +14,10 @@ class LogCommand
 
   Error operator( )( DVS & );
 
-  Error GetLog( DVS &, const std::string &hashID );
+  Error GetLog( DVS &, const std::string &hashID, bool showPatchDiff = false );
 
   protected:
   private:
   std::string m_HashId;
+  bool m_ShowPatchDiff = false;
 };

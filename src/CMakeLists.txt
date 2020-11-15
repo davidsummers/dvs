@@ -13,6 +13,7 @@ set( SOURCE_FILES
      command_status.cpp
      command_tag.cpp
      command_write_tree.cpp
+     diff.cpp
      dvs.cpp
      file_system_base.cpp
      file_system_memory.cpp
@@ -37,6 +38,7 @@ set( HEADER_FILES
      command_tag.h
      command_write_tree.h
      common.h
+     diff.h
      dvs.h
      file_system_base.h
      file_system_memory.h

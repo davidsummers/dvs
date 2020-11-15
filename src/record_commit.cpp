@@ -3,28 +3,29 @@
 #include <sstream>
 #include <string>
 
+#include "command_cat.h"
 #include "record_commit.h"
 
 //
 // Commit Record
 //
 
-std::string CommitRecord::GetTreeOid( ) const
+Oid CommitRecord::GetTreeOid( ) const
 {
   return m_TreeOid;
 }
 
-void CommitRecord::SetTreeOid( const std::string &oid_ )
+void CommitRecord::SetTreeOid( const Oid &oid_ )
 {
   m_TreeOid = oid_;
 }
 
-std::string CommitRecord::GetParentOid( ) const
+Oid CommitRecord::GetParentOid( ) const
 {
   return m_ParentOid;
 }
 
-void CommitRecord::SetParentOid( const std::string &oid_ )
+void CommitRecord::SetParentOid( const Oid &oid_ )
 {
   m_ParentOid = oid_;
 }
@@ -39,10 +40,29 @@ void CommitRecord::SetMsg( const std::string &msg_ )
   m_Msg = msg_;
 }
 
-std::string CommitRecord::Parse( std::istream &s_ )
+Error CommitRecord::Read( DVS &dvs_, const Oid &oid_ )
+{
+  Error             err;
+  CatCommand        catCommand;
+  std::stringstream commitSs;
+
+  CatCommand::CatResult catResult = catCommand.GetHash( dvs_, oid_, &commitSs, RecordType::commit );
+
+  if ( !catResult.err.empty( ) )
+  {
+    err = catResult.err;
+    return err;
+  }
+
+  err = Parse( commitSs );
+
+  return err;
+}
+
+Error CommitRecord::Parse( std::istream &s_ )
 {
   std::string type;
-  std::string hash;
+  Oid         oid;
 
   // Get the tree hash and the parent hash (if any).
   while ( true )
@@ -58,20 +78,20 @@ std::string CommitRecord::Parse( std::istream &s_ )
     }
 
     type = line.substr( 0, pos );
-    hash = line.substr( pos + 1 );
+    oid  = line.substr( pos + 1 );
 
-    if ( type.empty( ) && hash.empty( ) )
+    if ( type.empty( ) && oid.empty( ) )
     {
       break;
     }
 
     if ( type == "tree" )
     {
-      m_TreeOid = hash;
+      m_TreeOid = oid;
     }
     else if ( type == "parent" )
     {
-      m_ParentOid = hash;
+      m_ParentOid = oid;
     }
     else
     {
