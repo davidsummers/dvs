@@ -18,11 +18,12 @@ class TreeRecord
   public:
   void AddEntry( const std::string filename_, const RecordType &, std::string &hash );
 
-  Error Read( DVS &, const Oid & );
+  Error     Read( DVS &, const Oid & );
+  OidResult Write( DVS & );
 
   std::ostream &operator<<( std::ostream & ) const;
 
-  void ForAllEntries( std::function< void ( const RecordType &, const Oid &, const std::string &filename ) > ) const;
+  void ForAllEntries( std::function< void( const RecordType &, const Oid &, const std::string &filename ) > ) const;
 
   protected:
   private:
