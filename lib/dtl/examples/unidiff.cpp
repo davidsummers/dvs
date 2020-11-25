@@ -15,10 +15,16 @@ using dtl::Diff;
 using dtl::elemInfo;
 using dtl::uniHunk;
 
-static void showStats (string fp1, string fp2);
+static void showStats( const std::string &diffFilename1,
+                       const std::string &actualFilename1,
+                       const std::string &diffFilename2,
+                       const std::string &actualFilename2 );
 void unifiedDiff( string fp1, string fp2 ); 
 
-static void showStats (string fp1, string fp2) 
+static void showStats( const std::string &diffFilename1_,
+                       const std::string &actualFilename1_,
+                       const std::string &diffFilename2_,
+                       const std::string &actualFilename2_ ) 
 {
     const int    MAX_LENGTH    = 255;
     char         time_format[] = "%Y-%m-%d %H:%M:%S %z";
@@ -26,11 +32,14 @@ static void showStats (string fp1, string fp2)
     struct tm   *timeinfo[2];
     struct stat  st[2];
     
-    if (stat(fp1.c_str(), &st[0]) == -1) {
+    if ( stat( actualFilename1_.c_str( ), &st[0] ) == -1 )
+    {
         cerr << "argv1 is invalid." << endl;
         exit(-1);
     }
-    if (stat(fp2.c_str(), &st[1]) == -1) {
+
+    if ( stat( actualFilename2_.c_str( ), &st[1] ) == -1 )
+    {
         cerr << "argv2 is invalid" << endl;
         exit(-1);
     }
@@ -39,29 +48,49 @@ static void showStats (string fp1, string fp2)
     rawtime[0] = st[0].st_mtime;
     timeinfo[0] = localtime(&rawtime[0]);
     strftime(buf[0], MAX_LENGTH, time_format, timeinfo[0]);
-    cout << "--- " << fp1 << '\t' << buf[0] << endl;
+    cout << "--- " << diffFilename1_ << '\t' << buf[0] << endl;
     rawtime[1] = st[1].st_mtime;
     timeinfo[1] = localtime(&rawtime[1]);
     strftime(buf[1], MAX_LENGTH, time_format, timeinfo[1]);
-    cout << "+++ " << fp2 << '\t' << buf[1] << endl;
+    cout << "+++ " << diffFilename2_ << '\t' << buf[1] << endl;
 }
 
-void unifiedDiff( string fp1, string fp2 )
+void unifiedDiff( string fp1_, string fp2_ )
+{
+  void unifiedDiff( const std::string &diffFilename,
+                    const std::string &actualFilename1,
+                    std::ifstream &str1,
+                    const std::string &diffFilename2,
+                    const std::string &actualFilename2,
+                    std::ifstream &str2 );
+  std::ifstream aifs( fp1_ );
+  std::ifstream bifs( fp2_ );
+  unifiedDiff( fp1_, fp1_, aifs, fp2_, fp2_, bifs );
+}
+
+
+void unifiedDiff( const std::string &diffFilename1_,
+                  const std::string &actualFilename1_,
+                  std::ifstream &str1_,
+                  const std::string &diffFilename2_,
+                  const std::string &actualFilename2_,
+                  std::ifstream &str2_ )
 {
     typedef string                 elem;
     typedef vector< elem >         sequence;
     typedef pair< elem, elemInfo > sesElem;
 
-    ifstream      Aifs(fp1.c_str());
-    ifstream      Bifs(fp2.c_str());
     elem          buf;
     sequence      ALines, BLines;
     
-    while(getline(Aifs, buf)){
-        ALines.push_back(buf);
+    while( getline( str1_, buf ) )
+    {
+        ALines.push_back( buf );
     }
-    while(getline(Bifs, buf)){
-        BLines.push_back(buf);
+
+    while( getline( str2_, buf ) )
+    {
+        BLines.push_back( buf );
     }
     
     Diff< elem > diff(ALines, BLines);
@@ -72,9 +101,10 @@ void unifiedDiff( string fp1, string fp2 )
     // type unihunk definition test
     uniHunk< sesElem > hunk;
     
-    if (diff.getEditDistance() > 0) {
-        showStats(fp1, fp2);             // show file info
-    }
+    if ( diff.getEditDistance( ) > 0 )
+    {
+        showStats( diffFilename1_, actualFilename1_, diffFilename2_, actualFilename2_ );             // show file info
+     }
     
     diff.composeUnifiedHunks();
     diff.printUnifiedFormat();

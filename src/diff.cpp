@@ -1,19 +1,23 @@
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "command_cat.h"
 #include "diff.h"
+#include "dvs.h"
 #include "record_tree.h"
 
-std::string Diff::DiffTrees( const TreeRecord &from_, const TreeRecord &to_ )
+std::string Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_ )
 {
   std::stringstream output;
 
-  CompareTrees( from_, to_, [ &output ]( const std::string &path_, const std::vector< Oid > &oids_ ) {
+  CompareTrees( from_, to_, [ &dvs_, &output ]( const std::string &path_, const std::vector< Oid > &oids_ )
+  {
     if ( oids_.size( ) != 2 || oids_[ 0 ] != oids_[ 1 ] )
     {
-      DiffBlob( output, oids_[ 0 ], oids_[ 1 ], path_ );
+      DiffBlob( dvs_, output, oids_[ 0 ], oids_[ 1 ], path_ );
     }
   } );
 
@@ -28,11 +32,13 @@ void Diff::CompareTrees( const TreeRecord &                                     
   using TreePathMap = std::map< Path, std::vector< Oid > >;
   TreePathMap treePathMap;
 
-  from_.ForAllEntries( [ &treePathMap ]( const RecordType &type_, const Oid &oid_, const std::string &filename_ ) {
+  from_.ForAllEntries( [ &treePathMap ]( const RecordType &type_, const Oid &oid_, const std::string &filename_ )
+  {
     treePathMap[ filename_ ] = { oid_ };
   } );
 
-  to_.ForAllEntries( [ &treePathMap ]( const RecordType &type_, const Oid &oid_, const std::string &filename_ ) {
+  to_.ForAllEntries( [ &treePathMap ]( const RecordType &type_, const Oid &oid_, const std::string &filename_ )
+  {
     TreePathMap::iterator itr = treePathMap.find( filename_ );
 
     if ( itr == treePathMap.end( ) )
@@ -51,12 +57,80 @@ void Diff::CompareTrees( const TreeRecord &                                     
   }
 }
 
-void Diff::DiffBlob( std::ostream &output_, const Oid &from_, const Oid &to_, const std::string path_ )
+void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const Oid &from_, const Oid &to_, const std::string path_ )
 {
   output_ << "Changed: " << path_ << std::endl;
   using namespace std;
-  void        unifiedDiff( string fp1, string fp2 );
-  std::string fp1 = from_;
-  std::string fp2 = to_;
-  unifiedDiff( fp1, fp2 );
+  void unifiedDiff( const std::string &diffFileName1,
+                    const std::string &actualFilename1,
+                    std::ifstream &str1,
+                    const std::string &diffFilename2,
+                    const std::string &actualFilename2,
+                    std::ifstream &str2 );
+  std::string   diffFilename1 = "a/" + path_;
+  std::string   diffFilename2 = "b/" + path_;
+  std::string   actualFilename1;
+  std::string   actualFilename2;
+  std::ifstream stream1;
+  std::ifstream stream2;
+
+  if ( CatCommand::CatResult result = GetStreamFromOid( dvs_, from_, actualFilename1, stream1 ); !result.err.empty( ) )
+  {
+    return;
+  }
+
+  if ( CatCommand::CatResult result = GetStreamFromOid( dvs_, to_,   actualFilename2, stream2 ); !result.err.empty( ) )
+  {
+    return;
+  }
+
+  unifiedDiff( diffFilename1, actualFilename1, stream1, diffFilename2, actualFilename2, stream2 );
+}
+
+
+CatCommand::CatResult Diff::GetStreamFromOid( DVS &dvs_, const Oid &oid_, std::string &filename_, std::ifstream &inputStream_ )
+{
+  CatCommand::CatResult result;
+  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / oid_.substr( 0, 2 ) / oid_.substr( 2 );
+
+  filename_ = hashPath.string( );
+
+  if ( !std::filesystem::exists( filename_ ) )
+  {
+    std::stringstream ss;
+    ss << "Hash " << oid_ << " does not exist.";
+    result.err = ss.str( );
+    return result;
+  }
+
+  inputStream_.open( filename_, std::ios_base::binary );
+
+  if ( !inputStream_.is_open( ) )
+  {
+    std::stringstream ss;
+    ss << "Can't open file " << filename_ << ".";
+    result.err = ss.str( );
+    return result;
+  }
+
+  std::string header;
+
+  // Read header.
+  std::getline( inputStream_, header, '\0' );
+
+  {
+    std::string::size_type pos = header.find( ' ' );
+    std::string            sizeStr;
+
+    if ( pos != std::string::npos )
+    {
+      sizeStr = header.substr( pos + 1 );
+      header  = header.substr( 0, pos );
+    }
+
+    result.size = atoi( sizeStr.c_str( ) );
+    result.type = header;
+  }
+
+  return result;
 }
