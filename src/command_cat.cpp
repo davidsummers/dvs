@@ -75,7 +75,12 @@ CatCommand::CatResult CatCommand::GetHash( DVS &              dvs_,
 
   hashId = dvs_.GetOid( hashId );
 
-  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / hashId.substr( 0, 2 ) / hashId.substr( 2 );
+  std::filesystem::path hashPath;
+
+  if ( !hashId.empty( ) )
+  {
+    hashPath = dvs_.GetDvsDirectory( ) / "objects" / hashId.substr( 0, 2 ) / hashId.substr( 2 );
+  }
 
   if ( !std::filesystem::exists( hashPath ) )
   {

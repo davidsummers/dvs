@@ -29,16 +29,18 @@ static void showStats( const std::string &diffFilename1_,
     const int    MAX_LENGTH    = 255;
     char         time_format[] = "%Y-%m-%d %H:%M:%S %z";
     time_t       rawtime[2];
+    memset( &rawtime, 0, sizeof( rawtime ) );
     struct tm   *timeinfo[2];
     struct stat  st[2];
+    memset( &st, 0, sizeof( st ) );
     
-    if ( stat( actualFilename1_.c_str( ), &st[0] ) == -1 )
+    if ( !actualFilename1_.empty( ) && stat( actualFilename1_.c_str( ), &st[0] ) == -1 )
     {
         cerr << "argv1 is invalid." << endl;
         exit(-1);
     }
 
-    if ( stat( actualFilename2_.c_str( ), &st[1] ) == -1 )
+    if ( !actualFilename2_.empty( ) && stat( actualFilename2_.c_str( ), &st[1] ) == -1 )
     {
         cerr << "argv2 is invalid" << endl;
         exit(-1);

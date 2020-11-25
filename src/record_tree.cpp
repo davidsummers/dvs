@@ -22,19 +22,19 @@ void TreeRecord::AddEntry( const std::string filename_, const RecordType &type_,
 
 std::ostream &TreeRecord::operator<<( std::ostream &s_ ) const
 {
-  ForAllEntries( [ &s_ ]( const RecordType type_, const Oid &oid_, const std::string &filename_ ) {
-    s_ << HashCommand::LookupType( type_ ) << " " << oid_ << " " << filename_ << std::endl;
+  ForAllEntries( [ &s_ ]( const DirEntry &entry_ )
+  {
+    s_ << HashCommand::LookupType( entry_.type ) << " " << entry_.oid << " " << entry_.filename << std::endl;
   } );
 
   return s_;
 }
 
-void TreeRecord::ForAllEntries(
-  std::function< void( const RecordType &, const Oid &, const std::string &filename ) > func_ ) const
+void TreeRecord::ForAllEntries( std::function< void( const DirEntry & ) > func_ ) const
 {
   for ( const auto &entry : m_DirList )
   {
-    func_( entry.second.type, entry.second.oid, entry.second.filename );
+    func_( entry.second );
   }
 }
 

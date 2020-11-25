@@ -7,15 +7,32 @@
 #include "command_cat.h"
 #include "diff.h"
 #include "dvs.h"
-#include "record_tree.h"
 
 std::string Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_ )
 {
-  CompareTrees( from_, to_, [ &dvs_ ]( const std::string &path_, const std::vector< Oid > &oids_ )
+  CompareTrees( from_, to_, [ &dvs_ ]( const std::string &path_, const std::vector< TreeRecord::DirEntry > &entries_ )
   {
-    if ( oids_.size( ) != 2 || oids_[ 0 ] != oids_[ 1 ] )
+    if ( entries_.size( ) != 2 || entries_[ 0 ].oid != entries_[ 1 ].oid )
     {
-      DiffBlob( dvs_, std::cout, oids_[ 0 ], oids_[ 1 ], path_ );
+      std::optional< Oid > from;
+      std::optional< Oid > to;
+
+      if ( entries_.size( ) >= 1 )
+      {
+        from = entries_[ 0 ].oid; 
+      }
+
+      if ( entries_.size( ) >= 2 )
+      {
+        to = entries_[ 1 ].oid;
+      }
+
+      if ( !to.has_value( ) )
+      {
+        std::swap( from, to );
+      }
+
+      DiffBlob( dvs_, std::cout, from, to, path_ );
     }
   } );
 
@@ -24,28 +41,28 @@ std::string Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecor
 
 void Diff::CompareTrees( const TreeRecord &                                                           from_,
                          const TreeRecord &                                                           to_,
-                         std::function< void( const std::string &path, const std::vector< Oid > & ) > func_ )
+                         std::function< void( const std::string &path, const std::vector< TreeRecord::DirEntry > & ) > func_ )
 {
   using Path        = std::string;
-  using TreePathMap = std::map< Path, std::vector< Oid > >;
+  using TreePathMap = std::map< Path, std::vector< TreeRecord::DirEntry > >;
   TreePathMap treePathMap;
 
-  from_.ForAllEntries( [ &treePathMap ]( const RecordType &type_, const Oid &oid_, const std::string &filename_ )
+  from_.ForAllEntries( [ &treePathMap ]( const TreeRecord::DirEntry &entry_ )
   {
-    treePathMap[ filename_ ] = { oid_ };
+    treePathMap[ entry_.filename ] = { entry_ };
   } );
 
-  to_.ForAllEntries( [ &treePathMap ]( const RecordType &type_, const Oid &oid_, const std::string &filename_ )
+  to_.ForAllEntries( [ &treePathMap ]( const TreeRecord::DirEntry &entry_ )
   {
-    TreePathMap::iterator itr = treePathMap.find( filename_ );
+    TreePathMap::iterator itr = treePathMap.find( entry_.filename );
 
     if ( itr == treePathMap.end( ) )
     {
-      treePathMap[ filename_ ] = { oid_ };
+      treePathMap[ entry_.filename ] = { entry_ };
     }
     else
     {
-      itr->second.push_back( oid_ );
+      itr->second.push_back( entry_ );
     }
   } );
 
@@ -55,9 +72,9 @@ void Diff::CompareTrees( const TreeRecord &                                     
   }
 }
 
-void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const Oid &from_, const Oid &to_, const std::string path_ )
+void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const std::optional< Oid > &from_, const std::optional< Oid > &to_, const std::string path_ )
 {
-  output_ << "Index: " << from_ << "..." << to_ << std::endl;
+  output_ << "Index: " << ( from_.has_value( ) ? from_.value( ) : "00000000" ) << "..." << ( to_.has_value( ) ? to_.value( ) : "00000000" ) << std::endl;
   using namespace std;
   void unifiedDiff( const std::string &diffFileName1,
                     const std::string &actualFilename1,
@@ -72,12 +89,12 @@ void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const Oid &from_, const O
   std::ifstream stream1;
   std::ifstream stream2;
 
-  if ( CatCommand::CatResult result = GetStreamFromOid( dvs_, from_, actualFilename1, stream1 ); !result.err.empty( ) )
+  if ( CatCommand::CatResult result = GetStreamFromOid( dvs_, from_, actualFilename1, stream1 ); !result.err.empty( ) && from_.has_value( ) )
   {
     return;
   }
 
-  if ( CatCommand::CatResult result = GetStreamFromOid( dvs_, to_,   actualFilename2, stream2 ); !result.err.empty( ) )
+  if ( CatCommand::CatResult result = GetStreamFromOid( dvs_, to_,   actualFilename2, stream2 ); !result.err.empty( ) && to_.has_value( ) )
   {
     return;
   }
@@ -86,17 +103,24 @@ void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const Oid &from_, const O
 }
 
 
-CatCommand::CatResult Diff::GetStreamFromOid( DVS &dvs_, const Oid &oid_, std::string &filename_, std::ifstream &inputStream_ )
+CatCommand::CatResult Diff::GetStreamFromOid( DVS &dvs_, const std::optional< Oid > &oid_, std::string &filename_, std::ifstream &inputStream_ )
 {
   CatCommand::CatResult result;
-  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / oid_.substr( 0, 2 ) / oid_.substr( 2 );
+
+  if ( !oid_.has_value( ) )
+  {
+    result.err = "Oid has no value.";
+    return result;
+  }
+
+  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / oid_.value( ).substr( 0, 2 ) / oid_.value( ).substr( 2 );
 
   filename_ = hashPath.string( );
 
   if ( !std::filesystem::exists( filename_ ) )
   {
     std::stringstream ss;
-    ss << "Hash " << oid_ << " does not exist.";
+    ss << "Hash " << oid_.value( ) << " does not exist.";
     result.err = ss.str( );
     return result;
   }

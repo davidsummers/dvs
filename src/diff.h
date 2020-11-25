@@ -5,10 +5,12 @@
 //
 
 #include <functional>
+#include <optional>
 #include <ostream>
 
 #include "command_cat.h"
 #include "common.h"
+#include "record_tree.h"
 
 class DVS;
 class TreeRecord;
@@ -22,8 +24,8 @@ class Diff
   private:
   static void CompareTrees( const TreeRecord &from,
                             const TreeRecord &to,
-                            std::function< void( const std::string &path, const std::vector< Oid > & ) > );
-  static void DiffBlob( DVS &, std::ostream &, const Oid &from, const Oid &to, const std::string path );
+                            std::function< void( const std::string &path, const std::vector< TreeRecord::DirEntry > & ) > );
+  static void DiffBlob( DVS &, std::ostream &, const std::optional< Oid > &from, const std::optional< Oid > &to, const std::string path );
 
-  static CatCommand::CatResult GetStreamFromOid( DVS &, const Oid &, std::string &filename, std::ifstream & );
+  static CatCommand::CatResult GetStreamFromOid( DVS &, const std::optional< Oid > &, std::string &filename, std::ifstream & );
 };

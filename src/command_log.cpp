@@ -93,13 +93,13 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
     {
       Oid parentOid = commitRecord.GetParentOid( );
 
-      if ( !parentOid.empty( ) )
+      // if ( !parentOid.empty( ) )
       {
         CommitRecord parentCommitRecord;
 
         err = parentCommitRecord.Read( dvs_, parentOid );
 
-        if ( !err.empty( ) )
+        if ( !err.empty( ) && !parentOid.empty( ) )
         {
           return err;
         }
@@ -116,9 +116,13 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
 
         err = parentTree.Read( dvs_, parentCommitRecord.GetTreeOid( ) );
 
-        if ( !err.empty( ) )
+        if ( !err.empty( ) && !parentCommitRecord.GetTreeOid( ).empty( ) )
         {
           return err;
+        }
+        else
+        {
+          err = "";
         }
 
         Diff::DiffTrees( dvs_, parentTree, commitTree );
