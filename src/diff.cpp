@@ -11,17 +11,15 @@
 
 std::string Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_ )
 {
-  std::stringstream output;
-
-  CompareTrees( from_, to_, [ &dvs_, &output ]( const std::string &path_, const std::vector< Oid > &oids_ )
+  CompareTrees( from_, to_, [ &dvs_ ]( const std::string &path_, const std::vector< Oid > &oids_ )
   {
     if ( oids_.size( ) != 2 || oids_[ 0 ] != oids_[ 1 ] )
     {
-      DiffBlob( dvs_, output, oids_[ 0 ], oids_[ 1 ], path_ );
+      DiffBlob( dvs_, std::cout, oids_[ 0 ], oids_[ 1 ], path_ );
     }
   } );
 
-  return output.str( );
+  return "";
 }
 
 void Diff::CompareTrees( const TreeRecord &                                                           from_,
@@ -59,7 +57,7 @@ void Diff::CompareTrees( const TreeRecord &                                     
 
 void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const Oid &from_, const Oid &to_, const std::string path_ )
 {
-  output_ << "Changed: " << path_ << std::endl;
+  output_ << "Index: " << from_ << "..." << to_ << std::endl;
   using namespace std;
   void unifiedDiff( const std::string &diffFileName1,
                     const std::string &actualFilename1,

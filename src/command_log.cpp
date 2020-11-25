@@ -121,7 +121,7 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
           return err;
         }
 
-        std::cout << Diff::DiffTrees( dvs_, parentTree, commitTree ) << std::endl;
+        Diff::DiffTrees( dvs_, parentTree, commitTree );
       }
     }
 
