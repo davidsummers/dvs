@@ -37,5 +37,6 @@ target_link_libraries( test_dvs_command
                        dvslib
                        docopt_s
                        sha3lib
+                       unidifflib
                      )
 

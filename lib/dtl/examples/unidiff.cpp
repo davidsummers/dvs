@@ -16,7 +16,7 @@ using dtl::elemInfo;
 using dtl::uniHunk;
 
 static void showStats (string fp1, string fp2);
-static void unifiedDiff (string fp1, string fp2); 
+void unifiedDiff( string fp1, string fp2 ); 
 
 static void showStats (string fp1, string fp2) 
 {
@@ -46,7 +46,7 @@ static void showStats (string fp1, string fp2)
     cout << "+++ " << fp2 << '\t' << buf[1] << endl;
 }
 
-static void unifiedDiff (string fp1, string fp2) 
+void unifiedDiff( string fp1, string fp2 )
 {
     typedef string                 elem;
     typedef vector< elem >         sequence;

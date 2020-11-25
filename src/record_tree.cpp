@@ -22,16 +22,15 @@ void TreeRecord::AddEntry( const std::string filename_, const RecordType &type_,
 
 std::ostream &TreeRecord::operator<<( std::ostream &s_ ) const
 {
-  ForAllEntries( [ &s_ ] ( const RecordType type_, const Oid &oid_, const std::string &filename_ )
-  {
-    s_ << HashCommand::LookupType( type_ ) << " " << oid_ << " " << filename_
-       << std::endl;
+  ForAllEntries( [ &s_ ]( const RecordType type_, const Oid &oid_, const std::string &filename_ ) {
+    s_ << HashCommand::LookupType( type_ ) << " " << oid_ << " " << filename_ << std::endl;
   } );
 
   return s_;
 }
 
-void TreeRecord::ForAllEntries( std::function< void ( const RecordType &, const Oid &, const std::string &filename ) > func_ ) const
+void TreeRecord::ForAllEntries(
+  std::function< void( const RecordType &, const Oid &, const std::string &filename ) > func_ ) const
 {
   for ( const auto &entry : m_DirList )
   {
@@ -56,6 +55,25 @@ Error TreeRecord::Read( DVS &dvs_, const Oid &oid_ )
   err = Parse( treeSs );
 
   return err;
+}
+
+OidResult TreeRecord::Write( DVS &dvs_ )
+{
+  OidResult   result;
+  HashCommand hashCommand;
+
+  std::stringstream ss;
+
+  ss << *this;
+
+  auto [ hashErr, oid ] = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::tree );
+
+  // std::cout << "Directory End: " << oid << std::endl;
+
+  result.err = hashErr;
+  result.oid = oid;
+
+  return result;
 }
 
 Error TreeRecord::Parse( std::istream &s_ )

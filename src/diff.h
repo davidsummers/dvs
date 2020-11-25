@@ -5,6 +5,7 @@
 //
 
 #include <functional>
+#include <ostream>
 
 #include "common.h"
 
@@ -17,5 +18,8 @@ class Diff
 
   protected:
   private:
-  static void CompareTrees( const TreeRecord &from, const TreeRecord &to, std::function< void ( const std::string &path, const std::vector< Oid > & ) > );
+  static void CompareTrees( const TreeRecord &from,
+                            const TreeRecord &to,
+                            std::function< void( const std::string &path, const std::vector< Oid > & ) > );
+  static void DiffBlob( std::ostream &, const Oid &from, const Oid &to, const std::string path );
 };

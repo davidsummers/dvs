@@ -67,17 +67,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
     }
   }
 
-  HashCommand hashCommand;
+  result = treeRecord.Write( dvs_ );
 
-  std::stringstream ss;
-
-  ss << treeRecord;
-
-  auto [ hashErr, oid ] = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::tree );
-
-  // std::cout << "Directory End: " << oid << std::endl;
-
-  result.err = hashErr;
-  result.oid = oid;
   return result;
 }
