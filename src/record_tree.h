@@ -1,7 +1,7 @@
 #pragma once
 
 //
-// Treet Record
+// Tree Record
 //
 
 #include <istream>
