@@ -63,6 +63,8 @@ target_compile_definitions( dvslib PRIVATE
 
 target_include_directories( dvslib PRIVATE
                             ../lib/docopt
+                            ../lib/dtl
+                            ../lib/dtl/examples
                             ../lib/SHA-3/SHA-3
                           )
 
@@ -81,4 +83,5 @@ target_link_libraries( dvs
                        dvslib
                        docopt_s
                        sha3lib
+                       unidifflib
                      )
