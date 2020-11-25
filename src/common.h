@@ -18,7 +18,7 @@ enum class RecordType
   tag,
 };
 
-using OidResult = struct
+using OidResult = struct OidResult
 {
   Error err;
   Oid   oid;
