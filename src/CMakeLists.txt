@@ -20,7 +20,6 @@ set( SOURCE_FILES
      command_write_tree.cpp
      diff.cpp
      dvs.cpp
-     read_tree_generator.cpp
      record_commit.cpp
      record_tree.cpp
    )
@@ -42,7 +41,6 @@ set( HEADER_FILES
      common.h
      diff.h
      dvs.h
-     read_tree_generator.h
      record_commit.h
      record_tree.h
    )
