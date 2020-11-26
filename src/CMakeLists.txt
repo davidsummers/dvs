@@ -20,9 +20,6 @@ set( SOURCE_FILES
      command_write_tree.cpp
      diff.cpp
      dvs.cpp
-     file_system_base.cpp
-     file_system_memory.cpp
-     file_system_normal.cpp
      read_tree_generator.cpp
      record_commit.cpp
      record_tree.cpp
@@ -45,9 +42,6 @@ set( HEADER_FILES
      common.h
      diff.h
      dvs.h
-     file_system_base.h
-     file_system_memory.h
-     file_system_normal.h
      read_tree_generator.h
      record_commit.h
      record_tree.h
