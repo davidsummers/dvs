@@ -71,13 +71,14 @@ DVS::~DVS( )
 
 int DVS::ParseCommands( int argc_, char **argv_ )
 {
+#ifdef CMAKE_GIT_HASH
 #define XSTRINGIFY( s ) STRINGIFY ( s )
 #define STRINGIFY( s ) # s
-#ifdef CMAKE_GIT_HASH
   const char *GIT_HASH = XSTRINGIFY( CMAKE_GIT_HASH );
 #else
   const char *GIT_HASH = "dev";
 #endif
+
   using DocOptArgs = std::map< std::string, docopt::value >;
 
   DocOptArgs args = args = docopt::docopt( s_USAGE,
@@ -175,7 +176,7 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   return 0;
 }
 
-Error DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseBranchCommands( DocOptArgs &args_ )
 {
   Error err;
 
@@ -239,7 +240,7 @@ Error DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
   return err;
 }
 
-Error DVS::ParseInternalCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseInternalCommands( DocOptArgs &args_ )
 {
   Error err;
 
@@ -293,7 +294,7 @@ Error DVS::ParseInternalCommands( std::map< std::string, docopt::value > &args_ 
   return err;
 }
 
-Error DVS::ParseTagCommands( std::map< std::string, docopt::value > &args_ )
+Error DVS::ParseTagCommands( DocOptArgs &args_ )
 {
   Error err;
 

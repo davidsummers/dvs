@@ -26,9 +26,9 @@ class DVS
 
   int ParseCommands( int argc, char **argv );
 
-  Error ParseBranchCommands( std::map< std::string, docopt::value > &args_ );
-  Error ParseInternalCommands( std::map< std::string, docopt::value > &args_ );
-  Error ParseTagCommands( std::map< std::string, docopt::value > &args_ );
+  Error ParseBranchCommands(   DocOptArgs & );
+  Error ParseInternalCommands( DocOptArgs & );
+  Error ParseTagCommands(      DocOptArgs & );
 
   // Helpers
   Error Validate( const std::string &dir = "" );
