@@ -14,8 +14,8 @@
 #include "command_branch_create.h"
 #include "command_branch_delete.h"
 #include "command_branch_list.h"
+#include "command_branch_switch.h"
 #include "command_cat.h"
-#include "command_checkout.h"
 #include "command_commit.h"
 #include "command_hash.h"
 #include "command_init.h"
@@ -29,10 +29,10 @@ const char s_USAGE[] =
   R"(DVS - David's Versioning System.
 
     Usage:
-      dvs branch checkout <BranchName>
       dvs branch create <BranchName>
       dvs branch delete <BranchName>
       dvs branch list
+      dvs branch switch <BranchName>
       dvs commit ( -m | --message ) <message>
       dvs fetch
       dvs init [<directory>]
@@ -170,10 +170,10 @@ Error DVS::ParseBranchCommands( std::map< std::string, docopt::value > &args_ )
 {
   Error err;
 
-  if ( docopt::value checkoutOption = args_[ "checkout" ];
-       checkoutOption && checkoutOption.isBool( ) && checkoutOption.asBool( ) )
+  if ( docopt::value switchOption = args_[ "switch" ];
+       switchOption && switchOption.isBool( ) && switchOption.asBool( ) )
   {
-    CheckoutCommand checkoutCmd;
+    SwitchBranchCommand checkoutCmd;
 
     err = checkoutCmd.ParseArgs( args_ );
 

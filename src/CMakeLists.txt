@@ -3,8 +3,8 @@ set( SOURCE_FILES
      command_branch_create.cpp
      command_branch_delete.cpp
      command_branch_list.cpp
+     command_branch_switch.cpp
      command_cat.cpp
-     command_checkout.cpp
      command_commit.cpp
      command_hash.cpp
      command_init.cpp
@@ -27,8 +27,8 @@ set( HEADER_FILES
      command_branch_create.h
      command_branch_delete.h
      command_branch_list.h
+     command_branch_switch.h
      command_cat.h
-     command_checkout.h
      command_commit.h
      command_hash.h
      command_init.h

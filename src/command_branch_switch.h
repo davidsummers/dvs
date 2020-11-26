@@ -7,14 +7,14 @@
 
 class DVS;
 
-class CheckoutCommand
+class SwitchBranchCommand
 {
   public:
   Error ParseArgs( std::map< std::string, docopt::value > & );
 
   Error operator( )( DVS & );
 
-  Error Checkout( DVS &, const std::string &name );
+  Error Switch( DVS &, const std::string &name );
 
   protected:
   private:

@@ -4,11 +4,11 @@
 #include <string.h>
 
 #include "command_cat.h"
-#include "command_checkout.h"
 #include "command_read_tree.h"
+#include "command_branch_switch.h"
 #include "dvs.h"
 
-Error CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error SwitchBranchCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
 {
   Error err;
 
@@ -21,19 +21,19 @@ Error CheckoutCommand::ParseArgs( std::map< std::string, docopt::value > &args_ 
   return err;
 }
 
-Error CheckoutCommand::operator( )( DVS &dvs_ )
+Error SwitchBranchCommand::operator( )( DVS &dvs_ )
 {
   if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
     return validateError;
   }
 
-  Error err = Checkout( dvs_, m_BranchName );
+  Error err = Switch( dvs_, m_BranchName );
 
   return err;
 }
 
-Error CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_ )
+Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
 {
   Error err;
 
@@ -156,7 +156,7 @@ Error CheckoutCommand::Checkout( DVS &dvs_, const std::string &branchName_ )
   return err;
 }
 
-bool CheckoutCommand::IsBranch( DVS &dvs_, const std::string &branchName_ )
+bool SwitchBranchCommand::IsBranch( DVS &dvs_, const std::string &branchName_ )
 {
   RefValue refValue = dvs_.GetRef( s_REFS_BRANCHES_LOCAL + branchName_ );
   bool     isBranch = !refValue.value.empty( );
