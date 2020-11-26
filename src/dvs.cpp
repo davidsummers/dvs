@@ -71,11 +71,18 @@ DVS::~DVS( )
 
 int DVS::ParseCommands( int argc_, char **argv_ )
 {
+#define XSTRINGIFY( s ) STRINGIFY ( s )
+#define STRINGIFY( s ) # s
+#ifdef CMAKE_GIT_HASH
+  const char *GIT_HASH = XSTRINGIFY( CMAKE_GIT_HASH );
+#else
+  const char *GIT_HASH = "dev";
+#endif
   std::map< std::string, docopt::value > args = docopt::docopt( s_USAGE,
                                                                 { argv_ + 1, argv_ + argc_ },
-                                                                true,               // Show help if requested.
-                                                                "dvs Version 0.0.1" // Version string.
-  );
+                                                                true, // Show help if requested.
+                                                                std::string( "Version 0.0.1-" ) + GIT_HASH  // Version string.
+                                                              );
 
   Error err;
 

@@ -14,7 +14,7 @@ if not exist %BUILD_DIR% (
 mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
 echo %CD%
-cmake %DVS_DIR%
+cmake -DGIT_HASH=%BUILD% %DVS_DIR%
 popd
 )
 

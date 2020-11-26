@@ -1,3 +1,8 @@
+if ( NOT GIT_HASH )
+  set( GIT_HASH "dev" )
+endif( )
+
+message( "GIT_HASH = ${GIT_HASH}" )
 
 set( SOURCE_FILES
      command_branch_create.cpp
@@ -58,6 +63,7 @@ add_library( dvslib
 
 target_compile_definitions( dvslib PRIVATE
                            _CRT_SECURE_NO_WARNINGS
+                           CMAKE_GIT_HASH=${GIT_HASH}
                          )
 
 
