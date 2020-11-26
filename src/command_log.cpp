@@ -10,7 +10,7 @@
 #include "record_commit.h"
 #include "record_tree.h"
 
-Error LogCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error LogCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 

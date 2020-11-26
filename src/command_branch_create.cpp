@@ -6,7 +6,7 @@
 #include "command_branch_create.h"
 #include "dvs.h"
 
-Error CreateBranchCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error CreateBranchCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 

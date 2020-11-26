@@ -10,7 +10,7 @@ class DVS;
 class SwitchBranchCommand
 {
   public:
-  Error ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( DocOptArgs & );
 
   Error operator( )( DVS & );
 

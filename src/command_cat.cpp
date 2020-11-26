@@ -6,7 +6,7 @@
 #include "command_cat.h"
 #include "dvs.h"
 
-Error CatCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error CatCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 

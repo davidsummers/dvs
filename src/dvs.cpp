@@ -78,11 +78,13 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 #else
   const char *GIT_HASH = "dev";
 #endif
-  std::map< std::string, docopt::value > args = docopt::docopt( s_USAGE,
-                                                                { argv_ + 1, argv_ + argc_ },
-                                                                true, // Show help if requested.
-                                                                std::string( "Version 0.0.1-" ) + GIT_HASH  // Version string.
-                                                              );
+  using DocOptArgs = std::map< std::string, docopt::value >;
+
+  DocOptArgs args = args = docopt::docopt( s_USAGE,
+                                           { argv_ + 1, argv_ + argc_ },
+                                           true, // Show help if requested.
+                                           std::string( "Version 0.0.1-" ) + GIT_HASH  // Version string.
+                                         );
 
   Error err;
 

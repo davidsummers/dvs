@@ -6,7 +6,7 @@
 #include "command_branch_list.h"
 #include "dvs.h"
 
-Error ListBranchCommand::ParseArgs( std::map< std::string, docopt::value > & /* args_ */ )
+Error ListBranchCommand::ParseArgs( DocOptArgs & /* args_ */ )
 {
   Error err;
 

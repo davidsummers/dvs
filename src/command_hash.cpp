@@ -23,7 +23,7 @@ RecordMapLookup s_RecordMapLookup =
 //clang-format on
 
 
-Error HashCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error HashCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 

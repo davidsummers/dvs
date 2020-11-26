@@ -6,7 +6,7 @@
 #include "command_tag.h"
 #include "dvs.h"
 
-Error TagCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error TagCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 

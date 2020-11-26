@@ -6,6 +6,9 @@
 
 #include <string>
 
+#include "docopt.h"
+
+using DocOptArgs = std::map< std::string, docopt::value >;
 using Error = std::string;
 using Oid   = std::string;
 

@@ -6,7 +6,7 @@
 #include "command_branch_delete.h"
 #include "dvs.h"
 
-Error DeleteBranchCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error DeleteBranchCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 

@@ -7,7 +7,7 @@
 #include "command_read_tree.h"
 #include "dvs.h"
 
-Error ReadTreeCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error ReadTreeCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 

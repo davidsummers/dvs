@@ -5,7 +5,7 @@
 #include "command_init.h"
 #include "dvs.h"
 
-Error InitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error InitCommand::ParseArgs( DocOptArgs &args_ )
 {
   std::string err;
 

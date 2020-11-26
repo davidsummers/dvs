@@ -8,7 +8,7 @@
 #include "command_branch_switch.h"
 #include "dvs.h"
 
-Error SwitchBranchCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error SwitchBranchCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 

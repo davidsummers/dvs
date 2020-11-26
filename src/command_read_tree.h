@@ -18,7 +18,7 @@ class ReadTreeCommand
     Oid                   oid;
   };
 
-  Error ParseArgs( std::map< std::string, docopt::value > & );
+  Error ParseArgs( DocOptArgs & );
 
   Error operator( )( DVS & );
 

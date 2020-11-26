@@ -7,7 +7,7 @@
 #include "dvs.h"
 #include "record_commit.h"
 
-Error CommitCommand::ParseArgs( std::map< std::string, docopt::value > &args_ )
+Error CommitCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 
