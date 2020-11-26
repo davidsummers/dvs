@@ -121,70 +121,15 @@ void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const std::optional< Oid 
   std::ifstream stream1;
   std::ifstream stream2;
 
-  if ( CatCommand::CatResult result = GetStreamFromOid( dvs_, from_, actualFilename1, stream1 ); !result.err.empty( ) && from_.has_value( ) )
+  if ( CatCommand::CatResult result = CatCommand::GetStreamFromOid( dvs_, from_, actualFilename1, stream1 ); !result.err.empty( ) && from_.has_value( ) )
   {
     return;
   }
 
-  if ( CatCommand::CatResult result = GetStreamFromOid( dvs_, to_,   actualFilename2, stream2 ); !result.err.empty( ) && to_.has_value( ) )
+  if ( CatCommand::CatResult result = CatCommand::GetStreamFromOid( dvs_, to_,   actualFilename2, stream2 ); !result.err.empty( ) && to_.has_value( ) )
   {
     return;
   }
 
   unifiedDiff( diffFilename1, actualFilename1, stream1, diffFilename2, actualFilename2, stream2 );
-}
-
-
-CatCommand::CatResult Diff::GetStreamFromOid( DVS &dvs_, const std::optional< Oid > &oid_, std::string &filename_, std::ifstream &inputStream_ )
-{
-  CatCommand::CatResult result;
-
-  if ( !oid_.has_value( ) )
-  {
-    result.err = "Oid has no value.";
-    return result;
-  }
-
-  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / oid_.value( ).substr( 0, 2 ) / oid_.value( ).substr( 2 );
-
-  filename_ = hashPath.string( );
-
-  if ( !std::filesystem::exists( filename_ ) )
-  {
-    std::stringstream ss;
-    ss << "Hash " << oid_.value( ) << " does not exist.";
-    result.err = ss.str( );
-    return result;
-  }
-
-  inputStream_.open( filename_, std::ios_base::binary );
-
-  if ( !inputStream_.is_open( ) )
-  {
-    std::stringstream ss;
-    ss << "Can't open file " << filename_ << ".";
-    result.err = ss.str( );
-    return result;
-  }
-
-  std::string header;
-
-  // Read header.
-  std::getline( inputStream_, header, '\0' );
-
-  {
-    std::string::size_type pos = header.find( ' ' );
-    std::string            sizeStr;
-
-    if ( pos != std::string::npos )
-    {
-      sizeStr = header.substr( pos + 1 );
-      header  = header.substr( 0, pos );
-    }
-
-    result.size = atoi( sizeStr.c_str( ) );
-    result.type = header;
-  }
-
-  return result;
 }

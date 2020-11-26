@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <optional>
 #include <string>
 
 #include "common.h"
@@ -33,6 +34,8 @@ class CatCommand
                      const std::string &hashID,
                      std::ostream *,
                      RecordType expectedRecordType = RecordType::none );
+
+  static CatCommand::CatResult GetStreamFromOid( DVS &, const std::optional< Oid > &, std::string &filename, std::ifstream & );
 
   protected:
   private:

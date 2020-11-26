@@ -26,6 +26,4 @@ class Diff
                             const TreeRecord &to,
                             std::function< void( const std::string &path, const std::vector< TreeRecord::DirEntry > & ) > );
   static void DiffBlob( DVS &, std::ostream &, const std::optional< Oid > &from, const std::optional< Oid > &to, const std::string &dir, const std::string &path );
-
-  static CatCommand::CatResult GetStreamFromOid( DVS &, const std::optional< Oid > &, std::string &filename, std::ifstream & );
 };

@@ -172,3 +172,57 @@ CatCommand::CatResult CatCommand::GetHash( DVS &              dvs_,
 
   return result;
 }
+
+CatCommand::CatResult CatCommand::GetStreamFromOid( DVS &dvs_, const std::optional< Oid > &oid_, std::string &filename_, std::ifstream &inputStream_ )
+{
+  CatCommand::CatResult result;
+
+  if ( !oid_.has_value( ) )
+  {
+    result.err = "Oid has no value.";
+    return result;
+  }
+
+  std::filesystem::path hashPath = dvs_.GetDvsDirectory( ) / "objects" / oid_.value( ).substr( 0, 2 ) / oid_.value( ).substr( 2 );
+
+  filename_ = hashPath.string( );
+
+  if ( !std::filesystem::exists( filename_ ) )
+  {
+    std::stringstream ss;
+    ss << "Hash " << oid_.value( ) << " does not exist.";
+    result.err = ss.str( );
+    return result;
+  }
+
+  inputStream_.open( filename_, std::ios_base::binary );
+
+  if ( !inputStream_.is_open( ) )
+  {
+    std::stringstream ss;
+    ss << "Can't open file " << filename_ << ".";
+    result.err = ss.str( );
+    return result;
+  }
+
+  std::string header;
+
+  // Read header.
+  std::getline( inputStream_, header, '\0' );
+
+  {
+    std::string::size_type pos = header.find( ' ' );
+    std::string            sizeStr;
+
+    if ( pos != std::string::npos )
+    {
+      sizeStr = header.substr( pos + 1 );
+      header  = header.substr( 0, pos );
+    }
+
+    result.size = atoi( sizeStr.c_str( ) );
+    result.type = header;
+  }
+
+  return result;
+}
