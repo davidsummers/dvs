@@ -8,9 +8,11 @@
 #include "diff.h"
 #include "dvs.h"
 
-std::string Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_ )
+Error Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_ )
 {
-  CompareTrees( from_, to_, [ &dvs_ ]( const std::string &path_, const std::vector< TreeRecord::DirEntry > &entries_ )
+  Error err;
+
+  CompareTrees( from_, to_, [ &err, &dvs_ ]( const std::string &path_, const std::vector< TreeRecord::DirEntry > &entries_ )
   {
     if ( entries_.size( ) != 2 || entries_[ 0 ].oid != entries_[ 1 ].oid )
     {
@@ -32,11 +34,41 @@ std::string Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecor
         std::swap( from, to );
       }
 
-      DiffBlob( dvs_, std::cout, from, to, path_ );
+      if ( entries_.size( ) >= 1 && entries_[ 0 ].type == RecordType::blob )
+      {
+        DiffBlob( dvs_, std::cout, from, to, path_ );
+      }
+      else if ( entries_.size( ) >= 1 && entries_[ 0 ].type == RecordType::tree )
+      {
+        TreeRecord tree1;
+        TreeRecord tree2;
+
+        if ( from.has_value( ) )
+        {
+          err = tree1.Read( dvs_, from.value( ) );
+
+          if ( !err.empty( ) )
+          {
+            return;
+          }
+        }
+
+        if ( to.has_value( ) )
+        {
+          err = tree2.Read( dvs_, to.value( ) );
+
+          if ( !err.empty( ) )
+          {
+            return;
+          }
+        }
+
+        err = DiffTrees( dvs_, tree1, tree2 );
+      }
     }
   } );
 
-  return "";
+  return err;
 }
 
 void Diff::CompareTrees( const TreeRecord &                                                           from_,
