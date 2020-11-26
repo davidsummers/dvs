@@ -6,6 +6,12 @@
 #include "dvs.h"
 #include "record_tree.h"
 
+Error WriteTreeCommand::ParseArgs( DocOptArgs & )
+{
+  return "";
+}
+
+
 Error WriteTreeCommand::operator( )( DVS &dvs_ )
 {
   if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )

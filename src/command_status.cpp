@@ -5,6 +5,11 @@
 #include "command_status.h"
 #include "dvs.h"
 
+Error StatusCommand::ParseArgs( DocOptArgs &args_ )
+{
+  return "";
+}
+
 Error StatusCommand::operator( )( DVS &dvs_ )
 {
   if ( Error validate_error = dvs_.Validate( ); !validate_error.empty( ) )

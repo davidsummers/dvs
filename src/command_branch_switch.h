@@ -7,7 +7,7 @@
 
 class DVS;
 
-class SwitchBranchCommand
+class SwitchBranchCommand : public BaseCommand
 {
   public:
   Error ParseArgs( DocOptArgs & );

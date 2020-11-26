@@ -3,11 +3,12 @@
 #include <map>
 #include <string>
 
+#include "command_base.h"
 #include "docopt.h"
 
 class DVS;
 
-class LogCommand
+class LogCommand : public BaseCommand
 {
   public:
   Error ParseArgs( DocOptArgs & );

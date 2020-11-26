@@ -3,12 +3,13 @@
 #include <filesystem>
 #include <string>
 
+#include "command_base.h"
 #include "common.h"
 #include "docopt.h"
 
 class DVS;
 
-class ReadTreeCommand
+class ReadTreeCommand : public BaseCommand
 {
   public:
   using GetTreeResult = struct

@@ -2,12 +2,13 @@
 
 #include <string>
 
+#include "command_base.h"
 #include "common.h"
 #include "docopt.h"
 
 class DVS;
 
-class HashCommand
+class HashCommand : public BaseCommand
 {
   public:
   Error ParseArgs( DocOptArgs & );

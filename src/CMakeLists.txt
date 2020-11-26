@@ -5,6 +5,7 @@ endif( )
 message( "GIT_HASH = ${GIT_HASH}" )
 
 set( SOURCE_FILES
+     command_base.cpp
      command_branch_create.cpp
      command_branch_delete.cpp
      command_branch_list.cpp
@@ -25,6 +26,7 @@ set( SOURCE_FILES
    )
 
 set( HEADER_FILES
+     command_base.h
      command_branch_create.h
      command_branch_delete.h
      command_branch_list.h

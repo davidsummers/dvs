@@ -4,12 +4,13 @@
 #include <optional>
 #include <string>
 
+#include "command_base.h"
 #include "common.h"
 #include "docopt.h"
 
 class DVS;
 
-class CatCommand
+class CatCommand : public BaseCommand
 {
   public:
   enum class PrintType
