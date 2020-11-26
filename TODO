@@ -2,7 +2,6 @@ Now:
 dvs tag create
 dvs tag list
 dvs tag delete
-dvs diff
 
 
 Future Ideas:
