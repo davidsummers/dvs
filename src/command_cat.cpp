@@ -75,48 +75,14 @@ CatCommand::CatResult CatCommand::GetHash( DVS &              dvs_,
 
   hashId = dvs_.GetOid( hashId );
 
-  std::filesystem::path hashPath;
+  std::string filename;
+  std::ifstream inputStream;
 
-  if ( !hashId.empty( ) )
-  {
-    hashPath = dvs_.GetDvsDirectory( ) / "objects" / hashId.substr( 0, 2 ) / hashId.substr( 2 );
-  }
+  result = GetStreamFromOid( dvs_, hashId, filename, inputStream );
 
-  if ( !std::filesystem::exists( hashPath ) )
+  if ( !result.err.empty( ) )
   {
-    std::stringstream ss;
-    ss << "Hash " << hashId << " does not exist.";
-    result.err = ss.str( );
     return result;
-  }
-
-  std::ifstream inputFile( hashPath, std::ios_base::binary );
-
-  if ( !inputFile.is_open( ) )
-  {
-    std::stringstream ss;
-    ss << "Can't open file " << hashPath << ".";
-    result.err = ss.str( );
-    return result;
-  }
-
-  std::string header;
-
-  // Read header.
-  std::getline( inputFile, header, '\0' );
-
-  {
-    std::string::size_type pos = header.find( ' ' );
-    std::string            sizeStr;
-
-    if ( pos != std::string::npos )
-    {
-      sizeStr = header.substr( pos + 1 );
-      header  = header.substr( 0, pos );
-    }
-
-    result.size = atoi( sizeStr.c_str( ) );
-    result.type = header;
   }
 
   if ( expectedRecordType_ != RecordType::none )
@@ -163,12 +129,12 @@ CatCommand::CatResult CatCommand::GetHash( DVS &              dvs_,
 
   do
   {
-    inputFile.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
-    if ( std::streamsize bytesRead = inputFile.gcount( ); bytesRead > 0 )
+    inputStream.read( reinterpret_cast< char * >( &buffer[ 0 ] ), sizeof( buffer ) );
+    if ( std::streamsize bytesRead = inputStream.gcount( ); bytesRead > 0 )
     {
       ostream_->write( reinterpret_cast< const char * >( &buffer[ 0 ] ), bytesRead );
     }
-  } while ( inputFile.good( ) );
+  } while ( inputStream.good( ) );
 
   return result;
 }
@@ -177,7 +143,7 @@ CatCommand::CatResult CatCommand::GetStreamFromOid( DVS &dvs_, const std::option
 {
   CatCommand::CatResult result;
 
-  if ( !oid_.has_value( ) )
+  if ( !oid_.has_value( ) || oid_.value( ).empty( ) )
   {
     result.err = "Oid has no value.";
     return result;
