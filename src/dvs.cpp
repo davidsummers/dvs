@@ -73,8 +73,8 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 {
   std::map< std::string, docopt::value > args = docopt::docopt( s_USAGE,
                                                                 { argv_ + 1, argv_ + argc_ },
-                                                                true,             // Show help if requested.
-                                                                "dvs Version 1.0" // Version string.
+                                                                true,               // Show help if requested.
+                                                                "dvs Version 0.0.1" // Version string.
   );
 
   Error err;
