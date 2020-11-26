@@ -8,11 +8,11 @@
 #include "diff.h"
 #include "dvs.h"
 
-Error Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_ )
+Error Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_, const std::string dirPath_ )
 {
   Error err;
 
-  CompareTrees( from_, to_, [ &err, &dvs_ ]( const std::string &path_, const std::vector< TreeRecord::DirEntry > &entries_ )
+  CompareTrees( from_, to_, [ &err, &dirPath_, &dvs_ ]( const std::string &path_, const std::vector< TreeRecord::DirEntry > &entries_ )
   {
     if ( entries_.size( ) != 2 || entries_[ 0 ].oid != entries_[ 1 ].oid )
     {
@@ -36,7 +36,7 @@ Error Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_
 
       if ( entries_.size( ) >= 1 && entries_[ 0 ].type == RecordType::blob )
       {
-        DiffBlob( dvs_, std::cout, from, to, path_ );
+        DiffBlob( dvs_, std::cout, from, to, dirPath_, path_ );
       }
       else if ( entries_.size( ) >= 1 && entries_[ 0 ].type == RecordType::tree )
       {
@@ -63,7 +63,7 @@ Error Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_
           }
         }
 
-        err = DiffTrees( dvs_, tree1, tree2 );
+        err = DiffTrees( dvs_, tree1, tree2, dirPath_ + "/" + entries_[ 0 ].filename );
       }
     }
   } );
@@ -104,7 +104,7 @@ void Diff::CompareTrees( const TreeRecord &                                     
   }
 }
 
-void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const std::optional< Oid > &from_, const std::optional< Oid > &to_, const std::string path_ )
+void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const std::optional< Oid > &from_, const std::optional< Oid > &to_, const std::string &dir_, const std::string &path_ )
 {
   output_ << "Index: " << ( from_.has_value( ) ? from_.value( ) : "00000000" ) << "..." << ( to_.has_value( ) ? to_.value( ) : "00000000" ) << std::endl;
   using namespace std;
@@ -114,8 +114,8 @@ void Diff::DiffBlob( DVS &dvs_, std::ostream &output_, const std::optional< Oid 
                     const std::string &diffFilename2,
                     const std::string &actualFilename2,
                     std::ifstream &str2 );
-  std::string   diffFilename1 = "a/" + path_;
-  std::string   diffFilename2 = "b/" + path_;
+  std::string   diffFilename1 = "a" + std::string( dir_.empty( ) ? "/" : dir_ + "/" ) + path_;
+  std::string   diffFilename2 = "b" + std::string( dir_.empty( ) ? "/" : dir_ + "/" ) + path_;
   std::string   actualFilename1;
   std::string   actualFilename2;
   std::ifstream stream1;
