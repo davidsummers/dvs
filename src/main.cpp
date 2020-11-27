@@ -2,16 +2,22 @@
 // DVS main program driver.
 //
 
+#include <iostream>
+
 #include "dvs.h"
-
-
 
 int main( int argc_, char **argv_ )
 {
 
   DVS dvs;
 
-  int err = dvs.ParseCommands( argc_, argv_ );
+  Error err = dvs.ParseCommands( argc_, argv_ );
 
-  return err;
+  if ( !err.empty( ) )
+  {
+    std::cerr << err << std::endl;
+  }
+
+  int retStatus = !err.empty( );
+  return retStatus;
 }

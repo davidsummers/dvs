@@ -24,6 +24,7 @@
 #include "command_status.h"
 #include "command_tag.h"
 #include "command_write_tree.h"
+#include "command_unimplemented.h"
 
 const char s_USAGE[] =
   R"(DVS - David's Versioning System.
@@ -69,7 +70,7 @@ DVS::~DVS( )
   std::filesystem::current_path( m_OriginalDirectory );
 }
 
-int DVS::ParseCommands( int argc_, char **argv_ )
+Error DVS::ParseCommands( int argc_, char **argv_ )
 {
 #ifdef CMAKE_GIT_HASH
 #define XSTRINGIFY( s ) STRINGIFY( s )
@@ -87,74 +88,45 @@ int DVS::ParseCommands( int argc_, char **argv_ )
                                     std::string( "Version 0.0.1-" ) + GIT_HASH // Version string.
   );
 
+  using BasePtr = std::unique_ptr< BaseCommand >;
+  using CommandPointerType = std::function< BasePtr ( ) >;
+  using CommandMap = std::map< std::string, CommandPointerType >;
+
+  CommandMap commandMap
+  {
+//    { "branch", BranchCommand }
+    { "commit", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CommitCommand        >( ); } },
+    { "fetch",  [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
+    { "init",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< InitCommand          >( ); } },
+    { "log",    [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< LogCommand           >( ); } },
+    { "pull",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
+    { "status", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< StatusCommand        >( ); } },
+  };
+
   Error err;
+
+  for ( auto &myEntry : commandMap )
+  {
+    const std::string  &commandName = myEntry.first;
+    
+    if ( docopt::value cmdOption = args[ commandName ]; cmdOption && cmdOption.isBool( ) && cmdOption.asBool( ) )
+    {
+      BasePtr command = myEntry.second( );
+      err = command->ParseArgs( args );
+
+      if ( !err.empty( ) )
+      {
+        return err;
+      }
+
+      err = command->operator( )( *this );
+      return err;
+    }
+  }
 
   if ( docopt::value branchOption = args[ "branch" ]; branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
   {
     err = ParseBranchCommands( args );
-  }
-  else if ( docopt::value commitCommand = args[ "commit" ];
-            commitCommand && commitCommand.isBool( ) && commitCommand.asBool( ) )
-  {
-    CommitCommand commitCmd;
-
-    err = commitCmd.ParseArgs( args );
-
-    if ( !err.empty( ) )
-    {
-      return 1;
-    }
-
-    err = commitCmd( *this );
-  }
-  else if ( docopt::value fetchOption = args[ "fetch" ]; fetchOption && fetchOption.isBool( ) && fetchOption.asBool( ) )
-  {
-    err = "'fetch' subcommand not yet implemented.";
-  }
-  else if ( docopt::value initOption = args[ "init" ]; initOption && initOption.isBool( ) && initOption.asBool( ) )
-  {
-    InitCommand initCommand;
-
-    err = initCommand.ParseArgs( args );
-
-    if ( !err.empty( ) )
-    {
-      return 1;
-    }
-
-    err = initCommand( *this );
-  }
-  else if ( docopt::value logOption = args[ "log" ]; logOption && logOption.isBool( ) && logOption.asBool( ) )
-  {
-    LogCommand logCommand;
-
-    err = logCommand.ParseArgs( args );
-
-    if ( !err.empty( ) )
-    {
-      return 1;
-    }
-
-    err = logCommand( *this );
-  }
-  else if ( docopt::value pullOption = args[ "pull" ]; pullOption && pullOption.isBool( ) && pullOption.asBool( ) )
-  {
-    err = "'pull' subcommand not yet implemented.";
-  }
-  else if ( docopt::value pushOption = args[ "push" ]; pushOption && pushOption.isBool( ) && pushOption.asBool( ) )
-  {
-    err = "'push' subcommand not yet implemented.";
-  }
-  else if ( docopt::value statusOption = args[ "status" ];
-            statusOption && statusOption.isBool( ) && statusOption.asBool( ) )
-  {
-    StatusCommand statusCommand;
-
-    err = statusCommand( *this );
-  }
-  else if ( docopt::value tagOption = args[ "tag" ]; tagOption && tagOption.isBool( ) && tagOption.asBool( ) )
-  {
-    err = ParseTagCommands( args );
   }
   else if ( docopt::value internalOption = args[ "internal" ];
             internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
@@ -163,17 +135,10 @@ int DVS::ParseCommands( int argc_, char **argv_ )
   }
   else
   {
-    std::cerr << "Command not yet implemented." << std::endl;
-    return 1;
+    err = "Command not yet implemented.";
   }
 
-  if ( !err.empty( ) )
-  {
-    std::cerr << err << std::endl;
-    return 1;
-  }
-
-  return 0;
+  return err;
 }
 
 Error DVS::ParseBranchCommands( DocOptArgs &args_ )

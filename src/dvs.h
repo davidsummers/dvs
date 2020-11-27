@@ -24,7 +24,7 @@ class DVS
   DVS( );
   ~DVS( );
 
-  int ParseCommands( int argc, char **argv );
+  Error ParseCommands( int argc, char **argv );
 
   Error ParseBranchCommands(   DocOptArgs & );
   Error ParseInternalCommands( DocOptArgs & );
