@@ -84,7 +84,7 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
 
     RefMap::iterator itr = refs.find( refValue.value );
 
-    std::cout << "commit " << refValue.value << ( itr == refs.end( ) ? "" : "( " + itr->second + " )" ) << std::endl;
+    std::cout << "commit " << refValue.value << ( itr == refs.end( ) ? "" : " ( " + itr->second + " )" ) << std::endl;
     std::cout << std::endl;
     std::cout << commitRecord.GetMsg( ) << std::endl;
     std::cout << std::endl;
