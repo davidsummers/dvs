@@ -1,13 +1,13 @@
-
-#include <dtl/dtl.hpp>
-#include "common.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
-
+#include <string.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <vector>
+
+#include <dtl/dtl.hpp>
+#include "common.hpp"
 
 using namespace std;
 
