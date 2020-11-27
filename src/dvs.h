@@ -18,17 +18,26 @@ constexpr const char *s_REFS_BRANCHES_REMOTE = "refs/remotes/";
 constexpr const char *s_REFS_TAGS            = "refs/tags/";
 //clang-format on
 
+class BaseCommand;
+
 class DVS
 {
   public:
+  using BasePtr = std::unique_ptr< BaseCommand >;
+  using CommandPointerType = std::function< BasePtr ( ) >;
+  using CommandMap = std::map< std::string, CommandPointerType >;
+
+  using ParseResult = struct ParseResult
+  {
+    bool  executedCommand = false;
+    Error errMsg;
+  };
+
   DVS( );
   ~DVS( );
 
-  Error ParseCommands( int argc, char **argv );
-
-  Error ParseBranchCommands(   DocOptArgs & );
-  Error ParseInternalCommands( DocOptArgs & );
-  Error ParseTagCommands(      DocOptArgs & );
+  ParseResult ParseArgs( int argc, char **argv );
+  ParseResult ParseArgs( DocOptArgs &, const CommandMap &commandMap_ );
 
   // Helpers
   Error Validate( const std::string &dir = "" );

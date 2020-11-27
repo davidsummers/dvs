@@ -11,13 +11,13 @@ int main( int argc_, char **argv_ )
 
   DVS dvs;
 
-  Error err = dvs.ParseCommands( argc_, argv_ );
+  DVS::ParseResult result = dvs.ParseArgs( argc_, argv_ );
 
-  if ( !err.empty( ) )
+  if ( !result.errMsg.empty( ) )
   {
-    std::cerr << err << std::endl;
+    std::cerr << result.errMsg << std::endl;
   }
 
-  int retStatus = !err.empty( );
+  int retStatus = !result.errMsg.empty( );
   return retStatus;
 }

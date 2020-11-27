@@ -58,6 +58,38 @@ const char s_USAGE[] =
       --version              Show version.
 )";
 
+
+DVS::CommandMap s_MainCommandMap
+{
+  { "commit", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CommitCommand        >( ); } },
+  { "fetch",  [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
+  { "init",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< InitCommand          >( ); } },
+  { "log",    [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< LogCommand           >( ); } },
+  { "pull",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
+  { "status", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< StatusCommand        >( ); } },
+};
+
+DVS::CommandMap s_BranchCommandMap
+{
+  { "create", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CreateBranchCommand  >( ); } },
+  { "delete", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< DeleteBranchCommand  >( ); } },
+  { "list",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< ListBranchCommand    >( ); } },
+  { "switch", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< SwitchBranchCommand  >( ); } },
+};
+
+DVS::CommandMap s_InternalCommandMap
+{
+  { "cat",        [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CatCommand       >( ); } },
+  { "read-tree",  [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< ReadTreeCommand  >( ); } },
+  { "hash",       [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< HashCommand      >( ); } },
+  { "write-tree", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< WriteTreeCommand >( ); } },
+};
+
+DVS::CommandMap s_TagCommandMap
+{
+  { "create", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< TagCommand >( ); } },
+};
+
 DVS::DVS( )
 {
   // Save current working directory.
@@ -70,7 +102,7 @@ DVS::~DVS( )
   std::filesystem::current_path( m_OriginalDirectory );
 }
 
-Error DVS::ParseCommands( int argc_, char **argv_ )
+DVS::ParseResult DVS::ParseArgs( int argc_, char **argv_ )
 {
 #ifdef CMAKE_GIT_HASH
 #define XSTRINGIFY( s ) STRINGIFY( s )
@@ -88,197 +120,77 @@ Error DVS::ParseCommands( int argc_, char **argv_ )
                                     std::string( "Version 0.0.1-" ) + GIT_HASH // Version string.
   );
 
-  using BasePtr = std::unique_ptr< BaseCommand >;
-  using CommandPointerType = std::function< BasePtr ( ) >;
-  using CommandMap = std::map< std::string, CommandPointerType >;
+  ParseResult result;
 
-  CommandMap commandMap
+  result = ParseArgs( args, s_MainCommandMap );
+
+  if ( result.executedCommand || !result.errMsg.empty( ) )
   {
-//    { "branch", BranchCommand }
-    { "commit", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CommitCommand        >( ); } },
-    { "fetch",  [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
-    { "init",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< InitCommand          >( ); } },
-    { "log",    [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< LogCommand           >( ); } },
-    { "pull",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
-    { "status", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< StatusCommand        >( ); } },
-  };
-
-  Error err;
-
-  for ( auto &myEntry : commandMap )
-  {
-    const std::string  &commandName = myEntry.first;
-    
-    if ( docopt::value cmdOption = args[ commandName ]; cmdOption && cmdOption.isBool( ) && cmdOption.asBool( ) )
-    {
-      BasePtr command = myEntry.second( );
-      err = command->ParseArgs( args );
-
-      if ( !err.empty( ) )
-      {
-        return err;
-      }
-
-      err = command->operator( )( *this );
-      return err;
-    }
+    return result; 
   }
 
   if ( docopt::value branchOption = args[ "branch" ]; branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
   {
-    err = ParseBranchCommands( args );
-  }
-  else if ( docopt::value internalOption = args[ "internal" ];
-            internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
-  {
-    err = ParseInternalCommands( args );
-  }
-  else
-  {
-    err = "Command not yet implemented.";
+    result = ParseArgs( args, s_BranchCommandMap );
+
+    if ( result.executedCommand || !result.errMsg.empty( ) )
+    {
+      return result;
+    }
   }
 
-  return err;
+  if ( docopt::value internalOption = args[ "internal" ];
+       internalOption && internalOption.isBool( ) && internalOption.asBool( ) )
+  {
+    result = ParseArgs( args, s_InternalCommandMap );
+
+    if ( result.executedCommand || !result.errMsg.empty( ) )
+    {
+      return result;
+    }
+  }
+
+  if ( docopt::value tagOption = args[ "tag" ];
+       tagOption && tagOption.isBool( ) && tagOption.asBool( ) )
+  {
+    result = ParseArgs( args, s_TagCommandMap );
+
+    if ( result.executedCommand || !result.errMsg.empty( ) )
+    {
+      return result;
+    }
+  }
+
+  result.errMsg = "Command not yet implemented.";
+
+  return result;
 }
 
-Error DVS::ParseBranchCommands( DocOptArgs &args_ )
+DVS::ParseResult DVS::ParseArgs( DocOptArgs &args_, const CommandMap &commandMap_ )
 {
-  Error err;
+  ParseResult result;
 
-  if ( docopt::value switchOption = args_[ "switch" ];
-       switchOption && switchOption.isBool( ) && switchOption.asBool( ) )
+  for ( auto &myEntry : commandMap_ )
   {
-    SwitchBranchCommand checkoutCmd;
-
-    err = checkoutCmd.ParseArgs( args_ );
-
-    if ( !err.empty( ) )
+    const std::string  &commandName = myEntry.first;
+    
+    if ( docopt::value cmdOption = args_[ commandName ]; cmdOption && cmdOption.isBool( ) && cmdOption.asBool( ) )
     {
-      return err;
+      BasePtr command = myEntry.second( );
+      result.errMsg = command->ParseArgs( args_ );
+
+      if ( !result.errMsg.empty( ) )
+      {
+        return result;
+      }
+
+      result.errMsg = command->operator( )( *this );
+      result.executedCommand = true;
+      return result;
     }
-
-    err = checkoutCmd( *this );
-  }
-  else if ( docopt::value createOption = args_[ "create" ];
-            createOption && createOption.isBool( ) && createOption.asBool( ) )
-  {
-    CreateBranchCommand createBranchCommand;
-
-    err = createBranchCommand.ParseArgs( args_ );
-
-    if ( !err.empty( ) )
-    {
-      return err;
-    }
-
-    err = createBranchCommand( *this );
-  }
-  else if ( docopt::value branchDeleteOption = args_[ "delete" ];
-            branchDeleteOption && branchDeleteOption.isBool( ) && branchDeleteOption.asBool( ) )
-  {
-    DeleteBranchCommand deleteBranchCommand;
-
-    err = deleteBranchCommand.ParseArgs( args_ );
-
-    if ( !err.empty( ) )
-    {
-      return err;
-    }
-
-    err = deleteBranchCommand( *this );
-  }
-  else if ( docopt::value branchListOption = args_[ "list" ];
-            branchListOption && branchListOption.isBool( ) && branchListOption.asBool( ) )
-  {
-    ListBranchCommand listBranchCommand;
-
-    err = listBranchCommand.ParseArgs( args_ );
-
-    if ( !err.empty( ) )
-    {
-      return err;
-    }
-
-    err = listBranchCommand( *this );
   }
 
-  return err;
-}
-
-Error DVS::ParseInternalCommands( DocOptArgs &args_ )
-{
-  Error err;
-
-  if ( docopt::value catOption = args_[ "cat" ]; catOption && catOption.isBool( ) && catOption.asBool( ) )
-  {
-    CatCommand catCommand;
-
-    err = catCommand.ParseArgs( args_ );
-
-    if ( !err.empty( ) )
-    {
-      return err;
-    }
-
-    err = catCommand( *this );
-  }
-  else if ( docopt::value readTreeOption = args_[ "read-tree" ];
-            readTreeOption && readTreeOption.isBool( ) && readTreeOption.asBool( ) )
-  {
-    ReadTreeCommand readTreeCommand;
-
-    err = readTreeCommand.ParseArgs( args_ );
-
-    if ( !err.empty( ) )
-    {
-      return err;
-    }
-
-    err = readTreeCommand( *this );
-  }
-  else if ( docopt::value hashOption = args_[ "hash" ]; hashOption && hashOption.isBool( ) && hashOption.asBool( ) )
-  {
-    HashCommand hashCommand;
-
-    err = hashCommand.ParseArgs( args_ );
-
-    if ( !err.empty( ) )
-    {
-      return err;
-    }
-
-    err = hashCommand( *this );
-  }
-  else if ( docopt::value writeTreeOption = args_[ "write-tree" ];
-            writeTreeOption && writeTreeOption.isBool( ) && writeTreeOption.asBool( ) )
-  {
-    WriteTreeCommand writeTreeCommand;
-    err = writeTreeCommand( *this );
-  }
-
-  return err;
-}
-
-Error DVS::ParseTagCommands( DocOptArgs &args_ )
-{
-  Error err;
-
-  if ( docopt::value tagCreateOption = args_[ "create" ];
-       tagCreateOption && tagCreateOption.isBool( ) && tagCreateOption.asBool( ) )
-  {
-    TagCommand tagCommand;
-
-    err = tagCommand.ParseArgs( args_ );
-
-    if ( !err.empty( ) )
-    {
-      return err;
-    }
-
-    err = tagCommand( *this );
-  }
-
-  return err;
+  return result;
 }
 
 Error DVS::Validate( const std::string &dir_ )
