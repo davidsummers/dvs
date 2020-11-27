@@ -14,10 +14,6 @@ Error InitCommand::ParseArgs( DocOptArgs &args_ )
   {
     m_Directory = dirOption.asString( );
   }
-  else
-  {
-    err = "Required directory not specified.";
-  }
 
   return err;
 }
