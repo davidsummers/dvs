@@ -21,7 +21,7 @@ create_build_dir :
 	fi
 
 build : create_build_dir
-	cd ${BUILD_DIR}; cmake -DGIT_HASH=$${GIT_HASH} ${DVS_DIR};
+	cd ${BUILD_DIR}; cmake -DGIT_HASH=${GIT_HASH} ${DVS_DIR};
 	cd ${BUILD_DIR}; cmake --build .
 
 build_dmg : build
