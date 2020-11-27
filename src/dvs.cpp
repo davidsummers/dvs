@@ -72,8 +72,8 @@ DVS::~DVS( )
 int DVS::ParseCommands( int argc_, char **argv_ )
 {
 #ifdef CMAKE_GIT_HASH
-#define XSTRINGIFY( s ) STRINGIFY ( s )
-#define STRINGIFY( s ) # s
+#define XSTRINGIFY( s ) STRINGIFY( s )
+#define STRINGIFY( s ) #s
   const char *GIT_HASH = XSTRINGIFY( CMAKE_GIT_HASH );
 #else
   const char *GIT_HASH = "dev";
@@ -81,11 +81,11 @@ int DVS::ParseCommands( int argc_, char **argv_ )
 
   using DocOptArgs = std::map< std::string, docopt::value >;
 
-  DocOptArgs args = args = docopt::docopt( s_USAGE,
-                                           { argv_ + 1, argv_ + argc_ },
-                                           true, // Show help if requested.
-                                           std::string( "Version 0.0.1-" ) + GIT_HASH  // Version string.
-                                         );
+  DocOptArgs args = docopt::docopt( s_USAGE,
+                                    { argv_ + 1, argv_ + argc_ },
+                                    true,                                      // Show help if requested.
+                                    std::string( "Version 0.0.1-" ) + GIT_HASH // Version string.
+  );
 
   Error err;
 
@@ -487,10 +487,11 @@ Oid DVS::GetOid( const std::string &name_ )
   return oid;
 }
 
-
-void DVS::ForAllRefs( const std::string &prefix_, const bool deref_, std::function< void ( const std::string &refname_, const RefValue & ) > func_ )
+void DVS::ForAllRefs( const std::string &                                                    prefix_,
+                      const bool                                                             deref_,
+                      std::function< void( const std::string &refname_, const RefValue & ) > func_ )
 {
-  std::vector< std::string > refs { "HEAD" };
+  std::vector< std::string > refs{ "HEAD" };
 
   std::vector< std::filesystem::path > paths
   {
@@ -509,7 +510,8 @@ void DVS::ForAllRefs( const std::string &prefix_, const bool deref_, std::functi
         continue;
       }
 
-      std::string root = RelPath( entry.path( ).string( ), rootPath.parent_path( ).parent_path( ).parent_path( ).string( ) ).substr( 1 );
+      std::string root =
+        RelPath( entry.path( ).string( ), rootPath.parent_path( ).parent_path( ).parent_path( ).string( ) ).substr( 1 );
       refs.push_back( root );
     }
   }
@@ -528,7 +530,6 @@ void DVS::ForAllRefs( const std::string &prefix_, const bool deref_, std::functi
   }
 }
 
-
 std::string DVS::RelPath( const std::string &filename_, const std::string &dir_ )
 {
   std::string result = filename_;
@@ -537,7 +538,7 @@ std::string DVS::RelPath( const std::string &filename_, const std::string &dir_ 
   {
     result = filename_.substr( dir_.length( ) );
   }
- 
+
   return result;
 }
 
