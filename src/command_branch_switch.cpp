@@ -17,6 +17,10 @@ Error SwitchBranchCommand::ParseArgs( DocOptArgs &args_ )
   {
     m_BranchName = branchNameOption.asString( );
   }
+  else
+  {
+    err = "Missing required branch name.";
+  }
 
   return err;
 }
