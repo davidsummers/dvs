@@ -6,6 +6,5 @@ dvs tag delete
 
 Future Ideas:
 
-Should 'dvs checkout <BranchName>' be 'dvs branch checkout <BranchName>'???
 
 
