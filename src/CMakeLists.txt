@@ -19,6 +19,7 @@ set( SOURCE_FILES
      command_status.cpp
      command_tag.cpp
      command_write_tree.cpp
+     command_unimplemented.cpp
      diff.cpp
      dvs.cpp
      record_commit.cpp
@@ -40,6 +41,7 @@ set( HEADER_FILES
      command_status.h
      command_tag.h
      command_write_tree.h
+     command_unimplemented.h
      common.h
      diff.h
      dvs.h
