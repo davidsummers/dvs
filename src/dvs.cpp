@@ -215,7 +215,7 @@ Error DVS::Validate( const std::string &dir_ )
   if ( currentPath.empty( ) )
   {
     std::stringstream ss;
-    ss << "Directory " << s_DVS_DIR << " does not exist.";
+    ss << "This is not a DVS repository because directory " << s_DVS_DIR << " does not exist.";
     return ss.str( );
   }
 
