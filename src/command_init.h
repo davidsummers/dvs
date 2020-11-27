@@ -12,9 +12,9 @@ class DVS;
 class InitCommand : public BaseCommand
 {
   public:
-  Error ParseArgs( DocOptArgs & );
+  Error ParseArgs( DocOptArgs & ) override;
 
-  Error operator( )( DVS & );
+  Error operator( )( DVS & ) override;
 
   Error InitDvs( DVS &, const std::string rootPath = "", std::ostream *outStream = nullptr );
 

@@ -11,9 +11,9 @@ class DVS;
 class LogCommand : public BaseCommand
 {
   public:
-  Error ParseArgs( DocOptArgs & );
+  Error ParseArgs( DocOptArgs & ) override;
 
-  Error operator( )( DVS & );
+  Error operator( )( DVS & ) override;
 
   Error GetLog( DVS &, const std::string &hashID, bool showPatchDiff = false );
 

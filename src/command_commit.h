@@ -12,9 +12,9 @@ class DVS;
 class CommitCommand : public BaseCommand
 {
   public:
-  Error ParseArgs( DocOptArgs & );
+  Error ParseArgs( DocOptArgs & ) override;
 
-  Error operator( )( DVS & );
+  Error operator( )( DVS & ) override;
 
   OidResult Commit( DVS &, const std::string &message );
 

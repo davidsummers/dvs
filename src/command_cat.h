@@ -27,9 +27,9 @@ class CatCommand : public BaseCommand
     std::string type;
   };
 
-  Error ParseArgs( DocOptArgs & );
+  Error ParseArgs( DocOptArgs & ) override;
 
-  Error operator( )( DVS & );
+  Error operator( )( DVS & ) override;
 
   CatResult GetHash( DVS &,
                      const std::string &hashID,

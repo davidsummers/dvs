@@ -19,9 +19,9 @@ class ReadTreeCommand : public BaseCommand
     Oid                   oid;
   };
 
-  Error ParseArgs( DocOptArgs & );
+  Error ParseArgs( DocOptArgs & ) override;
 
-  Error operator( )( DVS & );
+  Error operator( )( DVS & ) override;
 
   OidResult ReadTree( DVS &, const std::string &hashId );
 
