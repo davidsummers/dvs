@@ -11,8 +11,8 @@ class DVS;
 class BaseCommand
 {
   public:
-  BaseCommand( );
-  virtual ~BaseCommand( );
+  BaseCommand( ) = default;
+  virtual ~BaseCommand( ) = default;
 
   virtual Error ParseArgs( DocOptArgs & ) = 0;
 
