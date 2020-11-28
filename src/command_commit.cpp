@@ -13,6 +13,12 @@ Error CommitCommand::ParseArgs( DocOptArgs &args_ )
 
   bool msgFlag = false;
 
+  if ( docopt::value path = args_[ "<path>" ];
+       path && path.isString( ) && !path.asString( ).empty( ) )
+  {
+    m_Path = path.asString( );
+  }
+
   if ( docopt::value msgOption = args_[ "-m" ]; msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
   {
     msgFlag = true;
@@ -58,7 +64,7 @@ Error CommitCommand::operator( )( DVS &dvs_ )
   return result.err;
 }
 
-OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
+OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const std::string &path_ )
 {
   OidResult    result;
   CommitRecord commitRecord;
@@ -67,7 +73,9 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
 
   WriteTreeCommand writeTreeCommand;
 
-  OidResult writeTreeResult = writeTreeCommand.WriteTree( dvs_, "." );
+  std::string path = path_.empty( ) ? dvs_.GetTopLevelDirectory( ).string( ) : path_;
+
+  OidResult writeTreeResult = writeTreeCommand.WriteTree( dvs_, path );
 
   if ( !writeTreeResult.err.empty( ) )
   {

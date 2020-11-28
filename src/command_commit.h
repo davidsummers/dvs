@@ -16,9 +16,10 @@ class CommitCommand : public BaseCommand
 
   Error operator( )( DVS & ) override;
 
-  OidResult Commit( DVS &, const std::string &message );
+  OidResult Commit( DVS &, const std::string &message, const std::string &path = "" );
 
   protected:
   private:
   std::string m_Msg;
+  std::string m_Path;
 };

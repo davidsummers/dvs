@@ -10,9 +10,15 @@
 #include "dvs.h"
 #include "record_commit.h"
 
-Error DiffCommand::ParseArgs( DocOptArgs & /* args_ */ )
+Error DiffCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
+
+  if ( docopt::value path = args_[ "<path>" ];
+       path && path.isString( ) && !path.asString( ).empty( ) )
+  {
+    m_Path = path.asString( );
+  }
 
   return err;
 }
@@ -24,17 +30,19 @@ Error DiffCommand::operator( )( DVS &dvs_ )
     return validateError;
   }
 
-  Error err = Diff( dvs_ );
+  Error err = Diff( dvs_, m_Path );
 
   return err;
 }
 
-Error DiffCommand::Diff( DVS &dvs_ )
+Error DiffCommand::Diff( DVS &dvs_, const std::string &path_ )
 {
   Error err;
 
+  std::string path = path_.empty( ) ? dvs_.GetTopLevelDirectory( ).string( ) : path_;
+
   WriteTreeCommand currentTreeCommand;
-  OidResult currentTreeResult = currentTreeCommand.WriteTree( dvs_, dvs_.GetTopLevelDirectory( ).string( ) );
+  OidResult currentTreeResult = currentTreeCommand.WriteTree( dvs_, path );
 
   if ( !currentTreeResult.err.empty( ) )
   {

@@ -37,8 +37,8 @@ const char s_USAGE[] =
       dvs branch delete <BranchName>
       dvs branch list
       dvs branch switch <BranchName>
-      dvs commit ( -m | --message ) <message>
-      dvs diff
+      dvs commit [<path>] ( -m | --message ) <message>
+      dvs diff [<path>]
       dvs fetch
       dvs init [<directory>]
       dvs log [ -p ] [<hash>]

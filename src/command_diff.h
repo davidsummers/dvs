@@ -16,8 +16,9 @@ class DiffCommand : public BaseCommand
 
   Error operator( )( DVS & ) override;
 
-  Error Diff( DVS & );
+  Error Diff( DVS &, const std::string &path = "" );
 
   protected:
   private:
+  std::string m_Path;
 };
