@@ -16,10 +16,10 @@ class DVS;
 class TreeRecord
 {
   public:
-  using DirEntry = struct
+  using DirEntry = struct DirEntry
   {
     Oid         oid;
-    RecordType  type;
+    RecordType  type = RecordType::none;
     std::string filename;
   };
 
