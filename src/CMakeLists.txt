@@ -17,7 +17,9 @@ set( SOURCE_FILES
      command_log.cpp
      command_read_tree.cpp
      command_status.cpp
-     command_tag.cpp
+     command_tag_create.cpp
+     command_tag_delete.cpp
+     command_tag_list.cpp
      command_write_tree.cpp
      command_unimplemented.cpp
      diff.cpp
@@ -39,7 +41,9 @@ set( HEADER_FILES
      command_log.h
      command_read_tree.h
      command_status.h
-     command_tag.h
+     command_tag_create.h
+     command_tag_delete.h
+     command_tag_list.h
      command_write_tree.h
      command_unimplemented.h
      common.h

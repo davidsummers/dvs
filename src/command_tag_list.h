@@ -9,7 +9,7 @@
 
 class DVS;
 
-class TagCommand : public BaseCommand
+class ListTagCommand : public BaseCommand
 {
   public:
   Error ParseArgs( DocOptArgs & ) override;

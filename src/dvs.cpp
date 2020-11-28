@@ -22,9 +22,11 @@
 #include "command_log.h"
 #include "command_read_tree.h"
 #include "command_status.h"
-#include "command_tag.h"
-#include "command_write_tree.h"
+#include "command_tag_create.h"
+#include "command_tag_delete.h"
+#include "command_tag_list.h"
 #include "command_unimplemented.h"
+#include "command_write_tree.h"
 
 const char s_USAGE[] =
   R"(DVS - David's Versioning System.
@@ -58,37 +60,40 @@ const char s_USAGE[] =
       --version              Show version.
 )";
 
-
+// clang-format off
 DVS::CommandMap s_MainCommandMap
 {
-  { "commit", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CommitCommand        >( ); } },
-  { "fetch",  [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
-  { "init",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< InitCommand          >( ); } },
-  { "log",    [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< LogCommand           >( ); } },
-  { "pull",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
-  { "status", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< StatusCommand        >( ); } },
+  { "commit", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CommitCommand >( );        } },
+  { "fetch",  [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
+  { "init",   [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< InitCommand >( );          } },
+  { "log",    [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< LogCommand >( );           } },
+  { "pull",   [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
+  { "status", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< StatusCommand >( );        } },
 };
 
 DVS::CommandMap s_BranchCommandMap
 {
-  { "create", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CreateBranchCommand  >( ); } },
-  { "delete", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< DeleteBranchCommand  >( ); } },
-  { "list",   [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< ListBranchCommand    >( ); } },
-  { "switch", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< SwitchBranchCommand  >( ); } },
+  { "create", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CreateBranchCommand >( ); } },
+  { "delete", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< DeleteBranchCommand >( ); } },
+  { "list",   [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< ListBranchCommand >( );   } },
+  { "switch", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< SwitchBranchCommand >( ); } },
 };
 
 DVS::CommandMap s_InternalCommandMap
 {
-  { "cat",        [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CatCommand       >( ); } },
-  { "read-tree",  [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< ReadTreeCommand  >( ); } },
-  { "hash",       [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< HashCommand      >( ); } },
-  { "write-tree", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< WriteTreeCommand >( ); } },
+  { "cat",        [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CatCommand >( ); } },
+  { "read-tree",  [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< ReadTreeCommand >( ); } },
+  { "hash",       [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< HashCommand >( ); } },
+  { "write-tree", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< WriteTreeCommand >( ); } },
 };
 
 DVS::CommandMap s_TagCommandMap
 {
-  { "create", [ ] ( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< TagCommand >( ); } },
+  { "create", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CreateTagCommand >( ); } },
+  { "delete", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< DeleteTagCommand >( ); } },
+  { "list",   [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< ListTagCommand >( );   } },
 };
+// clang-format on
 
 DVS::DVS( )
 {
@@ -126,7 +131,7 @@ DVS::ParseResult DVS::ParseArgs( int argc_, char **argv_ )
 
   if ( result.executedCommand || !result.errMsg.empty( ) )
   {
-    return result; 
+    return result;
   }
 
   if ( docopt::value branchOption = args[ "branch" ]; branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
@@ -150,8 +155,7 @@ DVS::ParseResult DVS::ParseArgs( int argc_, char **argv_ )
     }
   }
 
-  if ( docopt::value tagOption = args[ "tag" ];
-       tagOption && tagOption.isBool( ) && tagOption.asBool( ) )
+  if ( docopt::value tagOption = args[ "tag" ]; tagOption && tagOption.isBool( ) && tagOption.asBool( ) )
   {
     result = ParseArgs( args, s_TagCommandMap );
 
@@ -172,19 +176,19 @@ DVS::ParseResult DVS::ParseArgs( DocOptArgs &args_, const CommandMap &commandMap
 
   for ( auto &myEntry : commandMap_ )
   {
-    const std::string  &commandName = myEntry.first;
-    
+    const std::string &commandName = myEntry.first;
+
     if ( docopt::value cmdOption = args_[ commandName ]; cmdOption && cmdOption.isBool( ) && cmdOption.asBool( ) )
     {
       BasePtr command = myEntry.second( );
-      result.errMsg = command->ParseArgs( args_ );
+      result.errMsg   = command->ParseArgs( args_ );
 
       if ( !result.errMsg.empty( ) )
       {
         return result;
       }
 
-      result.errMsg = command->operator( )( *this );
+      result.errMsg          = command->operator( )( *this );
       result.executedCommand = true;
       return result;
     }
@@ -370,12 +374,14 @@ void DVS::ForAllRefs( const std::string &                                       
 {
   std::vector< std::string > refs{ "HEAD" };
 
+  // clang-format off
   std::vector< std::filesystem::path > paths
   {
     GetDvsDirectory( ) / s_REFS_BRANCHES_LOCAL,
     GetDvsDirectory( ) / s_REFS_BRANCHES_REMOTE,
     GetDvsDirectory( ) / s_REFS_TAGS,
   };
+  // clang-format on
 
   for ( auto &rootPath : paths )
   {

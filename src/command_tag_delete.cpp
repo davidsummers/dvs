@@ -3,10 +3,10 @@
 #include <sstream>
 #include <string.h>
 
-#include "command_tag.h"
+#include "command_tag_delete.h"
 #include "dvs.h"
 
-Error TagCommand::ParseArgs( DocOptArgs &args_ )
+Error DeleteTagCommand::ParseArgs( DocOptArgs &args_ )
 {
   Error err;
 
@@ -31,7 +31,7 @@ Error TagCommand::ParseArgs( DocOptArgs &args_ )
   return err;
 }
 
-Error TagCommand::operator( )( DVS &dvs_ )
+Error DeleteTagCommand::operator( )( DVS &dvs_ )
 {
   if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
   {
@@ -43,7 +43,7 @@ Error TagCommand::operator( )( DVS &dvs_ )
   return err;
 }
 
-Error TagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
+Error DeleteTagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
 {
   Error err;
 
