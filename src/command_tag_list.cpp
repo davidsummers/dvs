@@ -29,6 +29,11 @@ Error ListTagCommand::ListTag( DVS &dvs_ )
 
   std::filesystem::path tagPath = dvs_.GetDvsDirectory( ) / s_REFS_TAGS;
 
+  if ( !std::filesystem::exists( tagPath ) )
+  {
+    return ""; // Nothing to do or show here.
+  }
+
   for ( const auto &entry : std::filesystem::directory_iterator( tagPath ) )
   {
     std::cout << entry.path( ).filename( ).string( ) << std::endl;
