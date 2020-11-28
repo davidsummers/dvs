@@ -6,6 +6,7 @@
 #include "command_diff.h"
 #include "command_hash.h"
 #include "command_write_tree.h"
+#include "diff.h"
 #include "dvs.h"
 #include "record_commit.h"
 
@@ -32,41 +33,35 @@ Error DiffCommand::Diff( DVS &dvs_ )
 {
   Error err;
 
-  // CommitRecord     commitRecord;
-  WriteTreeCommand writeTreeCommand;
+  WriteTreeCommand currentTreeCommand;
+  OidResult currentTreeResult = currentTreeCommand.WriteTree( dvs_, "." );
 
-  OidResult writeTreeResult = writeTreeCommand.WriteTree( dvs_, "." );
-
-  if ( !writeTreeResult.err.empty( ) )
+  if ( !currentTreeResult.err.empty( ) )
   {
-    err = writeTreeResult.err;
+    err = currentTreeResult.err;
     return err;
   }
 
-  commitRecord.SetTreeOid( writeTreeResult.oid );
+  TreeRecord currentTree;
+  err = currentTree.Read( dvs_, currentTreeResult.oid );
+
+  if ( !err.empty( ) )
+  {
+    return err;
+  } 
 
   RefValue parentRef = dvs_.GetRef( s_HEAD_REF );
 
-  commitRecord.SetParentOid( parentRef.value );
+  TreeRecord parentTree;
 
-  std::stringstream ss;
+  err = parentTree.Read( dvs_, parentRef.value );
 
-  ss << commitRecord;
-
-  HashCommand hashCommand;
-
-  OidResult commitHashResult = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::commit );
-
-  if ( !commitHashResult.err.empty( ) )
+  if ( !parentRef.value.empty( ) && !err.empty( ) )
   {
-    err = commitHashResult.err;
+    return err;
   }
-  else
-  {
-    Oid oid = commitHashResult.oid;
 
-    dvs_.SetRef( s_HEAD_REF, RefValue{ false, oid } );
-  }
+  err = Diff::DiffTrees( dvs_, parentTree, currentTree );  
 
   return err;
 }
