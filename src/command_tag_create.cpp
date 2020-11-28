@@ -54,6 +54,12 @@ Error CreateTagCommand::CreateTag( DVS &dvs_, const std::string &tagName_, const
     refValue = dvs_.GetRef( s_HEAD_REF );
   }
 
+  if ( refValue.value.empty( ) )
+  {
+    err = "Couldn't find HEAD reference. Is this an empty repository?";
+    return err;
+  }
+
   dvs_.SetRef( s_REFS_TAGS + tagName_, refValue );
 
   return err;
