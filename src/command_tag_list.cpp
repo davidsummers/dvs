@@ -27,7 +27,7 @@ Error ListTagCommand::ListTag( DVS &dvs_ )
 {
   Error err;
 
-  std::filesystem::path tagPath = dvs_.GetDvsDirectory( ) / s_REFS_TAGS;
+  std::filesystem::path tagPath = dvs_.GetSpecialPath( SpecialName::TAGS );
 
   if ( !std::filesystem::exists( tagPath ) )
   {

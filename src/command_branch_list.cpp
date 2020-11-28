@@ -27,8 +27,7 @@ Error ListBranchCommand::ListBranch( DVS &dvs_ )
 {
   Error err;
 
-  std::filesystem::path newDir = dvs_.GetDvsDirectory( );
-  newDir /= s_REFS_BRANCHES_LOCAL;
+  std::filesystem::path newDir = dvs_.GetSpecialPath( SpecialName::BRANCHES_LOCAL );
 
   if ( std::filesystem::exists( newDir ) )
   {
@@ -48,8 +47,7 @@ Error ListBranchCommand::ListBranch( DVS &dvs_ )
     std::cout << std::endl;
   }
 
-  newDir = dvs_.GetDvsDirectory( );
-  newDir /= s_REFS_BRANCHES_REMOTE;
+  newDir = dvs_.GetSpecialPath( SpecialName::BRANCHES_REMOTE );
 
   if ( std::filesystem::exists( newDir ) )
   {

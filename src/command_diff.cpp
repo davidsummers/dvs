@@ -34,7 +34,7 @@ Error DiffCommand::Diff( DVS &dvs_ )
   Error err;
 
   WriteTreeCommand currentTreeCommand;
-  OidResult currentTreeResult = currentTreeCommand.WriteTree( dvs_, "." );
+  OidResult currentTreeResult = currentTreeCommand.WriteTree( dvs_, dvs_.GetTopLevelDirectory( ).string( ) );
 
   if ( !currentTreeResult.err.empty( ) )
   {
@@ -50,7 +50,7 @@ Error DiffCommand::Diff( DVS &dvs_ )
     return err;
   } 
 
-  RefValue parentRef = dvs_.GetRef( s_HEAD_REF );
+  RefValue parentRef = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ) );
 
   CommitRecord parentCommit;
   err = parentCommit.Read( dvs_, parentRef.value );

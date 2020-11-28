@@ -77,7 +77,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
 
   commitRecord.SetTreeOid( writeTreeResult.oid );
 
-  RefValue parentRef = dvs_.GetRef( s_HEAD_REF );
+  RefValue parentRef = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ) );
 
   commitRecord.SetParentOid( parentRef.value );
 
@@ -97,7 +97,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_ )
   {
     result.oid = commitHashResult.oid;
 
-    dvs_.SetRef( s_HEAD_REF, RefValue{ false, result.oid } );
+    dvs_.SetRef( dvs_.GetSpecialName( SpecialName::HEAD ), RefValue{ false, result.oid } );
   }
 
   return result;

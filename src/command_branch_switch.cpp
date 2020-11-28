@@ -47,7 +47,7 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
 
   if ( refValue.value.empty( ) )
   {
-    refValue = dvs_.GetRef( s_HEAD_REF );
+    refValue = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ) );
   }
 
   if ( refValue.value.empty( ) )
@@ -144,7 +144,7 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
 
   if ( IsBranch( dvs_, branchName_ ) )
   {
-    std::string branchName = s_REFS_BRANCHES_LOCAL;
+    std::string branchName = dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL );
     branchName += branchName_;
     refValue = RefValue{ true, branchName };
   }
@@ -155,14 +155,14 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
 
   // Now save the commit hash in .dvs/HEAD
   const bool deref = false;
-  dvs_.SetRef( s_HEAD_REF, refValue, deref );
+  dvs_.SetRef( dvs_.GetSpecialName( SpecialName::HEAD ), refValue, deref );
 
   return err;
 }
 
 bool SwitchBranchCommand::IsBranch( DVS &dvs_, const std::string &branchName_ )
 {
-  RefValue refValue = dvs_.GetRef( s_REFS_BRANCHES_LOCAL + branchName_ );
+  RefValue refValue = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL ) + branchName_ );
   bool     isBranch = !refValue.value.empty( );
   return isBranch;
 }

@@ -51,7 +51,7 @@ Error CreateTagCommand::CreateTag( DVS &dvs_, const std::string &tagName_, const
 
   if ( refValue.value.empty( ) )
   {
-    refValue = dvs_.GetRef( s_HEAD_REF );
+    refValue = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ) );
   }
 
   if ( refValue.value.empty( ) )
@@ -60,7 +60,7 @@ Error CreateTagCommand::CreateTag( DVS &dvs_, const std::string &tagName_, const
     return err;
   }
 
-  dvs_.SetRef( s_REFS_TAGS + tagName_, refValue );
+  dvs_.SetRef( dvs_.GetSpecialName( SpecialName::TAGS ) + tagName_, refValue );
 
   return err;
 }

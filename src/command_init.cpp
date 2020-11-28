@@ -43,7 +43,7 @@ Error InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::ostream
   }
 
   std::filesystem::path dvsDir = dvs_.GetDvsDirectory( ) / rootPath;
-  dvsDir /= s_DVS_DIR;
+  dvsDir /= dvs_.GetSpecialName( SpecialName::DVS );
 
   // Create DVS directory.
   if ( !std::filesystem::create_directories( dvsDir ) )
@@ -77,9 +77,9 @@ Error InitCommand::InitDvs( DVS &dvs_, const std::string rootPath_, std::ostream
 
   // Create first (default) branch
   const bool  symbolic    = true;
-  std::string newRefValue = s_REFS_BRANCHES_LOCAL;
+  std::string newRefValue = dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL );
   newRefValue += "master";
-  dvs_.SetRef( s_HEAD_REF, RefValue{ symbolic, newRefValue } );
+  dvs_.SetRef( dvs_.GetSpecialName( SpecialName::HEAD ), RefValue{ symbolic, newRefValue } );
 
   return "";
 }

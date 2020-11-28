@@ -39,7 +39,7 @@ Error CreateBranchCommand::CreateBranch( DVS &dvs_, const std::string &branchNam
 {
   Error err;
   std::string oid = dvs_.GetOid( oid_ );
-  dvs_.SetRef( s_REFS_BRANCHES_LOCAL + branchName_, RefValue{ false, oid } );
+  dvs_.SetRef( dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL ) + branchName_, RefValue{ false, oid } );
   std::cout << "Create branch name '" << branchName_ << "'" << std::endl;
   return err;
 }

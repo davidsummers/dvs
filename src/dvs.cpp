@@ -100,6 +100,19 @@ DVS::CommandMap s_TagCommandMap
 };
 // clang-format on
 
+using SpecialNameMap = std::map< SpecialName, std::string >;
+
+// clang-format off
+SpecialNameMap s_SpecialNameMap
+{
+  { SpecialName::DVS,             ".dvs"          },
+  { SpecialName::BRANCHES_LOCAL,  "refs/locals/"  },
+  { SpecialName::BRANCHES_REMOTE, "refs/remotes/" },
+  { SpecialName::HEAD,            "HEAD"          },
+  { SpecialName::TAGS,            "refs/tags/"    },
+};
+//clang-format on
+
 DVS::DVS( )
 {
   // Save current working directory.
@@ -213,7 +226,7 @@ Error DVS::Validate( const std::string &dir_ )
 
   for ( ; !currentPath.empty( ); currentPath = RemoveLastPathElement( currentPath ) )
   {
-    std::filesystem::path testPath = currentPath / s_DVS_DIR;
+    std::filesystem::path testPath = currentPath / GetSpecialName( SpecialName::DVS );
     if ( std::filesystem::exists( testPath ) )
     {
       m_DvsDirectory = testPath;
@@ -224,7 +237,7 @@ Error DVS::Validate( const std::string &dir_ )
   if ( currentPath.empty( ) )
   {
     std::stringstream ss;
-    ss << "This is not a DVS repository because directory " << s_DVS_DIR << " does not exist.";
+    ss << "This is not a DVS repository because directory " << GetSpecialName( SpecialName::DVS ) << " does not exist.";
     return ss.str( );
   }
 
@@ -261,10 +274,17 @@ std::filesystem::path DVS::GetDvsDirectory( )
   return m_DvsDirectory;
 }
 
+std::filesystem::path DVS::GetTopLevelDirectory( )
+{
+  std::filesystem::path dvsDir = GetDvsDirectory( );
+  std::filesystem::path topLevelDir = dvsDir.parent_path( );
+  return topLevelDir;
+}
+
 bool DVS::IsIgnored( const std::filesystem::path &path_ )
 {
   const std::string filename = path_.filename( ).string( );
-  if ( filename == s_DVS_DIR )
+  if ( filename == GetSpecialName( SpecialName::DVS ) )
   {
     return true;
   }
@@ -343,7 +363,7 @@ DVS::RefIntRet DVS::GetRefInternal( const std::string &ref_, const bool deref_ )
 
 Oid DVS::GetOid( const std::string &name_ )
 {
-  std::string name = name_ == "@" ? s_HEAD_REF : name_;
+  std::string name = name_ == "@" ? GetSpecialName( SpecialName::HEAD ) : name_;
 
   Oid oid;
 
@@ -352,8 +372,8 @@ Oid DVS::GetOid( const std::string &name_ )
   {
     name,
     "refs/" + name,
-    s_REFS_TAGS + name,
-    s_REFS_BRANCHES_LOCAL + name,
+    GetSpecialName( SpecialName::TAGS ) + name,
+    GetSpecialName( SpecialName::BRANCHES_LOCAL ) + name,
   };
   // clang-format on
 
@@ -382,9 +402,9 @@ void DVS::ForAllRefs( const std::string &                                       
   // clang-format off
   std::vector< std::filesystem::path > paths
   {
-    GetDvsDirectory( ) / s_REFS_BRANCHES_LOCAL,
-    GetDvsDirectory( ) / s_REFS_BRANCHES_REMOTE,
-    GetDvsDirectory( ) / s_REFS_TAGS,
+    GetDvsDirectory( ) / GetSpecialName( SpecialName::BRANCHES_LOCAL ),
+    GetDvsDirectory( ) / GetSpecialName( SpecialName::BRANCHES_REMOTE ),
+    GetDvsDirectory( ) / GetSpecialName( SpecialName::TAGS ),
   };
   // clang-format on
 
@@ -433,4 +453,16 @@ std::string DVS::RelPath( const std::string &filename_, const std::string &dir_ 
 bool DVS::StartsWith( const std::string &str_, const std::string &startsWith_ )
 {
   return str_.find( startsWith_ ) == 0;
+}
+
+
+std::string DVS::GetSpecialName( const SpecialName name_ )
+{
+  return s_SpecialNameMap[ name_ ];
+}
+
+
+std::filesystem::path DVS::GetSpecialPath( const SpecialName name_ )
+{
+  return GetDvsDirectory( ) / GetSpecialName( name_ );
 }

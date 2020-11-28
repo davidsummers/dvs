@@ -41,7 +41,7 @@ Error DeleteTagCommand::DeleteTag( DVS &dvs_, const std::string &tagName_ )
 {
   Error err;
 
-  std::filesystem::path tagPath = dvs_.GetDvsDirectory( ) / s_REFS_TAGS / tagName_;
+  std::filesystem::path tagPath = dvs_.GetSpecialPath( SpecialName::TAGS ) / tagName_;
 
   if ( !std::filesystem::exists( tagPath ) )
   {

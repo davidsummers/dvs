@@ -37,12 +37,10 @@ Error DeleteBranchCommand::DeleteBranch( DVS &dvs_, const std::string &branchNam
 {
   Error err;
 
-  std::filesystem::path localBranch = dvs_.GetDvsDirectory( );
-  localBranch /= s_REFS_BRANCHES_LOCAL;
+  std::filesystem::path localBranch = dvs_.GetSpecialPath( SpecialName::BRANCHES_LOCAL );
   localBranch /= branchName_;
 
-  std::filesystem::path remoteBranch = dvs_.GetDvsDirectory( );
-  remoteBranch /= s_REFS_BRANCHES_REMOTE;
+  std::filesystem::path remoteBranch = dvs_.GetSpecialPath( SpecialName::BRANCHES_REMOTE );
   remoteBranch /= branchName_;
 
   if ( std::filesystem::exists( localBranch ) )

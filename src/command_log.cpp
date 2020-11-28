@@ -66,7 +66,7 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
 
   if ( refValue.value.empty( ) )
   {
-    refValue = dvs_.GetRef( s_HEAD_REF );
+    refValue = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ) );
   }
 
   refValue.value = dvs_.GetOid( refValue.value );

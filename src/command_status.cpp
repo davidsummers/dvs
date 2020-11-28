@@ -15,7 +15,7 @@ Error StatusCommand::operator( )( DVS &dvs_ )
   if ( Error validate_error = dvs_.Validate( ); !validate_error.empty( ) )
   {
     std::stringstream ss;
-    ss << "Can't validate " << s_DVS_DIR << " directory: " + validate_error;
+    ss << "Can't validate " << dvs_.GetSpecialName( SpecialName::DVS ) << " directory: " + validate_error;
     return ss.str( );
   }
 
@@ -52,16 +52,16 @@ Error StatusCommand::Status( DVS &dvs_ )
 std::string StatusCommand::GetBranchName( DVS &dvs_ )
 {
   const bool deref = false;
-  RefValue   head  = dvs_.GetRef( s_HEAD_REF, deref );
+  RefValue   head  = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ), deref );
 
   if ( !head.symbolic )
   {
     return "";
   }
 
-  assert( ( (void) "Head starts with refs/locals", head.value.find( s_REFS_BRANCHES_LOCAL ) == 0 ) );
+  assert( ( (void) "Head starts with refs/locals", head.value.find( dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL ) ) == 0 ) );
 
-  std::string result = head.value.substr( head.value.find( s_REFS_BRANCHES_LOCAL ) );
+  std::string result = head.value.substr( head.value.find( dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL ) ) );
 
   return result;
 }
