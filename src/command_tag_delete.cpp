@@ -22,12 +22,6 @@ Error DeleteTagCommand::ParseArgs( DocOptArgs &args_ )
     err = ss.str( );
   }
 
-  if ( docopt::value hashOption = args_[ "<hash>" ];
-       hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
-  {
-    m_HashId = hashOption.asString( );
-  }
-
   return err;
 }
 
@@ -38,23 +32,26 @@ Error DeleteTagCommand::operator( )( DVS &dvs_ )
     return validateError;
   }
 
-  Error err = Tag( dvs_, m_TagName, m_HashId );
+  Error err = DeleteTag( dvs_, m_TagName );
 
   return err;
 }
 
-Error DeleteTagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
+Error DeleteTagCommand::DeleteTag( DVS &dvs_, const std::string &tagName_ )
 {
   Error err;
 
-  RefValue refValue = RefValue{ false, hashId_ };
+  std::filesystem::path tagPath = dvs_.GetDvsDirectory( ) / s_REFS_TAGS / tagName_;
 
-  if ( refValue.value.empty( ) )
+  if ( !std::filesystem::exists( tagPath ) )
   {
-    refValue = dvs_.GetRef( s_HEAD_REF );
+    std::stringstream ss;
+    ss << "Tag '" << tagName_ << "' does not exist.";
+    err = ss.str( );
+    return err;
   }
 
-  dvs_.SetRef( s_REFS_TAGS + tagName_, refValue );
+  std::filesystem::remove( tagPath );
 
   return err;
 }

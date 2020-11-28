@@ -44,6 +44,8 @@ const char s_USAGE[] =
       dvs push
       dvs status
       dvs tag create <tag> [<hash>]
+      dvs tag delete <tag>
+      dvs tag list
       dvs internal cat [ -s | -t ] <hash>
       dvs internal hash <file>
       dvs internal read-tree <hash>

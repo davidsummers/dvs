@@ -16,7 +16,7 @@ class CreateTagCommand : public BaseCommand
 
   Error operator( )( DVS & ) override;
 
-  Error Tag( DVS &, const std::string &tagName, const std::string &hashId = "" );
+  Error CreateTag( DVS &, const std::string &tagName, const std::string &hashId = "" );
 
   protected:
   private:

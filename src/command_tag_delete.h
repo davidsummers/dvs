@@ -16,10 +16,9 @@ class DeleteTagCommand : public BaseCommand
 
   Error operator( )( DVS & ) override;
 
-  Error Tag( DVS &, const std::string &tagName, const std::string &hashId = "" );
+  Error DeleteTag( DVS &, const std::string &tagName );
 
   protected:
   private:
   std::string m_TagName;
-  std::string m_HashId;
 };

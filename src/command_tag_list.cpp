@@ -6,29 +6,9 @@
 #include "command_tag_list.h"
 #include "dvs.h"
 
-Error ListTagCommand::ParseArgs( DocOptArgs &args_ )
+Error ListTagCommand::ParseArgs( DocOptArgs & /* args_ */ )
 {
-  Error err;
-
-  if ( docopt::value tagOption = args_[ "<tag>" ];
-       tagOption && tagOption.isString( ) && !tagOption.asString( ).empty( ) )
-  {
-    m_TagName = tagOption.asString( );
-  }
-  else
-  {
-    std::stringstream ss;
-    ss << "Missing tag identifier.";
-    err = ss.str( );
-  }
-
-  if ( docopt::value hashOption = args_[ "<hash>" ];
-       hashOption && hashOption.isString( ) && !hashOption.asString( ).empty( ) )
-  {
-    m_HashId = hashOption.asString( );
-  }
-
-  return err;
+  return "";
 }
 
 Error ListTagCommand::operator( )( DVS &dvs_ )
@@ -38,23 +18,21 @@ Error ListTagCommand::operator( )( DVS &dvs_ )
     return validateError;
   }
 
-  Error err = Tag( dvs_, m_TagName, m_HashId );
+  Error err = ListTag( dvs_ );
 
   return err;
 }
 
-Error ListTagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
+Error ListTagCommand::ListTag( DVS &dvs_ )
 {
   Error err;
 
-  RefValue refValue = RefValue{ false, hashId_ };
+  std::filesystem::path tagPath = dvs_.GetDvsDirectory( ) / s_REFS_TAGS;
 
-  if ( refValue.value.empty( ) )
+  for ( const auto &entry : std::filesystem::directory_iterator( tagPath ) )
   {
-    refValue = dvs_.GetRef( s_HEAD_REF );
+    std::cout << entry.path( ).filename( ).string( ) << std::endl;
   }
-
-  dvs_.SetRef( s_REFS_TAGS + tagName_, refValue );
 
   return err;
 }

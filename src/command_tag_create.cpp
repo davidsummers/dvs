@@ -38,12 +38,12 @@ Error CreateTagCommand::operator( )( DVS &dvs_ )
     return validateError;
   }
 
-  Error err = Tag( dvs_, m_TagName, m_HashId );
+  Error err = CreateTag( dvs_, m_TagName, m_HashId );
 
   return err;
 }
 
-Error CreateTagCommand::Tag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
+Error CreateTagCommand::CreateTag( DVS &dvs_, const std::string &tagName_, const std::string &hashId_ )
 {
   Error err;
 
