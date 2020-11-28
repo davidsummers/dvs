@@ -52,11 +52,19 @@ Error DiffCommand::Diff( DVS &dvs_ )
 
   RefValue parentRef = dvs_.GetRef( s_HEAD_REF );
 
-  TreeRecord parentTree;
-
-  err = parentTree.Read( dvs_, parentRef.value );
+  CommitRecord parentCommit;
+  err = parentCommit.Read( dvs_, parentRef.value );
 
   if ( !parentRef.value.empty( ) && !err.empty( ) )
+  {
+    return err;
+  }
+
+  TreeRecord parentTree;
+
+  err = parentTree.Read( dvs_, parentCommit.GetTreeOid( ) );
+
+  if ( !parentCommit.GetTreeOid( ).empty( ) && !err.empty( ) )
   {
     return err;
   }
