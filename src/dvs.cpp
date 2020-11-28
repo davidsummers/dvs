@@ -17,6 +17,7 @@
 #include "command_branch_switch.h"
 #include "command_cat.h"
 #include "command_commit.h"
+#include "command_diff.h"
 #include "command_hash.h"
 #include "command_init.h"
 #include "command_log.h"
@@ -37,6 +38,7 @@ const char s_USAGE[] =
       dvs branch list
       dvs branch switch <BranchName>
       dvs commit ( -m | --message ) <message>
+      dvs diff
       dvs fetch
       dvs init [<directory>]
       dvs log [ -p ] [<hash>]
@@ -66,6 +68,7 @@ const char s_USAGE[] =
 DVS::CommandMap s_MainCommandMap
 {
   { "commit", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CommitCommand >( );        } },
+  { "diff",   [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< DiffCommand >( );          } },
   { "fetch",  [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< UnimplementedCommand >( ); } },
   { "init",   [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< InitCommand >( );          } },
   { "log",    [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< LogCommand >( );           } },

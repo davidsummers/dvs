@@ -12,6 +12,7 @@ set( SOURCE_FILES
      command_branch_switch.cpp
      command_cat.cpp
      command_commit.cpp
+     command_diff.cpp
      command_hash.cpp
      command_init.cpp
      command_log.cpp
@@ -36,6 +37,7 @@ set( HEADER_FILES
      command_branch_switch.h
      command_cat.h
      command_commit.h
+     command_diff.h
      command_hash.h
      command_init.h
      command_log.h
