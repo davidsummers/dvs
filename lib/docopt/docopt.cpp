@@ -164,28 +164,57 @@ std::vector<T*> flat_filter(Pattern& pattern) {
 }
 
 static std::vector<std::string> parse_section(std::string const& name, std::string const& source) {
-	// ECMAScript regex only has "?=" for a non-matching lookahead. In order to make sure we always have
-	// a newline to anchor our matching, we have to avoid matching the final newline of each grouping.
-	// Therefore, our regex is adjusted from the docopt Python one to use ?= to match the newlines before
-	// the following lines, rather than after.
-	std::regex const re_section_pattern {
-		"(?:^|\\n)"  // anchored at a linebreak (or start of string)
-		"("
-		   "[^\\n]*" + name + "[^\\n]*(?=\\n?)" // a line that contains the name
-		   "(?:\\n[ \\t].*?(?=\\n|$))*"         // followed by any number of lines that are indented
-		")",
-		std::regex::icase
-	};
+#ifndef _MSC_VER
+    // ECMAScript regex only has "?=" for a non-matching lookahead. In order to make sure we always have
+    // a newline to anchor our matching, we have to avoid matching the final newline of each grouping.
+    // Therefore, our regex is adjusted from the docopt Python one to use ?= to match the newlines before
+    // the following lines, rather than after.
+    std::regex const re_section_pattern{
+        "(?:^|\\n)"  // anchored at a linebreak (or start of string)
+        "("
+           "[^\\n]*" + name + "[^\\n]*(?=\\n?)" // a line that contains the name
+           "(?:\\n[ \\t].*?(?=\\n|$))*"         // followed by any number of lines that are indented
+        ")",
+        std::regex::icase
+    };
 
-	std::vector<std::string> ret;
-	std::for_each(std::sregex_iterator(source.begin(), source.end(), re_section_pattern),
-		      std::sregex_iterator(),
-		      [&](std::smatch const& match)
-	{
-		ret.push_back(trim(match[1].str()));
-	});
+    std::vector<std::string> ret;
+    std::for_each(std::sregex_iterator(source.begin(), source.end(), re_section_pattern),
+        std::sregex_iterator(),
+        [&](std::smatch const& match)
+    {
+        ret.push_back(trim(match[1].str()));
+    });
 
-	return ret;
+    return ret;
+#else
+    //Parse the sections in a more old-fashioned way in order to avoid stack overflows in Microsoft's regex implementation
+    std::regex const re_section_start_pattern{ "(?:^|\\n)[^\\n]*" + name, std::regex::icase};
+    std::sregex_iterator const re_end;
+
+    std::vector<std::string> ret;
+    auto const source_end = source.end();
+    std::sregex_iterator section_head(source.begin(), source_end, re_section_start_pattern);
+    for (; section_head != re_end; ++section_head)
+    {
+        //We found a section header
+        auto section_start = source.begin() + section_head->position();
+        if (*section_start == '\n') ++section_start; //If it is positioned on a newline, move ahead one char
+
+        //Add the complete header line to the section
+        auto section_end = std::find(section_start, source_end, '\n');
+        if (section_end != source_end) ++section_end; //skip '\n'
+
+        while (section_end != source_end)
+        { //Add subsequent lines to the section if they're indented
+            if (*section_end != '\t' && *section_end != ' ') break; //Unindented lines end the section
+            section_end = std::find(section_end, source_end, '\n');
+            if (section_end != source_end) ++section_end; //skip '\n'
+        }
+        ret.push_back(trim({section_start,section_end}));
+    }
+    return ret;
+#endif
 }
 
 static bool is_argument_spec(std::string const& token) {
@@ -524,26 +553,61 @@ static PatternList parse_argv(Tokens tokens, std::vector<Option>& options, bool 
 	return ret;
 }
 
-std::vector<Option> parse_defaults(std::string const& doc) {
-	// This pattern is a delimiter by which we split the options.
-	// The delimiter is a new line followed by a whitespace(s) followed by one or two hyphens.
-	static std::regex const re_delimiter{
-		"(?:^|\\n)[ \\t]*"  // a new line with leading whitespace
-		"(?=-{1,2})"        // [split happens here] (positive lookahead) ... and followed by one or two hyphes
-	};
+static std::vector<Option> parse_defaults(std::string const& doc) {
+#ifndef _MSC_VER
+    // This pattern is a bit more complex than the python docopt one due to lack of
+    // re.split. Effectively, it grabs any line with leading whitespace and then a
+    // hyphen; it stops grabbing when it hits another line that also looks like that.
+    static std::regex const pattern {
+        "(?:^|\\n)[ \\t]*"  // a new line with leading whitespace
+        "(-(.|\\n)*?)"      // a hyphen, and then grab everything it can...
+        "(?=\\n[ \\t]*-|$)" //  .. until it hits another new line with space and a hyphen
+    };
 
-	std::vector<Option> defaults;
-	for (auto s : parse_section("options:", doc)) {
-		s.erase(s.begin(), s.begin() + static_cast<std::ptrdiff_t>(s.find(':')) + 1); // get rid of "options:"
+    std::vector<Option> defaults;
 
-		for (const auto& opt : regex_split(s, re_delimiter)) {
-			if (starts_with(opt, "-")) {
-				defaults.emplace_back(Option::parse(opt));
-			}
-		}
-	}
+    for(auto s : parse_section("options:", doc)) {
+        s.erase(s.begin(), s.begin()+static_cast<std::ptrdiff_t>(s.find(':'))+1); // get rid of "options:"
 
-	return defaults;
+        std::for_each(std::sregex_iterator{ s.begin(), s.end(), pattern },
+                  std::sregex_iterator{},
+                  [&](std::smatch const& m)
+        {
+            std::string opt = m[1].str();
+
+            if (starts_with(opt, "-")) {
+                defaults.emplace_back(Option::parse(opt));
+            }
+        });
+    }
+
+    return defaults;
+#else
+    static std::regex const pattern {"(?:^|\\n)[\\t ]*-"};
+    std::vector<Option> defaults;
+
+    for (auto s : parse_section("options:", doc)) 
+    {
+        s.erase(s.begin(), s.begin() + static_cast<std::ptrdiff_t>(s.find(':')) + 1); // get rid of "options:"
+
+        std::sregex_iterator option_line(s.begin(), s.end(), pattern);
+        std::sregex_iterator re_end;
+        if (option_line == re_end) continue;
+
+        auto option_begin = std::find(s.begin() + option_line->position(), s.end(), '-');
+        ++option_line;
+
+        auto option_end = s.end();
+        for (; option_line != re_end; ++option_line)
+        {
+            option_end = s.begin() + option_line->position();
+            defaults.emplace_back(Option::parse({option_begin,option_end}));
+            option_begin = std::find(option_end, s.end(), '-');
+        }
+        defaults.emplace_back(Option::parse({option_begin,s.end()}));
+    }
+    return defaults;
+#endif
 }
 
 static bool isOptionSet(PatternList const& options, std::string const& opt1, std::string const& opt2 = "") {
