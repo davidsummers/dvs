@@ -124,7 +124,7 @@ DVS::ParseResult DVS::ParseArgs( int argc_, char **argv_ )
   DocOptArgs args = docopt::docopt( s_USAGE,
                                     { argv_ + 1, argv_ + argc_ },
                                     true,                                      // Show help if requested.
-                                    std::string( "Version 0.0.1-" ) + GIT_HASH // Version string.
+                                    std::string( "Version 0.1.0-" ) + GIT_HASH // Version string.
   );
 
   ParseResult result;
