@@ -29,5 +29,7 @@ Error DiffCommand::Diff( DVS &dvs_ )
 {
   Error err;
 
+  err = "DIFF COMMAND NOT IMPLEMENTED YET.";
+
   return err;
 }
