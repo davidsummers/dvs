@@ -79,7 +79,7 @@ Error Diff::ListChangedFiles( DVS &dvs_,
 
       if ( entry.type == RecordType::blob )
       {
-        std::string diffFilename = std::string( dirPath_.empty( ) ? "./" : dirPath_ + "/" ) + path_;
+        std::string diffFilename = std::string( dirPath_.empty( ) ? "" : dirPath_ + "/" ) + path_;
         std::cout << "    modified: " << diffFilename << std::endl;
       }
       else if ( entry.type == RecordType::tree )
@@ -107,7 +107,7 @@ Error Diff::ListChangedFiles( DVS &dvs_,
           }
         }
 
-        err = ListChangedFiles( dvs_, tree1, tree2, dirPath_ + "/" + entry.filename );
+        err = ListChangedFiles( dvs_, tree1, tree2, entry.filename );
       }
     }
   } );
