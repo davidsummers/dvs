@@ -14,7 +14,7 @@ class StatusCommand : public BaseCommand
 
   Error operator( )( DVS & ) override;
 
-  Error Status( DVS & );
+  Error Status( DVS &, const std::string &path = "" );
 
   protected:
   private:

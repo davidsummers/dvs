@@ -75,15 +75,14 @@ Error Diff::ListChangedFiles( DVS &dvs_,
   {
     if ( fromEntry_.oid != toEntry_.oid )
     {
-      RecordType  type     = fromEntry_.type == RecordType::none ? toEntry_.type : fromEntry_.type;
-      std::string filename = fromEntry_.filename.empty( ) ? toEntry_.filename : fromEntry_.filename;
+      TreeRecord::DirEntry entry = fromEntry_.type == RecordType::none ? toEntry_ : fromEntry_;
 
-      if ( type == RecordType::blob )
+      if ( entry.type == RecordType::blob )
       {
-        std::string diffFilename = std::string( dirPath_.empty( ) ? "/" : dirPath_ + "/" ) + path_ + filename;
-        std::cout << diffFilename << std::endl;
+        std::string diffFilename = std::string( dirPath_.empty( ) ? "./" : dirPath_ + "/" ) + path_;
+        std::cout << "    modified: " << diffFilename << std::endl;
       }
-      else if ( type == RecordType::tree )
+      else if ( entry.type == RecordType::tree )
       {
         TreeRecord tree1;
         TreeRecord tree2;
@@ -108,7 +107,7 @@ Error Diff::ListChangedFiles( DVS &dvs_,
           }
         }
 
-        err = DiffTrees( dvs_, tree1, tree2, dirPath_ + "/" + fromEntry_.filename );
+        err = ListChangedFiles( dvs_, tree1, tree2, dirPath_ + "/" + entry.filename );
       }
     }
   } );
