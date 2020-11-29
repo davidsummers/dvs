@@ -73,45 +73,45 @@ Error Diff::ListChangedFiles( DVS &dvs_,
                 to_,
                 [ &err, &dirPath_, &dvs_ ] ( const std::string &path_, const TreeRecord::DirEntry &fromEntry_, const TreeRecord::DirEntry &toEntry_ )
   {
-      if ( fromEntry_.oid != toEntry_.oid )
+    if ( fromEntry_.oid != toEntry_.oid )
+    {
+      RecordType  type     = fromEntry_.type == RecordType::none ? toEntry_.type : fromEntry_.type;
+      std::string filename = fromEntry_.filename.empty( ) ? toEntry_.filename : fromEntry_.filename;
+
+      if ( type == RecordType::blob )
       {
-        RecordType  type     = fromEntry_.type == RecordType::none ? toEntry_.type : fromEntry_.type;
-        std::string filename = fromEntry_.filename.empty( ) ? toEntry_.filename : fromEntry_.filename;
-
-        if ( type == RecordType::blob )
-        {
-          std::string diffFilename = std::string( dirPath_.empty( ) ? "/" : dirPath_ + "/" ) + path_ + filename;
-          std::cout << diffFilename << std::endl;
-        }
-        else if ( type == RecordType::tree )
-        {
-          TreeRecord tree1;
-          TreeRecord tree2;
-
-          if ( !fromEntry_.oid.empty( ) )
-          {
-            err = tree1.Read( dvs_, fromEntry_.oid );
-
-            if ( !err.empty( ) )
-            {
-              return;
-            }
-          }
-
-          if ( !toEntry_.oid.empty( ) )
-          {
-            err = tree2.Read( dvs_, toEntry_.oid );
-
-            if ( !err.empty( ) )
-            {
-              return;
-            }
-          }
-
-          err = DiffTrees( dvs_, tree1, tree2, dirPath_ + "/" + fromEntry_.filename );
-        }
+        std::string diffFilename = std::string( dirPath_.empty( ) ? "/" : dirPath_ + "/" ) + path_ + filename;
+        std::cout << diffFilename << std::endl;
       }
-    } );
+      else if ( type == RecordType::tree )
+      {
+        TreeRecord tree1;
+        TreeRecord tree2;
+
+        if ( !fromEntry_.oid.empty( ) )
+        {
+          err = tree1.Read( dvs_, fromEntry_.oid );
+
+          if ( !err.empty( ) )
+          {
+            return;
+          }
+        }
+
+        if ( !toEntry_.oid.empty( ) )
+        {
+          err = tree2.Read( dvs_, toEntry_.oid );
+
+          if ( !err.empty( ) )
+          {
+            return;
+          }
+        }
+
+        err = DiffTrees( dvs_, tree1, tree2, dirPath_ + "/" + fromEntry_.filename );
+      }
+    }
+  } );
 
   return err;
 }
