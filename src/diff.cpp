@@ -23,13 +23,13 @@ Error Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_
   //clang-format on
     if ( fromEntry_.oid != toEntry_.oid )
     {
-      RecordType type = fromEntry_.type == RecordType::none ? toEntry_.type : fromEntry_.type;
+      TreeRecord::DirEntry entry = fromEntry_.type == RecordType::none ? toEntry_ : fromEntry_;
 
-      if ( type == RecordType::blob )
+      if ( entry.type == RecordType::blob )
       {
         DiffBlob( dvs_, std::cout, fromEntry_.oid, toEntry_.oid, dirPath_, path_ );
       }
-      else if ( type == RecordType::tree )
+      else if ( entry.type == RecordType::tree )
       {
         TreeRecord tree1;
         TreeRecord tree2;
@@ -54,7 +54,7 @@ Error Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_
           }
         }
 
-        err = DiffTrees( dvs_, tree1, tree2, dirPath_ + "/" + fromEntry_.filename );
+        err = DiffTrees( dvs_, tree1, tree2, dirPath_ + "/" + entry.filename );
       }
     }
   } );
