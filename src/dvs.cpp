@@ -108,6 +108,7 @@ SpecialNameMap s_SpecialNameMap
   { SpecialName::DVS,             ".dvs"          },
   { SpecialName::BRANCHES_LOCAL,  "refs/locals/"  },
   { SpecialName::BRANCHES_REMOTE, "refs/remotes/" },
+  { SpecialName::INDEX,           "index"         },
   { SpecialName::HEAD,            "HEAD"          },
   { SpecialName::TAGS,            "refs/tags/"    },
 };

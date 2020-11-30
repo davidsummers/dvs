@@ -15,6 +15,7 @@ enum class SpecialName
   DVS,
   BRANCHES_LOCAL,
   BRANCHES_REMOTE,
+  INDEX,
   HEAD,
   TAGS,
 };
