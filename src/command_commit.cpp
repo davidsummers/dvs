@@ -13,10 +13,10 @@ Error CommitCommand::ParseArgs( DocOptArgs &args_ )
 
   bool msgFlag = false;
 
-  if ( docopt::value path = args_[ "<path>" ];
-       path && path.isString( ) && !path.asString( ).empty( ) )
+  if ( docopt::value pathList = args_[ "<path>" ];
+       pathList && pathList.isStringList( ) && !pathList.asStringList( ).empty( ) )
   {
-    m_Path = path.asString( );
+    m_PathList = pathList.asStringList( );
   }
 
   if ( docopt::value msgOption = args_[ "-m" ]; msgOption && msgOption.isBool( ) && msgOption.asBool( ) )
@@ -57,14 +57,14 @@ Error CommitCommand::operator( )( DVS &dvs_ )
     return validateError;
   }
 
-  OidResult result = Commit( dvs_, m_Msg );
+  OidResult result = Commit( dvs_, m_Msg, m_PathList );
 
   std::cout << "Commit Oid: " << result.oid << std::endl;
 
   return result.err;
 }
 
-OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const std::string &path_ )
+OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const std::vector< std::string > &pathList_ )
 {
   OidResult    result;
   CommitRecord commitRecord;
@@ -73,7 +73,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const s
 
   WriteTreeCommand writeTreeCommand;
 
-  std::string path = path_.empty( ) ? dvs_.GetTopLevelDirectory( ).string( ) : path_;
+  std::string path = pathList_.empty( ) ? dvs_.GetTopLevelDirectory( ).string( ) : pathList_[ 0 ]; // FIXME. Just one value for now.
 
   OidResult writeTreeResult = writeTreeCommand.WriteTree( dvs_, path );
 
