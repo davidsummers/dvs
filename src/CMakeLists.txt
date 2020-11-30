@@ -25,6 +25,7 @@ set( SOURCE_FILES
      command_unimplemented.cpp
      diff.cpp
      dvs.cpp
+     index.cpp
      record_commit.cpp
      record_tree.cpp
    )
@@ -51,6 +52,7 @@ set( HEADER_FILES
      common.h
      diff.h
      dvs.h
+     index.h
      record_commit.h
      record_tree.h
    )
