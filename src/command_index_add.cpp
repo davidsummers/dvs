@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include "command_index_add.h"
-#include "command_hash.h"
 #include "dvs.h"
 #include "index.h"
 
@@ -55,28 +54,17 @@ Error IndexAddCommand::IndexAdd( DVS &dvs_, const std::string &pathName_ )
     return err;
   }
 
-  std::string pathName = pathName_;
-
-  for ( size_t pos = pathName.find( '\\' ); pos != std::string::npos; pos = pathName.find( '\\' ) )
-  {
-    pathName[ pos ] = '/';
-  }
-
-  HashCommand hashCommand;
-
-  auto [ err, hash ] = hashCommand.Hash( dvs_, pathName, RecordType::blob );
+  Error err = index.AddEntry( dvs_, pathName_ );
 
   if ( !err.empty( ) )
   {
     return err;
   }
 
-  index.AddEntry( pathName, hash );
-
   if ( err = index.Write( dvs_ ); !err.empty( ) )
   {
     return err;
   }
 
-  return err;
+  return "";
 }

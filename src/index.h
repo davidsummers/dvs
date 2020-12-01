@@ -17,7 +17,7 @@ class Index
     Oid oid;
   };
 
-  void AddEntry( const std::string &filename, const Oid & );
+  Error AddEntry( DVS &, const std::string &filename );
 
   void ForAllEntries( std::function< void ( const IndexEntry & ) > );
 

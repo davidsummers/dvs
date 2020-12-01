@@ -2,13 +2,45 @@
 
 #include "dvs.h"
 #include "index.h"
+#include "command_hash.h"
 
-void Index::AddEntry( const std::string &filename_, const Oid &oid_ )
+Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
 {
+  std::string pathName = pathName_;
+
+  for ( size_t pos = pathName.find( '\\' ); pos != std::string::npos; pos = pathName.find( '\\' ) )
+  {
+    pathName[ pos ] = '/';
+  }
+
+  if ( std::filesystem::is_directory( pathName ) )
+  {
+    for ( const auto &entry : std::filesystem::directory_iterator( pathName ) )
+    {
+      if ( Error err = AddEntry( dvs_, entry.path( ).string( ) ); !err.empty( ) )
+      {
+        return err;
+      }
+    }
+
+    return "";
+  }
+
+  HashCommand hashCommand;
+
+  auto [ err, oid ] = hashCommand.Hash( dvs_, pathName, RecordType::blob );
+
+  if ( !err.empty( ) )
+  {
+    return err;
+  }
+
   IndexEntry entry;
-  entry.filename = filename_;
-  entry.oid = oid_;
-  m_IndexMap[ filename_ ] = entry;
+  entry.filename = pathName;
+  entry.oid = oid;
+  m_IndexMap[ pathName ] = entry;
+
+  return "";
 }
 
 void Index::ForAllEntries( std::function< void ( const IndexEntry & ) > func_ )
