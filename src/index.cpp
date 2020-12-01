@@ -51,8 +51,8 @@ Error Index::Read( DVS &dvs_ )
     }
 
     IndexEntry entry;
-    entry.filename = line.substr( 0, pos );
-    entry.oid      = line.substr( pos + 1 );
+    entry.oid      = line.substr( 0, pos );
+    entry.filename = line.substr( pos + 1 );
 
     m_IndexMap[ entry.filename ] = entry; 
   }
@@ -66,7 +66,7 @@ Error Index::Write( DVS &dvs_ )
 
   ForAllEntries( [ &output ] ( const IndexEntry &entry_ )
   {
-    output << entry_.filename << " " << entry_.oid << std::endl;
+    output << entry_.oid << " " << entry_.filename << std::endl;
   } );
 
   return "";
