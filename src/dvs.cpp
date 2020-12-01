@@ -19,6 +19,7 @@
 #include "command_commit.h"
 #include "command_diff.h"
 #include "command_hash.h"
+#include "command_index_add.h"
 #include "command_init.h"
 #include "command_log.h"
 #include "command_read_tree.h"
@@ -40,6 +41,7 @@ const char s_USAGE[] =
       dvs commit ( -m | --message ) <message>
       dvs diff [<path>]
       dvs fetch
+      dvs index add <path>
       dvs init [<directory>]
       dvs log [ -p ] [<hash>]
       dvs pull
@@ -82,6 +84,11 @@ DVS::CommandMap s_BranchCommandMap
   { "delete", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< DeleteBranchCommand >( ); } },
   { "list",   [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< ListBranchCommand >( );   } },
   { "switch", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< SwitchBranchCommand >( ); } },
+};
+
+DVS::CommandMap s_IndexCommandMap
+{
+  { "add", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< IndexAddCommand >( ); } },
 };
 
 DVS::CommandMap s_InternalCommandMap
@@ -156,6 +163,17 @@ DVS::ParseResult DVS::ParseArgs( int argc_, char **argv_ )
   if ( docopt::value branchOption = args[ "branch" ]; branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
   {
     result = ParseArgs( args, s_BranchCommandMap );
+
+    if ( result.executedCommand || !result.errMsg.empty( ) )
+    {
+      return result;
+    }
+  }
+
+  if ( docopt::value indexOption = args[ "index" ];
+       indexOption && indexOption.isBool( ) && indexOption.asBool( ) )
+  {
+    result = ParseArgs( args, s_IndexCommandMap );
 
     if ( result.executedCommand || !result.errMsg.empty( ) )
     {
