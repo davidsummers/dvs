@@ -19,14 +19,14 @@ Error WriteTreeCommand::operator( )( DVS &dvs_ )
     return validateError;
   }
 
-  OidResult result = WriteTree( dvs_ );
+  OidResult result = WriteTreeFromDirectory( dvs_ );
 
   std::cout << "Top Level Directory: " << result.oid << std::endl;
 
   return result.err;
 }
 
-OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
+OidResult WriteTreeCommand::WriteTreeFromDirectory( DVS &dvs_, const std::string &dir_ )
 {
   OidResult result;
 
@@ -55,7 +55,7 @@ OidResult WriteTreeCommand::WriteTree( DVS &dvs_, const std::string &dir_ )
     }
     else if ( entry.is_directory( ) )
     {
-      OidResult writeResult = WriteTree( dvs_, entry.path( ).string( ) );
+      OidResult writeResult = WriteTreeFromDirectory( dvs_, entry.path( ).string( ) );
       if ( !writeResult.err.empty( ) )
       {
         result.err = writeResult.err;

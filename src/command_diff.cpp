@@ -42,7 +42,7 @@ Error DiffCommand::Diff( DVS &dvs_, const std::string &path_ )
   std::string path = path_.empty( ) ? dvs_.GetTopLevelDirectory( ).string( ) : path_;
 
   WriteTreeCommand currentTreeCommand;
-  OidResult currentTreeResult = currentTreeCommand.WriteTree( dvs_, path );
+  OidResult currentTreeResult = currentTreeCommand.WriteTreeFromDirectory( dvs_, path );
 
   if ( !currentTreeResult.err.empty( ) )
   {

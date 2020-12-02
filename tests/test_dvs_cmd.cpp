@@ -232,7 +232,7 @@ static dvs_error_t test_dvs_internal_write_tree( )
     WriteTreeCommand writeTreeCommand;
 
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
-    OidResult result = writeTreeCommand.WriteTree( dvs, "." );
+    OidResult result = writeTreeCommand.WriteTreeFromDirectory( dvs, "." );
     
     if ( !result.err.empty( ) )
     {
@@ -290,7 +290,7 @@ static dvs_error_t test_dvs_internal_read_tree( )
     WriteTreeCommand writeTreeCommand;
 
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
-    OidResult result = writeTreeCommand.WriteTree( dvs, "." );
+    OidResult result = writeTreeCommand.WriteTreeFromDirectory( dvs, "." );
     
     if ( !result.err.empty( ) )
     {
@@ -356,7 +356,7 @@ static dvs_error_t test_dvs_commit( )
     WriteTreeCommand writeTreeCommand;
 
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
-    OidResult result = writeTreeCommand.WriteTree( dvs, "." );
+    OidResult result = writeTreeCommand.WriteTreeFromDirectory( dvs, "." );
     
     if ( !result.err.empty( ) )
     {

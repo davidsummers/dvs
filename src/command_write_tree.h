@@ -15,7 +15,7 @@ class WriteTreeCommand : public BaseCommand
 
   Error operator( )( DVS & ) override;
 
-  OidResult WriteTree( DVS &, const std::string &dir = "." );
+  OidResult WriteTreeFromDirectory( DVS &, const std::string &dir = "." );
 
   protected:
   private:
