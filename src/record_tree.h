@@ -16,20 +16,15 @@ class DVS;
 class TreeRecord
 {
   public:
-  using DirEntry = struct DirEntry
-  {
-    Oid         oid;
-    RecordType  type = RecordType::none;
-    std::string filename;
-  };
 
-  void AddEntry( const std::string filename_, const RecordType &, std::string &hash );
+  DirEntry &AddEntry( const std::string filename_, const RecordType &, const std::string &hash );
 
   Error     Read( DVS &, const Oid & );
   OidResult Write( DVS & );
 
   std::ostream &operator<<( std::ostream & ) const;
 
+  void ForAllEntries( std::function< void( DirEntry & ) > );
   void ForAllEntries( std::function< void( const DirEntry & ) > ) const;
 
   protected:

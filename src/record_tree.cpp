@@ -11,13 +11,15 @@
 #include "command_hash.h"
 #include "record_tree.h"
 
-void TreeRecord::AddEntry( const std::string filename_, const RecordType &type_, std::string &hash_ )
+DirEntry &TreeRecord::AddEntry( const std::string filename_, const RecordType &type_, const std::string &hash_ )
 {
   DirEntry entry;
   entry.filename         = filename_;
   entry.type             = type_;
   entry.oid              = hash_;
   m_DirList[ filename_ ] = entry;
+
+  return m_DirList[ filename_ ];
 }
 
 std::ostream &TreeRecord::operator<<( std::ostream &s_ ) const
@@ -30,13 +32,28 @@ std::ostream &TreeRecord::operator<<( std::ostream &s_ ) const
   return s_;
 }
 
-void TreeRecord::ForAllEntries( std::function< void( const DirEntry & ) > func_ ) const
+void TreeRecord::ForAllEntries( std::function< void( DirEntry & ) > func_ )
 {
-  for ( const auto &entry : m_DirList )
+  for ( DirList::iterator itr = m_DirList.begin( );
+        itr != m_DirList.end( );
+        ++itr )
   {
-    func_( entry.second );
+    DirEntry &dirEntry = itr->second;
+    func_( dirEntry );
   }
 }
+
+void TreeRecord::ForAllEntries( std::function< void( const DirEntry & ) > func_ ) const
+{
+  for ( DirList::const_iterator itr = m_DirList.begin( );
+        itr != m_DirList.end( );
+        ++itr )
+  {
+    const DirEntry &dirEntry = itr->second;
+    func_( dirEntry );
+  }
+}
+
 
 Error TreeRecord::Read( DVS &dvs_, const Oid &oid_ )
 {

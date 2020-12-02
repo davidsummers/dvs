@@ -29,8 +29,8 @@ class Diff
     const TreeRecord &to,
     std::function<
       void( const std::string &path,
-            const TreeRecord::DirEntry &fromRecord,
-            const TreeRecord::DirEntry &toRecord ) > );
+            const DirEntry &fromRecord,
+            const DirEntry &toRecord ) > );
 
   static void DiffBlob( DVS &,
                         std::ostream &,

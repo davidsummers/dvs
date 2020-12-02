@@ -25,6 +25,7 @@ set( SOURCE_FILES
      command_tag_list.cpp
      command_write_tree.cpp
      command_unimplemented.cpp
+     common.cpp
      diff.cpp
      dvs.cpp
      index.cpp

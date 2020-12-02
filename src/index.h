@@ -11,16 +11,11 @@ class DVS;
 class Index
 {
   public:
-  using IndexEntry = struct IndexEntry
-  {
-    std::string filename;
-    Oid oid;
-  };
 
   Error AddEntry( DVS &, const std::string &filename );
   Error RemoveEntry( DVS &, const std::string &filename );
 
-  void ForAllEntries( std::function< void ( const IndexEntry & ) > );
+  void ForAllEntries( std::function< void ( const DirEntry & ) > );
 
   Error Read( DVS & );
   Error Write( DVS & );
@@ -28,6 +23,6 @@ class Index
   protected:
   private:
 
-  using IndexMap = std::map< std::string, IndexEntry >;
+  using IndexMap = std::map< std::string, DirEntry >;
   IndexMap m_IndexMap;
 };

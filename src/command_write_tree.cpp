@@ -4,6 +4,7 @@
 #include "command_hash.h"
 #include "command_write_tree.h"
 #include "dvs.h"
+#include "index.h"
 #include "record_tree.h"
 
 Error WriteTreeCommand::ParseArgs( DocOptArgs & )
@@ -74,6 +75,95 @@ OidResult WriteTreeCommand::WriteTreeFromDirectory( DVS &dvs_, const std::string
   }
 
   result = treeRecord.Write( dvs_ );
+
+  return result;
+}
+
+
+OidResult WriteTreeCommand::WriteTreeFromIndex( DVS &dvs_, const std::string &dir_ )
+{
+  OidResult result;
+
+  Index index;
+
+  // First, read the index.
+  if ( Error err = index.Read( dvs_ ); !err.empty( ) )
+  {
+    result.err = err;
+    return result;
+  }
+
+  TreeRecord tree;
+
+  index.ForAllEntries( [ &tree ] ( const DirEntry &entry_ )
+  {
+    TreeRecord *currentTree = &tree;
+
+    // Write the file to the database, I think the file is already written so we just have to figure
+    // out which directory it is and write that.
+
+    std::filesystem::path path = entry_.filename;
+
+    for ( std::filesystem::path::iterator itr = path.begin( );
+          itr != path.end( );
+          ++itr )
+    {
+      std::filesystem::path component = *itr;
+      std::filesystem::path::iterator endPath = itr;
+      endPath++;
+      RecordType type = endPath == path.end( ) ? RecordType::blob : RecordType::tree;
+      DirEntry &newEntry = currentTree->AddEntry( component.string( ), type, type == RecordType::tree ? "" : entry_.oid );
+
+      if ( type == RecordType::tree )
+      {
+        newEntry.m_Tree = new TreeRecord;
+        currentTree = newEntry.m_Tree;
+      }
+    }
+
+  } );
+
+  
+  result = ProcessTreeDirectory( dvs_, tree );
+
+  if ( !result.err.empty( ) )
+  {
+    return result;
+  }
+
+  result = tree.Write( dvs_ );
+
+  // We are not changing the index so no need to write it here.
+  
+  return result;
+}
+
+
+void WriteTreeCommand::ForEachDirectoryInPath( const std::string &path_, std::function< void ( const std::string &newPath ) > func_ )
+{
+  std::filesystem::path path = path_;
+
+  for ( const auto &newPath : path )
+  {
+    func_( newPath.string( ) );
+  }
+}
+
+
+OidResult WriteTreeCommand::ProcessTreeDirectory( DVS &dvs_, TreeRecord &tree_ )
+{
+  OidResult result;
+
+  tree_.ForAllEntries( [ &dvs_, &result, this ] ( DirEntry &entry_ )
+  {
+    if ( entry_.type == RecordType::tree )
+    {
+      this->ProcessTreeDirectory( dvs_, *entry_.m_Tree );
+      result = entry_.m_Tree->Write( dvs_ );
+
+      entry_.oid = result.oid;
+    }
+  } );
 
   return result;
 }

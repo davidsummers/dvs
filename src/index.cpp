@@ -36,9 +36,10 @@ Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
     return err;
   }
 
-  IndexEntry entry;
-  entry.filename = pathName;
+  DirEntry entry;
+  entry.type = RecordType::blob;
   entry.oid = oid;
+  entry.filename = pathName;
   m_IndexMap[ pathName ] = entry;
 
   return "";
@@ -68,7 +69,7 @@ Error Index::RemoveEntry( DVS &dvs_, const std::string &pathName_ )
   return "";
 }
 
-void Index::ForAllEntries( std::function< void ( const IndexEntry & ) > func_ )
+void Index::ForAllEntries( std::function< void ( const DirEntry & ) > func_ )
 {
   for ( const auto &entry : m_IndexMap )
   {
@@ -107,10 +108,19 @@ Error Index::Read( DVS &dvs_ )
       break; // Something is wrong, this is not the line you are looking for.
     }
 
-    IndexEntry entry;
-    entry.oid      = line.substr( 0, pos );
-    entry.filename = line.substr( pos + 1 );
+    DirEntry entry;
+    entry.type = HashCommand::LookupType( line.substr( 0, pos ) );
+    entry.oid  = line.substr( pos + 1 );
 
+    pos = entry.oid.find( ' ' );
+
+    if ( pos == std::string::npos )
+    {
+      break; // Something is wrong, this is not the line you are looking for.
+    }
+
+    entry.filename = entry.oid.substr( pos + 1 );
+    entry.oid = entry.oid.substr( 0, pos );
     m_IndexMap[ entry.filename ] = entry; 
   }
   
@@ -121,9 +131,9 @@ Error Index::Write( DVS &dvs_ )
 {
   std::ofstream output( dvs_.GetSpecialPath( SpecialName::INDEX ), std::ios::binary );
 
-  ForAllEntries( [ &output ] ( const IndexEntry &entry_ )
+  ForAllEntries( [ &output ] ( const DirEntry &entry_ )
   {
-    output << entry_.oid << " " << entry_.filename << std::endl;
+    output << HashCommand::LookupType( entry_.type ) << " " << entry_.oid << " " << entry_.filename << std::endl;
   } );
 
   return "";
