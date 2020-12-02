@@ -18,6 +18,7 @@ class Index
   };
 
   Error AddEntry( DVS &, const std::string &filename );
+  Error RemoveEntry( DVS &, const std::string &filename );
 
   void ForAllEntries( std::function< void ( const IndexEntry & ) > );
 

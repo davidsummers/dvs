@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 
 #include "dvs.h"
 #include "index.h"
@@ -40,6 +41,30 @@ Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
   entry.oid = oid;
   m_IndexMap[ pathName ] = entry;
 
+  return "";
+}
+
+Error Index::RemoveEntry( DVS &dvs_, const std::string &pathName_ )
+{
+  std::string pathName = pathName_;
+
+  for ( size_t pos = pathName.find( '\\' ); pos != std::string::npos; pos = pathName.find( '\\' ) )
+  {
+    pathName[ pos ] = '/';
+  }
+
+  IndexMap::iterator itr = m_IndexMap.find( pathName );
+
+  if ( itr != m_IndexMap.end( ) )
+  {
+    m_IndexMap.erase( itr );
+  }
+  else
+  {
+    std::stringstream ss;
+    ss << "File '" << pathName << "' not found in index." << std::endl;
+  }
+  
   return "";
 }
 

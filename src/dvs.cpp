@@ -20,6 +20,7 @@
 #include "command_diff.h"
 #include "command_hash.h"
 #include "command_index_add.h"
+#include "command_index_remove.h"
 #include "command_init.h"
 #include "command_log.h"
 #include "command_read_tree.h"
@@ -42,6 +43,7 @@ const char s_USAGE[] =
       dvs diff [<path>]
       dvs fetch
       dvs index add <path>
+      dvs index remove <path>
       dvs init [<directory>]
       dvs log [ -p ] [<hash>]
       dvs pull
@@ -88,7 +90,8 @@ DVS::CommandMap s_BranchCommandMap
 
 DVS::CommandMap s_IndexCommandMap
 {
-  { "add", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< IndexAddCommand >( ); } },
+  { "add",    [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< IndexAddCommand >( );    } },
+  { "remove", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< IndexRemoveCommand >( ); } },
 };
 
 DVS::CommandMap s_InternalCommandMap
