@@ -13,6 +13,7 @@ class Index
   public:
 
   Error AddEntry( DVS &, const std::string &filename );
+  void AddEntry( DVS &, const DirEntry & );
   Error RemoveEntry( DVS &, const std::string &filename );
 
   void ForAllEntries( std::function< void ( const DirEntry & ) > );

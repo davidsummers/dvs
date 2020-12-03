@@ -45,6 +45,11 @@ Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
   return "";
 }
 
+void Index::AddEntry( DVS &dvs_, const DirEntry &entry_ )
+{
+  m_IndexMap[ entry_.filename ] = entry_;
+}
+
 Error Index::RemoveEntry( DVS &dvs_, const std::string &pathName_ )
 {
   std::string pathName = pathName_;
