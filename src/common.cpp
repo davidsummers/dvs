@@ -1,4 +1,5 @@
 #include "common.h"
+#include "record_tree.h"
 
 DirEntry::~DirEntry( )
 {
