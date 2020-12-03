@@ -7,6 +7,8 @@
 #include "command_read_tree.h"
 #include "command_branch_switch.h"
 #include "dvs.h"
+#include "index.h"
+#include "record_commit.h"
 
 Error SwitchBranchCommand::ParseArgs( DocOptArgs &args_ )
 {
@@ -57,89 +59,40 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
 
   refValue.value = dvs_.GetOid( refValue.value );
 
-  CatCommand        catCommand;
-  std::stringstream commitSs;
+  CommitRecord commit;
 
-  CatCommand::CatResult catResult = catCommand.GetHash( dvs_, refValue.value, &commitSs, RecordType::commit );
-
-  if ( !catResult.err.empty( ) )
+  if ( err = commit.Read( dvs_, refValue.value );
+       !err.empty( ) )
   {
-    err = catResult.err;
     return err;
   }
 
-  if ( catResult.type != "commit" )
-  {
-    std::stringstream ss;
-    ss << "Dvs log command expected 'commit' type for Hash ID '" << refValue.value << "'" << std::endl;
-    return ss.str( );
-  }
+  // Remove the existing index file since we are about to replace it.
+  std::filesystem::remove( dvs_.GetSpecialPath( SpecialName::INDEX ) );
 
-  std::string treeHash;
-  std::string parentHash;
-  std::string msg;
+  Index index;
 
-  std::string type;
-  std::string hash;
-
-  // Get the tree hash and the parent hash (if any).
-  while ( true )
-  {
-    std::string line;
-
-    std::getline( commitSs, line );
-
-    size_t pos = line.find( ' ' );
-    if ( pos == std::string::npos )
-    {
-      break;
-    }
-
-    type = line.substr( 0, pos );
-    hash = line.substr( pos + 1 );
-
-    if ( type.empty( ) && hash.empty( ) )
-    {
-      break;
-    }
-
-    if ( type == "tree" )
-    {
-      treeHash = hash;
-    }
-    else if ( type == "parent" )
-    {
-      parentHash = hash;
-    }
-    else
-    {
-      std::stringstream ss;
-      ss << "Log command: Unknown type '" << type << "'." << std::endl;
-      return ss.str( );
-    }
-  }
-
-  while ( true )
-  {
-    std::string input;
-    std::getline( commitSs, input );
-
-    if ( input.empty( ) )
-    {
-      break;
-    }
-
-    msg += input;
-  }
-
-  // Now read the resulting tree
+  // Now read the resulting tree.
   ReadTreeCommand readTreeCommand;
-  OidResult       readTreeResult = readTreeCommand.ReadTreeToDirectory( dvs_, treeHash );
+  OidResult       readTreeResult = readTreeCommand.ReadTreeToIndex( dvs_, index, commit.GetTreeOid( ) );
 
   if ( !readTreeResult.err.empty( ) )
   {
     err = readTreeResult.err;
     return err;
+  }
+
+  if ( err = index.Write( dvs_ );
+       !err.empty( ) )
+  {
+    return err;
+  }
+
+  readTreeResult = readTreeCommand.ReadTreeToDirectory( dvs_, commit.GetTreeOid( ) );
+
+  if ( !readTreeResult.err.empty( ) )
+  {
+    return readTreeResult.err;
   }
 
   if ( IsBranch( dvs_, branchName_ ) )
