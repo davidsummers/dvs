@@ -6,6 +6,8 @@
 #include "command_cat.h"
 #include "command_read_tree.h"
 #include "dvs.h"
+#include "index.h"
+#include "record_tree.h"
 
 Error ReadTreeCommand::ParseArgs( DocOptArgs &args_ )
 {
@@ -94,6 +96,40 @@ OidResult ReadTreeCommand::ReadTreeToDirectory( DVS &dvs_, const std::string &ha
   }
 
   OidResult result;
+  return result;
+}
+
+
+OidResult ReadTreeCommand::ReadTreeToIndex( DVS &dvs_, Index &index_, const std::string &hashId_, const std::string &pathPrefix_ )
+{
+  OidResult result;
+
+  std::string hashId = hashId_;
+  hashId             = dvs_.GetOid( hashId );
+
+  TreeRecord tree;
+
+  result.err = tree.Read( dvs_, hashId ); 
+
+  if ( !result.err.empty( ) )
+  {
+    return result;
+  }
+
+  tree.ForAllEntries( [ &dvs_, &index_, &pathPrefix_, &result, this ] ( const DirEntry &entry_ )
+  {
+    if ( entry_.type == RecordType::blob )
+    {
+      DirEntry newEntry = entry_;
+      newEntry.filename = pathPrefix_ + entry_.filename;
+      index_.AddEntry( dvs_, newEntry );
+    }
+    else if ( entry_.type == RecordType::tree )
+    {
+      result = ReadTreeToIndex( dvs_, index_, entry_.oid, entry_.filename + "/" );
+    }
+  } );
+
   return result;
 }
 
