@@ -80,7 +80,7 @@ OidResult ReadTreeCommand::ReadTreeToDirectory( DVS &dvs_, const std::string &ha
       std::filesystem::path curPath = std::filesystem::current_path( );
       std::filesystem::create_directory( filename );
       std::filesystem::current_path( filename );
-      ReadTree( dvs_, hash );
+      ReadTreeToDirectory( dvs_, hash );
       std::filesystem::current_path( curPath );
     }
     else

@@ -305,7 +305,7 @@ static dvs_error_t test_dvs_internal_read_tree( )
     }
 
     ReadTreeCommand readTreeCommand;
-    OidResult readResult = readTreeCommand.ReadTree( dvs, expectedDirOid );
+    OidResult readResult = readTreeCommand.ReadTreeToDirectory( dvs, expectedDirOid );
 
     if ( !readResult.err.empty( ) )
     {
