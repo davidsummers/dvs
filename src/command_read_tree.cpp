@@ -31,12 +31,12 @@ Error ReadTreeCommand::operator( )( DVS &dvs_ )
     return validateError;
   }
 
-  OidResult result = ReadTree( dvs_, m_HashId );
+  OidResult result = ReadTreeToDirectory( dvs_, m_HashId );
 
   return result.err;
 }
 
-OidResult ReadTreeCommand::ReadTree( DVS &dvs_, const std::string &hashId_ )
+OidResult ReadTreeCommand::ReadTreeToDirectory( DVS &dvs_, const std::string &hashId_ )
 {
   EmptyCurrentDirectory( dvs_ );
 

@@ -134,7 +134,7 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
 
   // Now read the resulting tree
   ReadTreeCommand readTreeCommand;
-  OidResult       readTreeResult = readTreeCommand.ReadTree( dvs_, treeHash );
+  OidResult       readTreeResult = readTreeCommand.ReadTreeToDirectory( dvs_, treeHash );
 
   if ( !readTreeResult.err.empty( ) )
   {
