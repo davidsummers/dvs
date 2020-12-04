@@ -158,7 +158,7 @@ OidResult WriteTreeCommand::ProcessTreeDirectory( DVS &dvs_, TreeRecord &tree_ )
   {
     if ( entry_.type == RecordType::tree )
     {
-      this->ProcessTreeDirectory( dvs_, *entry_.m_Tree );
+      ProcessTreeDirectory( dvs_, *entry_.m_Tree );
       result = entry_.m_Tree->Write( dvs_ );
 
       entry_.oid = result.oid;
