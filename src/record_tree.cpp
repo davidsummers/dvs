@@ -81,14 +81,10 @@ OidResult TreeRecord::Write( DVS &dvs_ )
 
   std::stringstream ss;
 
+  // Write out this tree to the stream.
   ss << *this;
 
-  auto [ hashErr, oid ] = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::tree );
-
-  // std::cout << "Directory End: " << oid << std::endl;
-
-  result.err = hashErr;
-  result.oid = oid;
+  result = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::tree );
 
   return result;
 }
