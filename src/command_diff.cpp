@@ -41,6 +41,13 @@ Error DiffCommand::Diff( DVS &dvs_, const std::string &path_ )
 
   std::string path = path_.empty( ) ? dvs_.GetTopLevelDirectory( ).string( ) : path_;
 
+  if ( !std::filesystem::is_directory( path ) )
+  {
+    std::stringstream ss;
+    ss << "DIFF for file: Not Yet Implemented." << std::endl;
+    return ss.str( );
+  }
+
   WriteTreeCommand currentTreeCommand;
   OidResult currentTreeResult = currentTreeCommand.WriteTreeFromDirectory( dvs_, path );
 
