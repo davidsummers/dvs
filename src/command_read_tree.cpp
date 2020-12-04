@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "command_cat.h"
+#include "command_hash.h"
 #include "command_read_tree.h"
 #include "dvs.h"
 #include "index.h"
@@ -45,57 +46,42 @@ OidResult ReadTreeCommand::ReadTreeToDirectory( DVS &dvs_, const std::string &ha
   std::string hashId = hashId_;
   hashId             = dvs_.GetOid( hashId );
 
-  std::stringstream dirSs;
-  {
-    CatCommand::CatResult catResult;
-    CatCommand            catCommand;
-    catResult = catCommand.GetHash( dvs_, hashId, &dirSs, RecordType::tree );
+  OidResult result;
 
-    if ( !catResult.err.empty( ) )
-    {
-      OidResult result;
-      result.err = catResult.err;
-      return result;
-    }
+  TreeRecord tree;
+
+  result.err = tree.Read( dvs_, hashId );
+
+  if ( !result.err.empty( ) )
+  {
+    return result;
   }
 
-  while ( dirSs )
+  tree.ForAllEntries( [ &dvs_, &result, this ] ( const DirEntry &entry_ )
   {
-    std::string type;
-    std::string hash;
-    std::string filename;
-    dirSs >> type >> hash >> filename;
-
-    if ( type.empty( ) && hash.empty( ) && filename.empty( ) )
+    if ( entry_.type == RecordType::blob )
     {
-      break;
-    }
-
-    if ( type == "blob" )
-    {
-      std::ofstream outFile( filename, std::ios_base::binary );
+      std::ofstream outFile( entry_.filename, std::ios_base::binary );
       CatCommand    fileCat;
-      fileCat.GetHash( dvs_, hash, &outFile, RecordType::blob );
+      fileCat.GetHash( dvs_, entry_.oid, &outFile, RecordType::blob );
     }
-    else if ( type == "tree" )
+    else if ( entry_.type == RecordType::tree )
     {
       std::filesystem::path curPath = std::filesystem::current_path( );
-      std::filesystem::create_directory( filename );
-      std::filesystem::current_path( filename );
-      ReadTreeToDirectory( dvs_, hash );
+      std::filesystem::create_directory( entry_.filename );
+      std::filesystem::current_path( entry_.filename );
+      ReadTreeToDirectory( dvs_, entry_.oid );
       std::filesystem::current_path( curPath );
     }
     else
     {
       OidResult         result;
       std::stringstream ss;
-      ss << "Expected type 'blob' or 'tree' but got '" << type << "'." << std::endl;
+      ss << "Expected type 'blob' or 'tree' but got '" << HashCommand::LookupType( entry_.type ) << "'." << std::endl;
       result.err = ss.str( );
-      return result;
     }
-  }
+  } );
 
-  OidResult result;
   return result;
 }
 
