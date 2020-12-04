@@ -25,6 +25,7 @@
 #include "dvs_test.h"
 #include "command_cat.h"
 #include "command_commit.h"
+#include "command_index_add.h"
 #include "command_init.h"
 #include "command_hash.h"
 #include "command_read_tree.h"
@@ -232,7 +233,7 @@ static dvs_error_t test_dvs_internal_write_tree( )
     WriteTreeCommand writeTreeCommand;
 
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
-    OidResult result = writeTreeCommand.WriteTree( dvs, "." );
+    OidResult result = writeTreeCommand.WriteTreeFromDirectory( dvs, "." );
     
     if ( !result.err.empty( ) )
     {
@@ -290,7 +291,7 @@ static dvs_error_t test_dvs_internal_read_tree( )
     WriteTreeCommand writeTreeCommand;
 
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
-    OidResult result = writeTreeCommand.WriteTree( dvs, "." );
+    OidResult result = writeTreeCommand.WriteTreeFromDirectory( dvs, "." );
     
     if ( !result.err.empty( ) )
     {
@@ -305,7 +306,7 @@ static dvs_error_t test_dvs_internal_read_tree( )
     }
 
     ReadTreeCommand readTreeCommand;
-    OidResult readResult = readTreeCommand.ReadTree( dvs, expectedDirOid );
+    OidResult readResult = readTreeCommand.ReadTreeToDirectory( dvs, expectedDirOid );
 
     if ( !readResult.err.empty( ) )
     {
@@ -353,10 +354,28 @@ static dvs_error_t test_dvs_commit( )
       readmeFile2 << EXPECTED_TEXT_2;
     }
 
+    IndexAddCommand indexAddCommand;
+
+    if ( Error err = indexAddCommand.IndexAdd( dvs, EXPECTED_FILE_NAME );
+         !err.empty( ) )
+    {
+      std::stringstream ss;
+      ss << err << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
+    if ( Error err = indexAddCommand.IndexAdd( dvs, "dir1/" + EXPECTED_FILE_NAME_2 );
+         !err.empty( ) )
+    {
+      std::stringstream ss;
+      ss << err << std::endl;
+      DVS_ERROR( ss.str( ).c_str( ) );
+    }
+
     WriteTreeCommand writeTreeCommand;
 
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
-    OidResult result = writeTreeCommand.WriteTree( dvs, "." );
+    OidResult result = writeTreeCommand.WriteTreeFromIndex( dvs, "." );
     
     if ( !result.err.empty( ) )
     {

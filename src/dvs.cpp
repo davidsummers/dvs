@@ -19,6 +19,8 @@
 #include "command_commit.h"
 #include "command_diff.h"
 #include "command_hash.h"
+#include "command_index_add.h"
+#include "command_index_remove.h"
 #include "command_init.h"
 #include "command_log.h"
 #include "command_read_tree.h"
@@ -40,6 +42,8 @@ const char s_USAGE[] =
       dvs commit [<path>] (-m |--message) <message>
       dvs diff [<path>]
       dvs fetch
+      dvs index add <path>
+      dvs index remove <path>
       dvs init [<directory>]
       dvs log [ -p ] [<hash>]
       dvs pull
@@ -84,6 +88,12 @@ DVS::CommandMap s_BranchCommandMap
   { "switch", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< SwitchBranchCommand >( ); } },
 };
 
+DVS::CommandMap s_IndexCommandMap
+{
+  { "add",    [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< IndexAddCommand >( );    } },
+  { "remove", [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< IndexRemoveCommand >( ); } },
+};
+
 DVS::CommandMap s_InternalCommandMap
 {
   { "cat",        [ ]( ) -> std::unique_ptr< BaseCommand > { return std::make_unique< CatCommand >( ); } },
@@ -108,6 +118,7 @@ SpecialNameMap s_SpecialNameMap
   { SpecialName::DVS,             ".dvs"          },
   { SpecialName::BRANCHES_LOCAL,  "refs/locals/"  },
   { SpecialName::BRANCHES_REMOTE, "refs/remotes/" },
+  { SpecialName::INDEX,           "index"         },
   { SpecialName::HEAD,            "HEAD"          },
   { SpecialName::TAGS,            "refs/tags/"    },
 };
@@ -155,6 +166,17 @@ DVS::ParseResult DVS::ParseArgs( int argc_, char **argv_ )
   if ( docopt::value branchOption = args[ "branch" ]; branchOption && branchOption.isBool( ) && branchOption.asBool( ) )
   {
     result = ParseArgs( args, s_BranchCommandMap );
+
+    if ( result.executedCommand || !result.errMsg.empty( ) )
+    {
+      return result;
+    }
+  }
+
+  if ( docopt::value indexOption = args[ "index" ];
+       indexOption && indexOption.isBool( ) && indexOption.asBool( ) )
+  {
+    result = ParseArgs( args, s_IndexCommandMap );
 
     if ( result.executedCommand || !result.errMsg.empty( ) )
     {

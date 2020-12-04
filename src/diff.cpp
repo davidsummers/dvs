@@ -17,13 +17,13 @@ Error Diff::DiffTrees( DVS &dvs_, const TreeRecord &from_, const TreeRecord &to_
   CompareTrees( from_,
                 to_,
                 [ &err, &dirPath_, &dvs_ ] ( const std::string &path_,
-                                             const TreeRecord::DirEntry &fromEntry_,
-                                             const TreeRecord::DirEntry &toEntry_ )
+                                             const DirEntry &fromEntry_,
+                                             const DirEntry &toEntry_ )
   {
   //clang-format on
     if ( fromEntry_.oid != toEntry_.oid )
     {
-      TreeRecord::DirEntry entry = fromEntry_.type == RecordType::none ? toEntry_ : fromEntry_;
+      DirEntry entry = fromEntry_.type == RecordType::none ? toEntry_ : fromEntry_;
 
       if ( entry.type == RecordType::blob )
       {
@@ -71,11 +71,11 @@ Error Diff::ListChangedFiles( DVS &dvs_,
 
   CompareTrees( from_,
                 to_,
-                [ &err, &dirPath_, &dvs_ ] ( const std::string &path_, const TreeRecord::DirEntry &fromEntry_, const TreeRecord::DirEntry &toEntry_ )
+                [ &err, &dirPath_, &dvs_ ] ( const std::string &path_, const DirEntry &fromEntry_, const DirEntry &toEntry_ )
   {
     if ( fromEntry_.oid != toEntry_.oid )
     {
-      TreeRecord::DirEntry entry = fromEntry_.type == RecordType::none ? toEntry_ : fromEntry_;
+      DirEntry entry = fromEntry_.type == RecordType::none ? toEntry_ : fromEntry_;
 
       if ( entry.type == RecordType::blob )
       {
@@ -115,24 +115,24 @@ Error Diff::ListChangedFiles( DVS &dvs_,
   return err;
 }
 
-void Diff::CompareTrees( const TreeRecord &                                             fromTree_,
-                         const TreeRecord &                                             toTree_,
-                         std::function< void( const std::string &         path,
-                                              const TreeRecord::DirEntry &fromRecord_,
-                                              const TreeRecord::DirEntry &toRecord_ ) > func_ )
+void Diff::CompareTrees( const TreeRecord &fromTree_,
+                         const TreeRecord &toTree_,
+                         std::function< void( const std::string &path,
+                                              const DirEntry &fromRecord_,
+                                              const DirEntry &toRecord_ ) > func_ )
 {
   using Path          = std::string;
   using TreePathEntry = struct TreePathEntry
   {
-    TreeRecord::DirEntry from;
-    TreeRecord::DirEntry to;
+    DirEntry from;
+    DirEntry to;
   };
 
   using TreePathMap = std::map< Path, TreePathEntry >;
   TreePathMap treePathMap;
 
   fromTree_.ForAllEntries(
-    [ &treePathMap ]( const TreeRecord::DirEntry &entry_ )
+    [ &treePathMap ]( const DirEntry &entry_ )
     {
       TreePathEntry entry;
       entry.from                     = entry_;
@@ -140,7 +140,7 @@ void Diff::CompareTrees( const TreeRecord &                                     
     } );
 
   toTree_.ForAllEntries(
-    [ &treePathMap ]( const TreeRecord::DirEntry &entry_ )
+    [ &treePathMap ]( const DirEntry &entry_ )
     {
       TreePathMap::iterator itr = treePathMap.find( entry_.filename );
 

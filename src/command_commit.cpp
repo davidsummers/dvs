@@ -75,7 +75,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const s
 
   std::string path = pathList_.empty( ) ? dvs_.GetTopLevelDirectory( ).string( ) : pathList_[ 0 ]; // FIXME. Just one value for now.
 
-  OidResult writeTreeResult = writeTreeCommand.WriteTree( dvs_, path );
+  OidResult writeTreeResult = writeTreeCommand.WriteTreeFromIndex( dvs_, path );
 
   if ( !writeTreeResult.err.empty( ) )
   {

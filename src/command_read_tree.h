@@ -8,6 +8,7 @@
 #include "docopt.h"
 
 class DVS;
+class Index;
 
 class ReadTreeCommand : public BaseCommand
 {
@@ -23,9 +24,8 @@ class ReadTreeCommand : public BaseCommand
 
   Error operator( )( DVS & ) override;
 
-  OidResult ReadTree( DVS &, const std::string &hashId );
-
-  GetTreeResult GetTree( const std::filesystem::path, const std::string &hashId );
+  OidResult ReadTreeToDirectory( DVS &, const std::string &hashId );
+  OidResult ReadTreeToIndex( DVS &, Index &, const std::string &hashId, const std::string &pathPrefix = "" );
 
   protected:
   private:
