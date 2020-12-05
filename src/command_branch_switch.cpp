@@ -3,9 +3,9 @@
 #include <sstream>
 #include <string.h>
 
+#include "command_branch_switch.h"
 #include "command_cat.h"
 #include "command_read_tree.h"
-#include "command_branch_switch.h"
 #include "dvs.h"
 #include "index.h"
 #include "record_commit.h"
@@ -61,8 +61,7 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
 
   CommitRecord commit;
 
-  if ( err = commit.Read( dvs_, refValue.value );
-       !err.empty( ) )
+  if ( err = commit.Read( dvs_, refValue.value ); !err.empty( ) )
   {
     return err;
   }
@@ -70,23 +69,25 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
   // Remove the existing index file since we are about to replace it.
   std::filesystem::remove( dvs_.GetSpecialPath( SpecialName::INDEX ) );
 
-  Index index;
+  Index &index = dvs_.GetIndex( );
 
-  // Now read the resulting tree.
   ReadTreeCommand readTreeCommand;
-  OidResult       readTreeResult = readTreeCommand.ReadTreeToIndex( dvs_, index, commit.GetTreeOid( ) );
+  OidResult       readTreeResult;
 
-  if ( !readTreeResult.err.empty( ) )
+  // clang-format off
+  err = index.WithIndex( dvs_, [ &dvs_, &commit, &index, &readTreeCommand, &readTreeResult ] ( ) -> Error
   {
-    err = readTreeResult.err;
-    return err;
-  }
+    // Now read the resulting tree.
+    readTreeResult = readTreeCommand.ReadTreeToIndex( dvs_, index, commit.GetTreeOid( ) );
 
-  if ( err = index.Write( dvs_ );
-       !err.empty( ) )
-  {
-    return err;
-  }
+    if ( !readTreeResult.err.empty( ) )
+    {
+      return readTreeResult.err;
+    }
+
+    return "";
+  } );
+  // clang-format on
 
   readTreeResult = readTreeCommand.ReadTreeToDirectory( dvs_, commit.GetTreeOid( ) );
 

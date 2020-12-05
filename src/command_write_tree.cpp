@@ -12,7 +12,6 @@ Error WriteTreeCommand::ParseArgs( DocOptArgs & )
   return "";
 }
 
-
 Error WriteTreeCommand::operator( )( DVS &dvs_ )
 {
   if ( Error validateError = dvs_.Validate( ); !validateError.empty( ) )
@@ -79,12 +78,11 @@ OidResult WriteTreeCommand::WriteTreeFromDirectory( DVS &dvs_, const std::string
   return result;
 }
 
-
 OidResult WriteTreeCommand::WriteTreeFromIndex( DVS &dvs_, const std::string &dir_ )
 {
   OidResult result;
 
-  Index index;
+  Index &index = dvs_.GetIndex( );
 
   // First, read the index.
   if ( Error err = index.Read( dvs_ ); !err.empty( ) )
@@ -95,6 +93,7 @@ OidResult WriteTreeCommand::WriteTreeFromIndex( DVS &dvs_, const std::string &di
 
   TreeRecord tree;
 
+  // clang-format off
   index.ForAllEntries( [ &tree ] ( const DirEntry &entry_ )
   {
     TreeRecord *currentTree = &tree;
@@ -120,10 +119,9 @@ OidResult WriteTreeCommand::WriteTreeFromIndex( DVS &dvs_, const std::string &di
         currentTree = newEntry.m_Tree;
       }
     }
-
   } );
+  // clang-format on
 
-  
   result = ProcessTreeDirectory( dvs_, tree );
 
   if ( !result.err.empty( ) )
@@ -134,12 +132,12 @@ OidResult WriteTreeCommand::WriteTreeFromIndex( DVS &dvs_, const std::string &di
   result = tree.Write( dvs_ );
 
   // We are not changing the index so no need to write it here.
-  
+
   return result;
 }
 
-
-void WriteTreeCommand::ForEachDirectoryInPath( const std::string &path_, std::function< void ( const std::string &newPath ) > func_ )
+void WriteTreeCommand::ForEachDirectoryInPath( const std::string &                                 path_,
+                                               std::function< void( const std::string &newPath ) > func_ )
 {
   std::filesystem::path path = path_;
 
@@ -149,11 +147,11 @@ void WriteTreeCommand::ForEachDirectoryInPath( const std::string &path_, std::fu
   }
 }
 
-
 OidResult WriteTreeCommand::ProcessTreeDirectory( DVS &dvs_, TreeRecord &tree_ )
 {
   OidResult result;
 
+  // clang-format off
   tree_.ForAllEntries( [ &dvs_, &result, this ] ( DirEntry &entry_ )
   {
     if ( entry_.type == RecordType::tree )
@@ -164,6 +162,7 @@ OidResult WriteTreeCommand::ProcessTreeDirectory( DVS &dvs_, TreeRecord &tree_ )
       entry_.oid = result.oid;
     }
   } );
+  // clang-format on
 
   return result;
 }
