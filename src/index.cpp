@@ -42,12 +42,15 @@ Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
   entry.filename = pathName;
   m_IndexMap[ pathName ] = entry;
 
+  m_Dirty = true;
+
   return "";
 }
 
 void Index::AddEntry( DVS &dvs_, const DirEntry &entry_ )
 {
   m_IndexMap[ entry_.filename ] = entry_;
+  m_Dirty = true;
 }
 
 Error Index::RemoveEntry( DVS &dvs_, const std::string &pathName_ )
@@ -70,6 +73,8 @@ Error Index::RemoveEntry( DVS &dvs_, const std::string &pathName_ )
     std::stringstream ss;
     ss << "File '" << pathName << "' not found in index." << std::endl;
   }
+
+  m_Dirty = true;
   
   return "";
 }
@@ -85,6 +90,11 @@ void Index::ForAllEntries( std::function< void ( const DirEntry & ) > func_ )
 
 Error Index::Read( DVS &dvs_ )
 {
+  if ( m_Read )
+  {
+    return "";
+  }
+
   m_IndexMap.clear( );
 
   std::filesystem::path indexPath = dvs_.GetSpecialPath( SpecialName::INDEX );
@@ -128,18 +138,27 @@ Error Index::Read( DVS &dvs_ )
     entry.oid = entry.oid.substr( 0, pos );
     m_IndexMap[ entry.filename ] = entry; 
   }
-  
+
+  m_Read = true; // We've now read this index so normally no need to re-read it.
+
   return "";
 }
 
 Error Index::Write( DVS &dvs_ )
 {
+  if ( !m_Dirty )
+  {
+    return ""; // Not dirty so no need to to re-write.
+  }
+
   std::ofstream output( dvs_.GetSpecialPath( SpecialName::INDEX ), std::ios::binary );
 
   ForAllEntries( [ &output ] ( const DirEntry &entry_ )
   {
     output << HashCommand::LookupType( entry_.type ) << " " << entry_.oid << " " << entry_.filename << std::endl;
   } );
+
+  m_Dirty = false; // No need to re-write it unless it becomes dirty again.
 
   return "";
 }

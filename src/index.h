@@ -26,4 +26,6 @@ class Index
 
   using IndexMap = std::map< std::string, DirEntry >;
   IndexMap m_IndexMap;
+  bool m_Read = false; // True if the index has been read from disk.
+  bool m_Dirty = false; // True if the index has changed and needs to be written out to disk.
 };
