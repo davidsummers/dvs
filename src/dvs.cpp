@@ -488,3 +488,8 @@ std::filesystem::path DVS::GetSpecialPath( const SpecialName name_ )
 {
   return GetDvsDirectory( ) / GetSpecialName( name_ );
 }
+
+Index &DVS::GetIndex( )
+{
+  return m_Index;
+}

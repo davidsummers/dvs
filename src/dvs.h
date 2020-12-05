@@ -9,6 +9,7 @@
 
 #include "common.h"
 #include "docopt.h"
+#include "index.h"
 
 enum class SpecialName
 {
@@ -60,8 +61,10 @@ class DVS
                    const bool                                                            deref  = true,
                    std::function< void( const std::string &refName, const RefValue & ) > func   = nullptr );
 
-  std::string GetSpecialName( const SpecialName );
+  std::string           GetSpecialName( const SpecialName );
   std::filesystem::path GetSpecialPath( const SpecialName );
+
+  Index &GetIndex( );
 
   protected:
   private:
@@ -77,6 +80,7 @@ class DVS
 
   std::filesystem::path m_OriginalDirectory;
   std::filesystem::path m_DvsDirectory;
+  Index                 m_Index;
 
   //
   // Methods
