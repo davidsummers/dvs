@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 
+#include "command_base.h"
 #include "docopt.h"
 
 class DVS;
