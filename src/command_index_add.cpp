@@ -47,24 +47,16 @@ Error IndexAddCommand::IndexAdd( DVS &dvs_, const std::string &pathName_ )
     return ss.str( );  
   }
 
-  Index index;
 
-  if ( Error err = index.Read( dvs_ ); !err.empty( ) && err != "Index file does not exist." )
+  Index &index = dvs_.GetIndex( );
+
+  Error err = index.WithIndex( dvs_, [ &dvs_, &index, &pathName_ ] ( )
   {
+
+    Error err = index.AddEntry( dvs_, pathName_ );
+
     return err;
-  }
+  } );
 
-  Error err = index.AddEntry( dvs_, pathName_ );
-
-  if ( !err.empty( ) )
-  {
-    return err;
-  }
-
-  if ( err = index.Write( dvs_ ); !err.empty( ) )
-  {
-    return err;
-  }
-
-  return "";
+  return err;
 }

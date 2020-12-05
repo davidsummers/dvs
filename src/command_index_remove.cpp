@@ -47,24 +47,14 @@ Error IndexRemoveCommand::IndexRemove( DVS &dvs_, const std::string &pathName_ )
     return ss.str( );  
   }
 
-  Index index;
+  Index &index = dvs_.GetIndex( );
 
-  if ( Error err = index.Read( dvs_ ); !err.empty( ) && err != "Index file does not exist." )
+  Error err = index.WithIndex( dvs_, [ &dvs_, &index, &pathName_ ] ( )
   {
+    Error err = index.RemoveEntry( dvs_, pathName_ );
+
     return err;
-  }
-
-  Error err = index.RemoveEntry( dvs_, pathName_ );
-
-  if ( !err.empty( ) )
-  {
-    return err;
-  }
-
-  if ( err = index.Write( dvs_ ); !err.empty( ) )
-  {
-    return err;
-  }
-
-  return "";
+  } );
+  
+  return err;
 }

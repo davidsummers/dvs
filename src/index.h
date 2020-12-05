@@ -21,6 +21,9 @@ class Index
   Error Read( DVS & );
   Error Write( DVS & );
 
+  // Read, perform function, then Write index.
+  Error WithIndex( DVS &, std::function< Error ( ) > );
+
   protected:
   private:
 

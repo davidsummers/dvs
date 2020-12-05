@@ -162,3 +162,24 @@ Error Index::Write( DVS &dvs_ )
 
   return "";
 }
+
+
+Error Index::WithIndex( DVS &dvs_, std::function< Error ( ) > func_ )
+{
+  if ( Error err = Read( dvs_ ); !err.empty( ) && err != "Index file does not exist." )
+  {
+    return err;
+  }
+
+  if ( Error err = func_( ); !err.empty( ) )
+  {
+    return err;
+  }
+
+  if ( Error err = Write( dvs_ ); !err.empty( ) )
+  {
+    return err;
+  }
+
+  return "";
+}
