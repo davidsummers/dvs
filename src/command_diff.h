@@ -16,9 +16,20 @@ class DiffCommand : public BaseCommand
 
   Error operator( )( DVS & ) override;
 
-  Error Diff( DVS &, const std::string &path = "" );
+  Error Diff( DVS &, const std::string &path = "", const bool &indexOption = false );
 
   protected:
   private:
+
+  //
+  // Data
+  //
+  bool m_IndexOption = false;
   std::string m_Path;
+
+  //
+  // Methods
+  //
+  Error DiffIndex( DVS &, const std::string &path = "" );
+  Error DiffWorkingCopy( DVS &, const std::string &path = "" );
 };

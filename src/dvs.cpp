@@ -40,7 +40,7 @@ const char s_USAGE[] =
       dvs branch list
       dvs branch switch <BranchName>
       dvs commit ( -m | --message ) <message>
-      dvs diff [<path>]
+      dvs diff [--index] [<path>]
       dvs fetch
       dvs index add <path>
       dvs index remove <path>
