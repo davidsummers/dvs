@@ -6,6 +6,7 @@
 #include "common.h"
 
 class DVS;
+class Index;
 
 class StatusCommand : public BaseCommand
 {
@@ -19,4 +20,7 @@ class StatusCommand : public BaseCommand
   protected:
   private:
   std::string GetBranchName( DVS & );
+  Error ShowBranch( DVS &dvs_ );
+  OidResult DiffHeadToIndex( DVS &dvs_, const Oid &indexOid );
+  OidResult DiffIndexToCurrentDirectory( DVS &, const Oid &indexOid );
 };

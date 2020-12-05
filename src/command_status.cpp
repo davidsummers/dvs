@@ -6,6 +6,7 @@
 #include "command_write_tree.h"
 #include "diff.h"
 #include "dvs.h"
+#include "index.h"
 #include "record_commit.h"
 #include "record_tree.h"
 
@@ -30,9 +31,63 @@ Error StatusCommand::operator( )( DVS &dvs_ )
 
 Error StatusCommand::Status( DVS &dvs_, const std::string &path_ )
 {
-  // First show which branch we are on.
-  std::cout << "Status: " << std::endl;
+  OidResult result;
 
+  // First show what branch we are on.
+  if ( result.err = ShowBranch( dvs_ );
+       !result.err.empty( ) )
+  {
+    return result.err;
+  }
+
+  // Get IndexTree Oid.
+  OidResult indexTreeResult;
+  WriteTreeCommand writeTreeCommand;
+
+  // Write tree from index and return Oid.
+  if ( indexTreeResult = writeTreeCommand.WriteTreeFromIndex( dvs_ );
+       !indexTreeResult.err.empty( ) )
+  {
+    return indexTreeResult.err;
+  }
+
+  // Next show changed files from HEAD to Index.
+  if ( result = DiffHeadToIndex( dvs_, indexTreeResult.oid );
+       !result.err.empty( ) )
+  {
+    return result.err;
+  }
+
+  // Next show changed files from Index to Current Directory.
+  if ( result = DiffIndexToCurrentDirectory( dvs_, indexTreeResult.oid );
+       !result.err.empty( ) )
+  {
+    return result.err;
+  }
+
+  return result.err;
+}
+
+std::string StatusCommand::GetBranchName( DVS &dvs_ )
+{
+  const bool deref = false;
+  RefValue   head  = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ), deref );
+
+  if ( !head.symbolic )
+  {
+    return "";
+  }
+
+  assert( ( (void) "Head starts with refs/locals", head.value.find( dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL ) ) == 0 ) );
+
+  std::string result = head.value.substr( head.value.find( dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL ) ) );
+
+  return result;
+}
+
+
+Error StatusCommand::ShowBranch( DVS &dvs_ )
+{
   std::string head = dvs_.GetOid( "@" );
 
   if ( head.empty( ) )
@@ -51,66 +106,89 @@ Error StatusCommand::Status( DVS &dvs_, const std::string &path_ )
     std::cout << "HEAD detached at " << head << std::endl;
   }
 
-  // Next show changed files.
+  std::cout << std::endl;
 
-  std::string path = path_.empty( ) ? dvs_.GetTopLevelDirectory( ).string( ) : path_;
+  return "";
+}
 
-  WriteTreeCommand currentTreeCommand;
-  OidResult currentTreeResult = currentTreeCommand.WriteTreeFromDirectory( dvs_, path );
+OidResult StatusCommand::DiffHeadToIndex( DVS &dvs_, const Oid &indexOid_ )
+{
+  OidResult result;
+
+  Oid headRef = dvs_.GetOid( dvs_.GetSpecialName( SpecialName::HEAD ) );
+  headRef = dvs_.GetOid( headRef );
+
+  CommitRecord commitRecord;
+
+  if ( result.err = commitRecord.Read( dvs_, headRef );
+       !result.err.empty( ) )
+  {
+    return result;
+  }
+
+  TreeRecord headTree;
+
+  if ( result.err = headTree.Read( dvs_, commitRecord.GetTreeOid( ) );
+       !result.err.empty( ) )
+  {
+    return result;
+  }
+
+  TreeRecord indexTree;
+
+  if ( result.err = indexTree.Read( dvs_, indexOid_ );
+       !result.err.empty( ) )
+  {
+    return result;
+  }
+  
+  std::cout << "Changes to be commited from index:" << std::endl;
+
+  result.err = Diff::ListChangedFiles( dvs_, headTree, indexTree );
+
+  std::cout << std::endl;
+
+  return result;
+}
+
+OidResult StatusCommand::DiffIndexToCurrentDirectory( DVS &dvs_, const Oid &indexOid_ )
+{
+  OidResult result;
+
+  std::string path = dvs_.GetTopLevelDirectory( ).string( );
+
+  WriteTreeCommand writeTreeCommand;
+  OidResult currentDirectoryTreeResult = writeTreeCommand.WriteTreeFromDirectory( dvs_, path );
+
+  if ( !currentDirectoryTreeResult.err.empty( ) )
+  {
+    result.err = currentDirectoryTreeResult.err;
+    return result;
+  }
 
   Error err;
 
-  if ( !currentTreeResult.err.empty( ) )
+  TreeRecord currentDirectoryTree;
+
+  if ( result.err = currentDirectoryTree.Read( dvs_, currentDirectoryTreeResult.oid );
+       !result.err.empty( ) )
   {
-    err = currentTreeResult.err;
-    return err;
+    return result;
   }
 
-  TreeRecord currentTree;
-  err = currentTree.Read( dvs_, currentTreeResult.oid );
+  TreeRecord indexTree;
 
-  if ( !err.empty( ) )
+  if ( result.err = indexTree.Read( dvs_, indexOid_ );
+       !result.err.empty( ) )
   {
-    return err;
-  } 
-
-  RefValue parentRef = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ) );
-
-  CommitRecord parentCommit;
-  err = parentCommit.Read( dvs_, parentRef.value );
-
-  if ( !parentRef.value.empty( ) && !err.empty( ) )
-  {
-    return err;
+    return result;
   }
 
-  TreeRecord parentTree;
+  std::cout << "Changes not staged for commit from index:" << std::endl;
 
-  err = parentTree.Read( dvs_, parentCommit.GetTreeOid( ) );
+  result.err = Diff::ListChangedFiles( dvs_, indexTree, currentDirectoryTree );
 
-  if ( !parentCommit.GetTreeOid( ).empty( ) && !err.empty( ) )
-  {
-    return err;
-  }
+  std::cout << std::endl;
 
-  err = Diff::ListChangedFiles( dvs_, parentTree, currentTree );  
-
-  return err;
-}
-
-std::string StatusCommand::GetBranchName( DVS &dvs_ )
-{
-  const bool deref = false;
-  RefValue   head  = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ), deref );
-
-  if ( !head.symbolic )
-  {
-    return "";
-  }
-
-  assert( ( (void) "Head starts with refs/locals", head.value.find( dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL ) ) == 0 ) );
-
-  std::string result = head.value.substr( head.value.find( dvs_.GetSpecialName( SpecialName::BRANCHES_LOCAL ) ) );
-
-  return result;
+  return result;  
 }
