@@ -1,9 +1,9 @@
 #include <fstream>
 #include <sstream>
 
+#include "command_hash.h"
 #include "dvs.h"
 #include "index.h"
-#include "command_hash.h"
 
 Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
 {
@@ -37,9 +37,9 @@ Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
   }
 
   DirEntry entry;
-  entry.type = RecordType::blob;
-  entry.oid = oid;
-  entry.filename = pathName;
+  entry.type             = RecordType::blob;
+  entry.oid              = oid;
+  entry.filename         = pathName;
   m_IndexMap[ pathName ] = entry;
 
   m_Dirty = true;
@@ -50,7 +50,7 @@ Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
 void Index::AddEntry( DVS &dvs_, const DirEntry &entry_ )
 {
   m_IndexMap[ entry_.filename ] = entry_;
-  m_Dirty = true;
+  m_Dirty                       = true;
 }
 
 Error Index::RemoveEntry( DVS &dvs_, const std::string &pathName_ )
@@ -75,18 +75,17 @@ Error Index::RemoveEntry( DVS &dvs_, const std::string &pathName_ )
   }
 
   m_Dirty = true;
-  
+
   return "";
 }
 
-void Index::ForAllEntries( std::function< void ( const DirEntry & ) > func_ )
+void Index::ForAllEntries( std::function< void( const DirEntry & ) > func_ )
 {
   for ( const auto &entry : m_IndexMap )
   {
     func_( entry.second );
   }
 }
-
 
 Error Index::Read( DVS &dvs_ )
 {
@@ -134,12 +133,13 @@ Error Index::Read( DVS &dvs_ )
       break; // Something is wrong, this is not the line you are looking for.
     }
 
-    entry.filename = entry.oid.substr( pos + 1 );
-    entry.oid = entry.oid.substr( 0, pos );
-    m_IndexMap[ entry.filename ] = entry; 
+    entry.filename               = entry.oid.substr( pos + 1 );
+    entry.oid                    = entry.oid.substr( 0, pos );
+    m_IndexMap[ entry.filename ] = entry;
   }
 
-  m_Read = true; // We've now read this index so normally no need to re-read it.
+  m_Read  = true;  // We've now read this index so normally no need to re-read it.
+  m_Dirty = false; // We've read the index, so this is now not dirty until changed.
 
   return "";
 }
@@ -153,18 +153,19 @@ Error Index::Write( DVS &dvs_ )
 
   std::ofstream output( dvs_.GetSpecialPath( SpecialName::INDEX ), std::ios::binary );
 
-  ForAllEntries( [ &output ] ( const DirEntry &entry_ )
+  // clang-format off
+  ForAllEntries( [ &output ]( const DirEntry &entry_ )
   {
     output << HashCommand::LookupType( entry_.type ) << " " << entry_.oid << " " << entry_.filename << std::endl;
   } );
+  // clang-format on
 
   m_Dirty = false; // No need to re-write it unless it becomes dirty again.
 
   return "";
 }
 
-
-Error Index::WithIndex( DVS &dvs_, std::function< Error ( ) > func_ )
+Error Index::WithIndex( DVS &dvs_, std::function< Error( ) > func_ )
 {
   if ( Error err = Read( dvs_ ); !err.empty( ) && err != "Index file does not exist." )
   {
