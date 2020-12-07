@@ -87,7 +87,7 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const s
 
   RefValue parentRef = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ) );
 
-  commitRecord.SetParentOid( parentRef.value );
+  commitRecord.AddParentOid( parentRef.value );
 
   std::stringstream ss;
 

@@ -46,7 +46,8 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
   using RefMap = std::map< Oid, std::string >;
   RefMap refs;
 
-  dvs_.ForAllRefs( "", true, [ &refs ] ( const std::string &refname_, const RefValue &refVal_ )
+  // clang-format off
+  dvs_.ForAllRefs( "", true, [ &refs ]( const std::string &refname_, const RefValue &refVal_ )
   {
     RefMap::iterator itr = refs.find( refVal_.value );
 
@@ -59,6 +60,7 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
       itr->second.append( ", " + refname_ );
     }
   } );
+  // clang-format on
 
   Error err;
 
@@ -91,15 +93,15 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
 
     if ( showPatchDiff_ )
     {
-      Oid parentOid = commitRecord.GetParentOid( );
+      const std::vector< Oid > &parentOids = commitRecord.GetParentOids( );
 
       // if ( !parentOid.empty( ) )
       {
         CommitRecord parentCommitRecord;
 
-        err = parentCommitRecord.Read( dvs_, parentOid );
+        err = parentCommitRecord.Read( dvs_, parentOids[ 0 ] );
 
-        if ( !err.empty( ) && !parentOid.empty( ) )
+        if ( !err.empty( ) && !parentOids.empty( ) && !parentOids[ 0 ].empty( ) )
         {
           return err;
         }
@@ -136,7 +138,7 @@ Error LogCommand::GetLog( DVS &dvs_, const std::string &hashId_, const bool show
       }
     }
 
-    refValue.value = commitRecord.GetParentOid( );
+    refValue.value = commitRecord.GetParentOids( )[ 0 ];
   }
 
   // The rest of the contents of the commit is the commit message;

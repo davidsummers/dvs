@@ -20,14 +20,22 @@ void CommitRecord::SetTreeOid( const Oid &oid_ )
   m_TreeOid = oid_;
 }
 
-Oid CommitRecord::GetParentOid( ) const
+const std::vector< Oid > &CommitRecord::GetParentOids( ) const
 {
-  return m_ParentOid;
+  return m_ParentOids;
 }
 
-void CommitRecord::SetParentOid( const Oid &oid_ )
+void CommitRecord::AddParentOid( const Oid &oid_ )
 {
-  m_ParentOid = oid_;
+  for ( const auto &entry : m_ParentOids )
+  {
+    if ( entry == oid_ )
+    {
+      return;
+    }
+  }
+
+  m_ParentOids.push_back( oid_ );
 }
 
 std::string CommitRecord::GetMsg( ) const
@@ -91,7 +99,7 @@ Error CommitRecord::Parse( std::istream &s_ )
     }
     else if ( type == "parent" )
     {
-      m_ParentOid = oid;
+      m_ParentOids.push_back( oid );
     }
     else
     {
@@ -123,9 +131,9 @@ std::ostream &operator<<( std::ostream &s_, const CommitRecord &commitRecord_ )
   s_ << "tree " << commitRecord_.GetTreeOid( ) << std::endl;
 
   // If we have a parent hash, write it out.
-  if ( !commitRecord_.GetParentOid( ).empty( ) )
+  for ( const auto &entryOid : commitRecord_.GetParentOids( ) )
   {
-    s_ << "parent " << commitRecord_.GetParentOid( ) << std::endl;
+    s_ << "parent " << entryOid << std::endl;
   }
 
   // Write out blank line to separate headers from message body content.

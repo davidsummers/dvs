@@ -5,6 +5,7 @@
 //
 
 #include <string>
+#include <vector>
 
 #include "common.h"
 
@@ -14,8 +15,8 @@ class CommitRecord
   Oid  GetTreeOid( ) const;
   void SetTreeOid( const Oid & );
 
-  Oid  GetParentOid( ) const;
-  void SetParentOid( const Oid & );
+  const std::vector< Oid > &GetParentOids( ) const;
+  void                      AddParentOid( const Oid & );
 
   std::string GetMsg( ) const;
   void        SetMsg( const std::string & );
@@ -28,9 +29,9 @@ class CommitRecord
   // Data
   //
 
-  Oid m_TreeOid;
-  Oid m_ParentOid;
-  std::string m_Msg;
+  Oid                m_TreeOid;
+  std::vector< Oid > m_ParentOids;
+  std::string        m_Msg;
 
   //
   // Methods
