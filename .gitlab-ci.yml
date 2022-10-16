@@ -1,0 +1,87 @@
+# image: gcc
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - .pre
+  - build
+
+.linux-platforms:
+  parallel:
+    matrix:
+      - PLATFORM: [ el9 ]
+
+.windows-platforms:
+  parallel:
+    matrix:
+      - VS: [ v141, v142, v143 ]
+
+docker-image-build:
+  stage: .pre
+  extends: .linux-platforms
+  tags:
+    - docker
+  script:
+    - echo "$CI_REGISTRY = $CI_REGISTRY"
+    - echo "$CI_REGISTRY_IMGE = $CI_REGISTRY_IMAGE"
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/$PLATFORM -f Dockerfile.$PLATFORM .
+    - docker push $CI_REGISTRY_IMAGE/$PLATFORM
+
+linux-software-build:
+  extends: .linux-platforms
+  stage: build
+  image: $CI_REGISTRY_IMAGE/$PLATFORM
+  tags:
+    - docker
+  script:
+    - cat /etc/redhat-release
+    - if [ -f /usr/bin/cmake3 ]; then export CMAKE=cmake3; else export CMAKE=cmake; fi
+    - echo "CMAKE = $CMAKE"
+    - $CMAKE --version
+    - rm -rf build
+    - mkdir build
+    - cd build
+    - $CMAKE ..
+    - make
+    - ls -lR
+  artifacts:
+    name: "dray-$PLATFORM-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - ./build/dray
+
+macos-software-build:
+  stage: build
+  tags:
+    - macos
+  script:
+    - rm -rf build
+    - mkdir build
+    - cd build
+    - if [ -f /usr/bin/cmake3 ]; then export CMAKE=cmake3; else export CMAKE=cmake; fi
+    - $CMAKE -G "Ninja Multi-Config" ..
+    - $CMAKE --build . --config Debug
+    - $CMAKE --build . --config Release
+  artifacts:
+    name: "dray-macos-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - ./build/Debug/*
+      - ./build/Release/*
+
+windows-software-build:
+  stage: build
+  extends: .windows-platforms
+  tags:
+    - windows
+  script:
+    - mkdir build
+    - cd build
+    - cmake -T $VS ..
+    - cmake --build . --config Debug
+    - cmake --build . --config Release    
+  artifacts:
+    name: "dray-windows-$VS-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - ./build/Debug/*
+      - ./build/Release/*
+
