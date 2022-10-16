@@ -5,6 +5,7 @@ variables:
 stages:
   - .pre
   - build
+  - test
 
 .linux-platforms:
   parallel:
@@ -46,9 +47,18 @@ linux-software-build:
     - make
     - ls -lR
   artifacts:
-    name: "dray-$PLATFORM-$CI_COMMIT_SHORT_SHA"
+    name: "dvs-$PLATFORM-$CI_COMMIT_SHORT_SHA"
     paths:
-      - ./build/dray
+      - ./build
+
+test-linux:
+  extends: .linux-platforms
+  stage: test
+  image: $CI_REGISTRY_IMAGE/$PLATFORM
+  tags:
+    - docker
+  script:
+    - ./build/tests/test_dvs_command
 
 macos-software-build:
   stage: build
@@ -62,8 +72,9 @@ macos-software-build:
     - $CMAKE -G "Ninja Multi-Config" ..
     - $CMAKE --build . --config Debug
     - $CMAKE --build . --config Release
+    - ./tests/Debug/test_dvs_command
   artifacts:
-    name: "dray-macos-$CI_COMMIT_SHORT_SHA"
+    name: "dvs-macos-$CI_COMMIT_SHORT_SHA"
     paths:
       - ./build/Debug/*
       - ./build/Release/*
@@ -79,8 +90,9 @@ windows-software-build:
     - cmake -T $VS ..
     - cmake --build . --config Debug
     - cmake --build . --config Release    
+    - .\tests\Debug\test_dvs_command
   artifacts:
-    name: "dray-windows-$VS-$CI_COMMIT_SHORT_SHA"
+    name: "dvs-windows-$VS-$CI_COMMIT_SHORT_SHA"
     paths:
       - ./build/Debug/*
       - ./build/Release/*
