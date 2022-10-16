@@ -1,0 +1,17 @@
+FROM almalinux/9-minimal
+
+RUN microdnf update -y && \
+    microdnf clean all
+
+RUN microdnf install -y epel-release && \
+    microdnf clean all
+
+RUN microdnf install -y \
+      cmake \
+      gcc-c++ \
+      git \
+      make \
+      rpmdevtools \
+      tar && \
+    microdnf clean all
+

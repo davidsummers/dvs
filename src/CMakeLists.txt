@@ -100,3 +100,8 @@ target_link_libraries( dvs
                        sha3lib
                        unidifflib
                      )
+
+if ( ${CMAKE_CXX_COMPILER_VERSION} STREQUAL "8.5.0" )
+  message( "*** GCC 8.5.0: Adding -lstdc++fs" )
+  target_link_libraries( dvs -lstdc++fs )
+endif( )
