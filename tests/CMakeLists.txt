@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.6.3 )
+cmake_minimum_required( VERSION 3.28 )
 project( dvs_tests )
 
 message( "DVS_TESTS: ${CMAKE_CURRENT_SOURCE_DIR}" )
