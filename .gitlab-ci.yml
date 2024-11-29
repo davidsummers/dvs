@@ -1,25 +1,32 @@
 # image: gcc
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
+  PLATFORM: el9
 
 stages:
   - .pre
   - build
   - test
 
-.linux-platforms:
+.configs:
   parallel:
     matrix:
-      - PLATFORM: [ el9 ]
+      - CONFIG:
+        - Debug
+        - Release
+        - RelWithDebInfo
 
 .windows-platforms:
   parallel:
     matrix:
       - VS: [ v141, v142, v143 ]
+        CONFIG:
+        - Debug
+        - Release
+        - RelWithDebInfo
 
 docker-image-build:
   stage: .pre
-  extends: .linux-platforms
   tags:
     - docker
   script:
@@ -30,54 +37,64 @@ docker-image-build:
     - docker push $CI_REGISTRY_IMAGE/$PLATFORM
 
 linux-software-build:
-  extends: .linux-platforms
+  extends: .configs
   stage: build
   image: $CI_REGISTRY_IMAGE/$PLATFORM
   tags:
     - docker
   script:
+    - echo "$CONFIG"
     - cat /etc/redhat-release
     - if [ -f /usr/bin/cmake3 ]; then export CMAKE=cmake3; else export CMAKE=cmake; fi
-    - echo "CMAKE = $CMAKE"
+    - echo "$CMAKE"
     - $CMAKE --version
     - rm -rf build
     - mkdir build
     - cd build
-    - $CMAKE ..
-    - make
-    - ls -lR
+    - scl enable gcc-toolset-14 '$CMAKE .. -G "Ninja Multi-Config" && $CMAKE --build . --config $CONFIG'
   artifacts:
-    name: "dvs-$PLATFORM-$CI_COMMIT_SHORT_SHA"
+    name: "dvs-$PLATFORM-$CONFIG-$CI_COMMIT_SHORT_SHA"
     paths:
-      - ./build
+      - ./build/*
 
 test-linux:
-  extends: .linux-platforms
+  extends: .configs
   stage: test
   image: $CI_REGISTRY_IMAGE/$PLATFORM
   tags:
     - docker
+  needs: [ 'linux-software-build' ]
   script:
-    - ./build/tests/test_dvs_command
+    - echo "$CONFIG"
+    - ./build/tests/$CONFIG/test_dvs_command
 
 macos-software-build:
   stage: build
+  extends: .configs
   tags:
     - macos
   script:
+    - echo "$CONFIG"
     - rm -rf build
     - mkdir build
     - cd build
     - if [ -f /usr/bin/cmake3 ]; then export CMAKE=cmake3; else export CMAKE=cmake; fi
     - $CMAKE -G "Ninja Multi-Config" ..
-    - $CMAKE --build . --config Debug
-    - $CMAKE --build . --config Release
-    - ./tests/Debug/test_dvs_command
+    - $CMAKE --build . --config $CONFIG
   artifacts:
-    name: "dvs-macos-$CI_COMMIT_SHORT_SHA"
+    name: "dvs-macos-$CONFIG-$CI_COMMIT_SHORT_SHA"
     paths:
-      - ./build/Debug/*
-      - ./build/Release/*
+      - ./build/*
+
+test-macos:
+  extends: .configs
+  stage: test
+  tags:
+    - macos
+  needs: [ 'macos-software-build' ]
+  script:
+    - echo "$CONFIG"
+    - ./build/tests/$CONFIG/test_dvs_command
 
 windows-software-build:
   stage: build
@@ -85,15 +102,24 @@ windows-software-build:
   tags:
     - windows
   script:
+    - echo "$VS"
+    - echo "$CONFIG"
     - mkdir build
     - cd build
     - cmake -T $VS ..
-    - cmake --build . --config Debug
-    - cmake --build . --config Release    
-    - .\tests\Debug\test_dvs_command
+    - cmake --build . --config $CONFIG
   artifacts:
-    name: "dvs-windows-$VS-$CI_COMMIT_SHORT_SHA"
+    name: "dvs-windows-$VS-$CONFIG-$CI_COMMIT_SHORT_SHA"
     paths:
-      - ./build/Debug/*
-      - ./build/Release/*
+      - ./build/*
 
+test-windows:
+  extends: .windows-platforms
+  stage: test
+  tags:
+    - windows
+  needs: [ 'windows-software-build' ]
+  script:
+    - echo "$CONFIG"
+    - cd build\tests\$CONFIG
+    - .\test_dvs_command.exe
