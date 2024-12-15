@@ -19,7 +19,7 @@ stages:
 .windows-platforms:
   parallel:
     matrix:
-      - VS: [ v141, v142, v143 ]
+      - VS: [ v143 ]
         CONFIG:
         - Debug
         - Release
