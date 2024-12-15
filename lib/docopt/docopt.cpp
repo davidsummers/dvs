@@ -12,14 +12,15 @@
 
 #include "docopt_value.h"
 
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
-#include <map>
-#include <string>
-#include <iostream>
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <iostream>
+#include <map>
+#include <string>
+#include <unordered_set>
+#include <unordered_map>
+#include <vector>
 
 using namespace docopt;
 
