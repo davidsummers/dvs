@@ -47,11 +47,11 @@ Error HashCommand::operator( )( DVS &dvs_ )
     return validate_error;
   }
 
-  auto [ err, oid ] = Hash( dvs_, m_Filename );
+  auto result = Hash( dvs_, m_Filename );
 
-  std::cout << oid << std::endl;
+  std::cout << result.value( ) << std::endl;
 
-  return err;
+  return result.has_value( ) ? "" : result.error( );
 }
 
 OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const RecordType hashType_ )
@@ -63,9 +63,8 @@ OidResult HashCommand::Hash( DVS &dvs_, const std::string &filename_, const Reco
   {
     std::stringstream ss;
     ss << "Couldn't open input file '" << filename_ << "'";
-    result.err = ss.str( );
 
-    return result;
+    return std::unexpected( ss.str( ) );
   }
 
   size_t size = std::filesystem::file_size( filename_ );
@@ -98,8 +97,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
       break;
 
     case RecordType::none:
-      result.err = "HashType: none"; // Illegal - return errror.
-      return result;
+      return std::unexpected( "HashType: none" ); // Illegal - return errror.
 
     case RecordType::tag:
       headerSs << "tag" << '\0';
@@ -136,7 +134,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
   }
 
   {
-    OidResult result;
+    // OidResult result;
     inputStream_.seekg( std::ios_base::beg );
 
     std::filesystem::path objectPath = dvs_.GetDvsDirectory( );
@@ -155,8 +153,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
       ss << "Warning: File '" << objectPath << "' already exists.";
       std::cerr << ss.str( ) << std::endl;
 #endif
-      result.oid = hashSs.str( );
-      return result;
+      return hashSs.str( );
     }
 
     std::ofstream outputFile( objectPath, std::ios_base::binary );
@@ -178,8 +175,7 @@ OidResult HashCommand::Hash( DVS &dvs_, std::istream &inputStream_, size_t size_
     }
   }
 
-  result.oid = hashSs.str( );
-  return result;
+  return hashSs.str( );
 }
 
 std::string HashCommand::LookupType( const RecordType recordType_ )

@@ -4,6 +4,7 @@
 // Common declarations
 //
 
+#include <expected>
 #include <string>
 
 #include "docopt.h"
@@ -21,11 +22,7 @@ enum class RecordType
   tag,
 };
 
-using OidResult = struct OidResult
-{
-  Error err;
-  Oid   oid;
-};
+using OidResult = std::expected< Oid, Error >;
 
 using RefValue = struct RefValue
 {

@@ -34,10 +34,10 @@ Error StatusCommand::Status( DVS &dvs_, const std::string &path_ )
   OidResult result;
 
   // First show what branch we are on.
-  if ( result.err = ShowBranch( dvs_ );
-       !result.err.empty( ) )
+  if ( result = ShowBranch( dvs_ );
+       !result.has_value( ) )
   {
-    return result.err;
+    return result.error( );
   }
 
   // Get IndexTree Oid.
@@ -46,26 +46,26 @@ Error StatusCommand::Status( DVS &dvs_, const std::string &path_ )
 
   // Write tree from index and return Oid.
   if ( indexTreeResult = writeTreeCommand.WriteTreeFromIndex( dvs_ );
-       !indexTreeResult.err.empty( ) )
+       !indexTreeResult.has_value( ) )
   {
-    return indexTreeResult.err;
+    return indexTreeResult.error( );
   }
 
   // Next show changed files from HEAD to Index.
-  if ( result = DiffHeadToIndex( dvs_, indexTreeResult.oid );
-       !result.err.empty( ) )
+  if ( result = DiffHeadToIndex( dvs_, indexTreeResult.value( ) );
+       !result.has_value( ) )
   {
-    return result.err;
+    return result.error( );
   }
 
   // Next show changed files from Index to Current Directory.
-  if ( result = DiffIndexToCurrentDirectory( dvs_, indexTreeResult.oid );
-       !result.err.empty( ) )
+  if ( result = DiffIndexToCurrentDirectory( dvs_, indexTreeResult.value( ) );
+       !result.has_value( ) )
   {
-    return result.err;
+    return result.error( );
   }
 
-  return result.err;
+  return result.value( );
 }
 
 std::string StatusCommand::GetBranchName( DVS &dvs_ )
@@ -120,31 +120,31 @@ OidResult StatusCommand::DiffHeadToIndex( DVS &dvs_, const Oid &indexOid_ )
 
   CommitRecord commitRecord;
 
-  if ( result.err = commitRecord.Read( dvs_, headRef );
-       !result.err.empty( ) )
+  if ( result = commitRecord.Read( dvs_, headRef );
+       !result.has_value( ) )
   {
     return result;
   }
 
   TreeRecord headTree;
 
-  if ( result.err = headTree.Read( dvs_, commitRecord.GetTreeOid( ) );
-       !result.err.empty( ) )
+  if ( result = headTree.Read( dvs_, commitRecord.GetTreeOid( ) );
+       !result.has_value( ) )
   {
     return result;
   }
 
   TreeRecord indexTree;
 
-  if ( result.err = indexTree.Read( dvs_, indexOid_ );
-       !result.err.empty( ) )
+  if ( result = indexTree.Read( dvs_, indexOid_ );
+       !result.has_value( ) )
   {
-    return result;
+    return result.error( );
   }
   
   std::cout << "Changes to be commited from index:" << std::endl;
 
-  result.err = Diff::ListChangedFiles( dvs_, headTree, indexTree );
+  result = Diff::ListChangedFiles( dvs_, headTree, indexTree );
 
   std::cout << std::endl;
 
@@ -160,33 +160,32 @@ OidResult StatusCommand::DiffIndexToCurrentDirectory( DVS &dvs_, const Oid &inde
   WriteTreeCommand writeTreeCommand;
   OidResult currentDirectoryTreeResult = writeTreeCommand.WriteTreeFromDirectory( dvs_, path );
 
-  if ( !currentDirectoryTreeResult.err.empty( ) )
+  if ( !currentDirectoryTreeResult.has_value( ) )
   {
-    result.err = currentDirectoryTreeResult.err;
-    return result;
+    return currentDirectoryTreeResult;
   }
 
   Error err;
 
   TreeRecord currentDirectoryTree;
 
-  if ( result.err = currentDirectoryTree.Read( dvs_, currentDirectoryTreeResult.oid );
-       !result.err.empty( ) )
+  if ( result = currentDirectoryTree.Read( dvs_, currentDirectoryTreeResult.value( ) );
+       !result.has_value( ) )
   {
     return result;
   }
 
   TreeRecord indexTree;
 
-  if ( result.err = indexTree.Read( dvs_, indexOid_ );
-       !result.err.empty( ) )
+  if ( result = indexTree.Read( dvs_, indexOid_ );
+       !result.has_value( ) )
   {
     return result;
   }
 
   std::cout << "Changes not staged for commit from index:" << std::endl;
 
-  result.err = Diff::ListChangedFiles( dvs_, indexTree, currentDirectoryTree );
+  result = Diff::ListChangedFiles( dvs_, indexTree, currentDirectoryTree );
 
   std::cout << std::endl;
 

@@ -90,16 +90,16 @@ static dvs_error_t test_dvs_internal_hash( )
 
     OidResult result = hashCommand.Hash( dvs, EXPECTED_FILE_NAME );
     
-    if ( !result.err.empty( ) )
+    if ( !result.has_value( ) )
     {
-      DVS_ERROR( result.err.c_str( ) );
+      DVS_ERROR( result.error( ).c_str( ) );
     }
 
     const char *EXPECTED_OID = "330f2ed27c77204cac1ab567cfffbad0db5724f8254c2e9de155da5979c401d6";
-    if ( result.oid != EXPECTED_OID )
+    if ( result.value( ) != EXPECTED_OID )
     {
       std::stringstream ss;
-      ss << "Expected: " << EXPECTED_OID << ", but got " << result.oid << std::endl;
+      ss << "Expected: " << EXPECTED_OID << ", but got " << result.value( ) << std::endl;
       DVS_ERROR( ss.str( ).c_str( ) );
     }
   }
@@ -139,16 +139,16 @@ static dvs_error_t test_dvs_internal_cat( )
 
     OidResult result = hashCommand.Hash( dvs, EXPECTED_FILE_NAME );
     
-    if ( !result.err.empty( ) )
+    if ( !result.has_value( ) )
     {
-      DVS_ERROR( result.err.c_str( ) );
+      DVS_ERROR( result.error( ).c_str( ) );
     }
 
     const char *EXPECTED_OID = "4489764f4231744fc5d7310cb208657282cfe45d943a65ac69b4d6404763193c";
-    if ( result.oid != EXPECTED_OID )
+    if ( result.value( ) != EXPECTED_OID )
     {
       std::stringstream ss;
-      ss << "Expected: " << EXPECTED_OID << ", but got " << result.oid << std::endl;
+      ss << "Expected: " << EXPECTED_OID << ", but got " << result.value( ) << std::endl;
       DVS_ERROR( ss.str( ).c_str( ) );
     }
 
@@ -235,15 +235,15 @@ static dvs_error_t test_dvs_internal_write_tree( )
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
     OidResult result = writeTreeCommand.WriteTreeFromDirectory( dvs, "." );
     
-    if ( !result.err.empty( ) )
+    if ( !result.has_value( ) )
     {
-      DVS_ERROR( result.err.c_str( ) );
+      DVS_ERROR( result.error( ).c_str( ) );
     }
 
-    if ( result.oid != expectedDirOid )
+    if ( result.value( ) != expectedDirOid )
     {
       std::stringstream ss;
-      ss << "Expected dir oid '" << expectedDirOid << "' but got '" << result.oid << "'" << std::endl;
+      ss << "Expected dir oid '" << expectedDirOid << "' but got '" << result.value( ) << "'" << std::endl;
       DVS_ERROR( ss.str( ).c_str( ) );
     }
   }
@@ -293,24 +293,24 @@ static dvs_error_t test_dvs_internal_read_tree( )
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
     OidResult result = writeTreeCommand.WriteTreeFromDirectory( dvs, "." );
     
-    if ( !result.err.empty( ) )
+    if ( !result.has_value( ) )
     {
-      DVS_ERROR( result.err.c_str( ) );
+      DVS_ERROR( result.error( ).c_str( ) );
     }
 
-    if ( result.oid != expectedDirOid )
+    if ( result.value( ) != expectedDirOid )
     {
       std::stringstream ss;
-      ss << "Expected dir oid '" << expectedDirOid << "' but got '" << result.oid << "'" << std::endl;
+      ss << "Expected dir oid '" << expectedDirOid << "' but got '" << result.value( ) << "'" << std::endl;
       DVS_ERROR( ss.str( ).c_str( ) );
     }
 
     ReadTreeCommand readTreeCommand;
     OidResult readResult = readTreeCommand.ReadTreeToDirectory( dvs, expectedDirOid );
 
-    if ( !readResult.err.empty( ) )
+    if ( !readResult.has_value( ) )
     {
-      DVS_ERROR( readResult.err.c_str( ) );
+      DVS_ERROR( readResult.error( ).c_str( ) );
     }
   }
 
@@ -377,15 +377,15 @@ static dvs_error_t test_dvs_commit( )
     const std::string expectedDirOid = "ef9f7e727e6cf95bb64f8dc2b46e398fff320ea6eeed9601679db3553feab54c";
     OidResult result = writeTreeCommand.WriteTreeFromIndex( dvs, "." );
     
-    if ( !result.err.empty( ) )
+    if ( !result.has_value( ) )
     {
-      DVS_ERROR( result.err.c_str( ) );
+      DVS_ERROR( result.error( ).c_str( ) );
     }
 
-    if ( result.oid != expectedDirOid )
+    if ( result.value( ) != expectedDirOid )
     {
       std::stringstream ss;
-      ss << "Expected dir oid '" << expectedDirOid << "' but got '" << result.oid << "'" << std::endl;
+      ss << "Expected dir oid '" << expectedDirOid << "' but got '" << result.value( ) << "'" << std::endl;
       DVS_ERROR( ss.str( ).c_str( ) );
     }
 
@@ -394,15 +394,15 @@ static dvs_error_t test_dvs_commit( )
 
     OidResult commitResult = commitCommand.Commit( dvs, "This is a commit message." );
 
-    if ( !commitResult.err.empty( ) )
+    if ( !commitResult.has_value( ) )
     {
-      DVS_ERROR( commitResult.err.c_str( ) );
+      DVS_ERROR( commitResult.error( ).c_str( ) );
     }
 
-    if ( commitResult.oid != expectedCommitOid )
+    if ( commitResult.value( ) != expectedCommitOid )
     {
       std::stringstream ss;
-      ss << "Expected Commit Oid '" << expectedCommitOid << "' but got '" << commitResult.oid << "'." << std::endl;
+      ss << "Expected Commit Oid '" << expectedCommitOid << "' but got '" << commitResult.value( ) << "'." << std::endl;
       DVS_ERROR( ss.str( ).c_str( ) );
     }
   }

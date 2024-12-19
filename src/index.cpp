@@ -29,16 +29,16 @@ Error Index::AddEntry( DVS &dvs_, const std::string &pathName_ )
 
   HashCommand hashCommand;
 
-  auto [ err, oid ] = hashCommand.Hash( dvs_, pathName, RecordType::blob );
+  auto result  = hashCommand.Hash( dvs_, pathName, RecordType::blob );
 
-  if ( !err.empty( ) )
+  if ( !result.has_value( ) )
   {
-    return err;
+    return result.error( );
   }
 
   DirEntry entry;
   entry.type             = RecordType::blob;
-  entry.oid              = oid;
+  entry.oid              = result.value( );
   entry.filename         = pathName;
   m_IndexMap[ pathName ] = entry;
 

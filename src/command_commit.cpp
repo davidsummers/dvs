@@ -1,3 +1,4 @@
+#include <expected>
 #include <iostream>
 #include <sstream>
 
@@ -59,9 +60,10 @@ Error CommitCommand::operator( )( DVS &dvs_ )
 
   OidResult result = Commit( dvs_, m_Msg );
 
-  std::cout << "Commit Oid: " << result.oid << std::endl;
+  std::cout << "Commit Oid: " << result.value( ) << std::endl;
 
-  return result.err;
+  Error ret = result.has_value( ) ? "" : result.error( );
+  return ret;
 }
 
 OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const std::string &path_ )
@@ -77,13 +79,12 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const s
 
   OidResult writeTreeResult = writeTreeCommand.WriteTreeFromIndex( dvs_, path );
 
-  if ( !writeTreeResult.err.empty( ) )
+  if ( !writeTreeResult.has_value( ) )
   {
-    result.err = writeTreeResult.err;
-    return result;
+    return writeTreeResult;
   }
 
-  commitRecord.SetTreeOid( writeTreeResult.oid );
+  commitRecord.SetTreeOid( writeTreeResult.value( ) );
 
   RefValue parentRef = dvs_.GetRef( dvs_.GetSpecialName( SpecialName::HEAD ) );
 
@@ -97,16 +98,10 @@ OidResult CommitCommand::Commit( DVS &dvs_, const std::string &message_, const s
 
   OidResult commitHashResult = hashCommand.Hash( dvs_, ss, ss.str( ).size( ), RecordType::commit );
 
-  if ( !commitHashResult.err.empty( ) )
+  if ( commitHashResult.has_value( ) )
   {
-    result.err = commitHashResult.err;
-  }
-  else
-  {
-    result.oid = commitHashResult.oid;
-
-    dvs_.SetRef( dvs_.GetSpecialName( SpecialName::HEAD ), RefValue{ false, result.oid } );
+    dvs_.SetRef( dvs_.GetSpecialName( SpecialName::HEAD ), RefValue{ false, commitHashResult.value( ) } );
   }
 
-  return result;
+  return commitHashResult;
 }

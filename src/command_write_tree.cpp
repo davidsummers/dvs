@@ -21,9 +21,9 @@ Error WriteTreeCommand::operator( )( DVS &dvs_ )
 
   OidResult result = WriteTreeFromDirectory( dvs_ );
 
-  std::cout << "Top Level Directory: " << result.oid << std::endl;
+  std::cout << "Top Level Directory: " << result.value( ) << std::endl;
 
-  return result.err;
+  return result.has_value( ) ? "" : result.error( );
 }
 
 OidResult WriteTreeCommand::WriteTreeFromDirectory( DVS &dvs_, const std::string &dir_ )
@@ -43,33 +43,30 @@ OidResult WriteTreeCommand::WriteTreeFromDirectory( DVS &dvs_, const std::string
     {
       HashCommand hashCommand;
 
-      auto [ err, hash ] = hashCommand.Hash( dvs_, entry.path( ).string( ), RecordType::blob );
+      auto result1  = hashCommand.Hash( dvs_, entry.path( ).string( ), RecordType::blob );
 
-      if ( !err.empty( ) )
+      if ( !result1.has_value( ) )
       {
-        result.err = err;
-        return result;
+        return result1;
       }
 
-      treeRecord.AddEntry( entry.path( ).filename( ).string( ), RecordType::blob, hash );
+      treeRecord.AddEntry( entry.path( ).filename( ).string( ), RecordType::blob, result1.value( ) );
     }
     else if ( entry.is_directory( ) )
     {
       OidResult writeResult = WriteTreeFromDirectory( dvs_, entry.path( ).string( ) );
-      if ( !writeResult.err.empty( ) )
+      if ( !writeResult.has_value( ) )
       {
-        result.err = writeResult.err;
-        return result;
+        return writeResult;
       }
 
-      treeRecord.AddEntry( entry.path( ).filename( ).string( ), RecordType::tree, writeResult.oid );
+      treeRecord.AddEntry( entry.path( ).filename( ).string( ), RecordType::tree, writeResult.value( ) );
     }
     else
     {
       std::stringstream ss;
       ss << "Unknown file type for " << entry.path( ) << ".";
-      result.err = ss.str( );
-      return result;
+      return std::unexpected( ss.str( ) );
     }
   }
 
@@ -87,8 +84,7 @@ OidResult WriteTreeCommand::WriteTreeFromIndex( DVS &dvs_, const std::string &di
   // First, read the index.
   if ( Error err = index.Read( dvs_ ); !err.empty( ) )
   {
-    result.err = err;
-    return result;
+    return std::unexpected( err );
   }
 
   TreeRecord tree;
@@ -124,7 +120,7 @@ OidResult WriteTreeCommand::WriteTreeFromIndex( DVS &dvs_, const std::string &di
 
   result = ProcessTreeDirectory( dvs_, tree );
 
-  if ( !result.err.empty( ) )
+  if ( !result.has_value( ) )
   {
     return result;
   }
@@ -159,7 +155,7 @@ OidResult WriteTreeCommand::ProcessTreeDirectory( DVS &dvs_, TreeRecord &tree_ )
       ProcessTreeDirectory( dvs_, *entry_.m_Tree );
       result = entry_.m_Tree->Write( dvs_ );
 
-      entry_.oid = result.oid;
+      entry_.oid = result.value( );
     }
   } );
   // clang-format on

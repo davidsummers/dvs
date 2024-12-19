@@ -62,18 +62,18 @@ Error DiffCommand::DiffIndex( DVS &dvs_, const std::string &path_ )
 
   CommitRecord commitRecord;
 
-  if ( result.err = commitRecord.Read( dvs_, headRef );
-       !result.err.empty( ) )
+  if ( result = commitRecord.Read( dvs_, headRef );
+       !result.has_value( ) )
   {
-    return result.err;
+    return result.error( );
   }
 
   TreeRecord headTree;
 
-  if ( result.err = headTree.Read( dvs_, commitRecord.GetTreeOid( ) );
-       !result.err.empty( ) )
+  if ( result = headTree.Read( dvs_, commitRecord.GetTreeOid( ) );
+       !result.has_value( ) )
   {
-    return result.err;
+    return result.error( );
   }
 
   // Get IndexTree Oid.
@@ -82,22 +82,22 @@ Error DiffCommand::DiffIndex( DVS &dvs_, const std::string &path_ )
 
   // Write tree from index and return Oid.
   if ( indexTreeResult = writeTreeCommand.WriteTreeFromIndex( dvs_ );
-       !indexTreeResult.err.empty( ) )
+       !indexTreeResult.has_value( ) )
   {
-    return indexTreeResult.err;
+    return indexTreeResult.error( );
   }
 
   TreeRecord indexTree;
 
-  if ( result.err = indexTree.Read( dvs_, indexTreeResult.oid );
-       !result.err.empty( ) )
+  if ( result = indexTree.Read( dvs_, indexTreeResult.value( ) );
+       !result.has_value( ) )
   {
-    return result.err;
+    return result.error( );
   }
   
-  result.err = Diff::DiffTrees( dvs_, headTree, indexTree );
+  result = Diff::DiffTrees( dvs_, headTree, indexTree );
 
-  return result.err;
+  return result.has_value( ) ? "" : result.error( );
 }
 
 Error DiffCommand::DiffWorkingCopy( DVS &dvs_, const std::string &path_ )
@@ -116,14 +116,13 @@ Error DiffCommand::DiffWorkingCopy( DVS &dvs_, const std::string &path_ )
   WriteTreeCommand currentTreeCommand;
   OidResult currentTreeResult = currentTreeCommand.WriteTreeFromDirectory( dvs_, path );
 
-  if ( !currentTreeResult.err.empty( ) )
+  if ( !currentTreeResult.has_value( ) )
   {
-    err = currentTreeResult.err;
-    return err;
+    return currentTreeResult.error( );
   }
 
   TreeRecord currentTree;
-  err = currentTree.Read( dvs_, currentTreeResult.oid );
+  err = currentTree.Read( dvs_, currentTreeResult.value( ) );
 
   if ( !err.empty( ) )
   {
@@ -136,14 +135,14 @@ Error DiffCommand::DiffWorkingCopy( DVS &dvs_, const std::string &path_ )
 
   // Write tree from index and return Oid.
   if ( indexTreeResult = writeTreeCommand.WriteTreeFromIndex( dvs_ );
-       !indexTreeResult.err.empty( ) )
+       !indexTreeResult.has_value( ) )
   {
-    return indexTreeResult.err;
+    return indexTreeResult.error( );
   }
 
   TreeRecord indexTree;
 
-  if ( err = indexTree.Read( dvs_, indexTreeResult.oid );
+  if ( err = indexTree.Read( dvs_, indexTreeResult.value( ) );
        !err.empty( ) )
   {
     return err;
