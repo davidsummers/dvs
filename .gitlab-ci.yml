@@ -19,7 +19,7 @@ stages:
 .windows-platforms:
   parallel:
     matrix:
-      - VS: [ v141, v142, v143 ]
+      - VS: [ v143 ]
         CONFIG:
         - Debug
         - Release
@@ -79,6 +79,7 @@ macos-software-build:
     - mkdir build
     - cd build
     - if [ -f /usr/bin/cmake3 ]; then export CMAKE=cmake3; else export CMAKE=cmake; fi
+    - $CMAKE --version
     - $CMAKE -G "Ninja Multi-Config" ..
     - $CMAKE --build . --config $CONFIG
   artifacts:
@@ -104,6 +105,7 @@ windows-software-build:
   script:
     - echo "$VS"
     - echo "$CONFIG"
+    - cmake --version
     - mkdir build
     - cd build
     - cmake -T $VS ..
