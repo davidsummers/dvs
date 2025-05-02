@@ -2,12 +2,10 @@ cmake_minimum_required( VERSION 3.28 )
 
 if ( APPLE )
 
-  # Apple compilers can't yet handle standard C++20 modules.
-  # Requires 'homebrew install 'llvm'.
-  message( STATUS "Set up for Apple LLVM CLANG compilers." )
+  message( STATUS "Set up for Apple platform compilers." )
 
-  set( CMAKE_C_COMPILER /usr/local/opt/llvm/bin/clang )
-  set( CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ )
+  #set( CMAKE_C_COMPILER /usr/local/opt/llvm/bin/clang )
+  #set( CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ )
 
 endif( )
 
@@ -15,7 +13,7 @@ project( dvs )
 
 option( USE_BOOST_REGEX "Replace std::regex with Boost.Regex" OFF )
 
-# Set standard C++ 17
+# Set standard C++ 23
 set( CMAKE_CXX_STANDARD          23  )
 set( CMAKE_CXX_STANDARD_REQUIRED ON  )
 set( CMAKE_CXX_EXTENSIONS        OFF )
