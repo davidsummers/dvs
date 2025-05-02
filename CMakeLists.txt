@@ -2,7 +2,9 @@ cmake_minimum_required( VERSION 3.28 )
 
 if ( APPLE )
 
-  message( STATUS "Set up for Apple platform compilers." )
+  message( STATUS "Set up for Apple (universal) platform build." )
+
+  set( CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE )
 
   #set( CMAKE_C_COMPILER /usr/local/opt/llvm/bin/clang )
   #set( CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ )
