@@ -80,9 +80,9 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
     // Now read the resulting tree.
     readTreeResult = readTreeCommand.ReadTreeToIndex( dvs_, index, commit.GetTreeOid( ) );
 
-    if ( !readTreeResult.err.empty( ) )
+    if ( !readTreeResult.has_value( ) )
     {
-      return readTreeResult.err;
+      return readTreeResult.error( );
     }
 
     return "";
@@ -91,9 +91,9 @@ Error SwitchBranchCommand::Switch( DVS &dvs_, const std::string &branchName_ )
 
   readTreeResult = readTreeCommand.ReadTreeToDirectory( dvs_, commit.GetTreeOid( ) );
 
-  if ( !readTreeResult.err.empty( ) )
+  if ( !readTreeResult.has_value( ) )
   {
-    return readTreeResult.err;
+    return readTreeResult.error( );
   }
 
   if ( IsBranch( dvs_, branchName_ ) )

@@ -36,7 +36,7 @@ Error ReadTreeCommand::operator( )( DVS &dvs_ )
 
   OidResult result = ReadTreeToDirectory( dvs_, m_HashId );
 
-  return result.err;
+  return result.has_value( ) ? "" : result.error( );
 }
 
 OidResult ReadTreeCommand::ReadTreeToDirectory( DVS &dvs_, const std::string &hashId_ )
@@ -50,9 +50,9 @@ OidResult ReadTreeCommand::ReadTreeToDirectory( DVS &dvs_, const std::string &ha
 
   TreeRecord tree;
 
-  result.err = tree.Read( dvs_, hashId );
+  result = tree.Read( dvs_, hashId );
 
-  if ( !result.err.empty( ) )
+  if ( !result.has_value( ) )
   {
     return result;
   }
@@ -75,10 +75,8 @@ OidResult ReadTreeCommand::ReadTreeToDirectory( DVS &dvs_, const std::string &ha
     }
     else
     {
-      OidResult         result;
       std::stringstream ss;
       ss << "Expected type 'blob' or 'tree' but got '" << HashCommand::LookupType( entry_.type ) << "'." << std::endl;
-      result.err = ss.str( );
     }
   } );
 
@@ -95,9 +93,9 @@ OidResult ReadTreeCommand::ReadTreeToIndex( DVS &dvs_, Index &index_, const std:
 
   TreeRecord tree;
 
-  result.err = tree.Read( dvs_, hashId ); 
+  result = tree.Read( dvs_, hashId ); 
 
-  if ( !result.err.empty( ) )
+  if ( !result.has_value( ) )
   {
     return result;
   }
